@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Aplikace pro chronické pacienty</string>
+    <string name="title_home">Home</string>
+    <string name="chat">Chat</string>
+    <string name="settings">Settings</string>
+    <string name="napis_svoji_zpravu">Napište zprávu</string>
+</resources>
