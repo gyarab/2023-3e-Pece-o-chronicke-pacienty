@@ -6,17 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.aplikaceprochronickpacienty.models.Message
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.annotation.SuppressLint
-import android.speech.tts.TextToSpeech
-import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import android.widget.Toast
-import com.aallam.openai.api.chat.ChatCompletion
-import com.aallam.openai.api.chat.ChatCompletionRequest
-import com.aallam.openai.api.chat.ChatMessage
-import com.aallam.openai.api.chat.ChatRole
-import com.aallam.openai.api.model.ModelId
-import com.aallam.openai.client.OpenAI
-import androidx.compose.runtime.mutableStateOf
 import com.google.api.gax.core.FixedCredentialsProvider
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.auth.oauth2.ServiceAccountCredentials
@@ -44,6 +35,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
+import java.io.InputStream
 import java.util.ArrayList
 import java.util.UUID
 
@@ -63,7 +55,9 @@ class Chat : AppCompatActivity() {
 
     private val client = OkHttpClient()
 
-    private var message: String = ""
+    private var otazka: String = ""
+
+    private var arrayList = arrayListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -80,14 +74,14 @@ class Chat : AppCompatActivity() {
 
             when (item.itemId) {
 
-                R.id.navigation_chat -> {
-                    return@setOnNavigationItemSelectedListener true
-                }
-
                 R.id.navigation_home -> {
 
                     startActivity(Intent(applicationContext, MainActivity::class.java))
                     overridePendingTransition(0, 0)
+                    return@setOnNavigationItemSelectedListener true
+                }
+
+                R.id.navigation_chat -> {
                     return@setOnNavigationItemSelectedListener true
                 }
 
@@ -107,18 +101,21 @@ class Chat : AppCompatActivity() {
 
         binding.btnSend.setOnClickListener {
 
-            message = binding.editMessage.text.toString()
+            otazka = binding.editMessage.text.toString()
 
-            if (message.isNotEmpty()) {
+            if (otazka.isNotEmpty()) {
 
-                addMessageToList(message, false)
-                sendMessageToBot(message)
+                addMessageToList(otazka, false)
+                sendMessageToBot(otazka)
 
             } else {
                 Toast.makeText(this@Chat, "Please enter text!", Toast.LENGTH_SHORT)
                     .show()
             }
         }
+
+        // nacteni souboru JSON a vytvoření motivační hlášky
+        readJSON()
 
         //initialize bot config
         setUpBot()
@@ -136,7 +133,7 @@ class Chat : AppCompatActivity() {
     private fun setUpBot() {
 
         try {
-            val stream = this.resources.openRawResource(R.raw.credential)
+            val stream = this.resources.openRawResource(R.raw.google_dialogflow_credentials)
             val credentials: GoogleCredentials = GoogleCredentials.fromStream(stream)
                 .createScoped("https://www.googleapis.com/auth/cloud-platform")
             val projectId: String = (credentials as ServiceAccountCredentials).projectId
@@ -171,6 +168,7 @@ class Chat : AppCompatActivity() {
                     .setQueryInput(queryInput)
                     .build()
                 val result = sessionsClient?.detectIntent(detectIntentRequest)
+
                 if (result != null) {
                     runOnUiThread {
                         updateUI(result)
@@ -183,18 +181,22 @@ class Chat : AppCompatActivity() {
         }
     }
 
-    fun getResponse(question: String, callback: (String) -> Unit) {
-        val apiKey = "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"
+    /** ChatGPT Response **/
+    private fun getResponse(question: String, callback: (String) -> Unit) {
+
+        val apiKey = BuildConfig.OPENAI_API_KEY
         val url = "https://api.openai.com/v1/chat/completions"
 
         val requestBody = """
         {
             "model": "gpt-3.5-turbo",
-            "messages": [{"role": "user", "content": "$question"}],
+            "messages": [{"role": "system", "content": "You are a helpful assistant."},{"role": "user", "content": "$question"}],
             "max_tokens": 500,
-            "temperature": 0
+            "temperature": 0.7
         }
     """.trimIndent()
+
+        Log.d("OTAZKA", question)
 
         val request = Request.Builder()
             .url(url)
@@ -205,28 +207,35 @@ class Chat : AppCompatActivity() {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("error","API failed",e)
+                Log.e("error", "API failed", e)
             }
 
             override fun onResponse(call: Call, response: Response) {
-
-                val body=response.body?.string()
+                val body = response.body?.string()
                 if (body != null) {
-                    Log.v("data",body)
-                }
-                else{
-                    Log.v("data","empty")
-                }
-                val souborJSON= JSONObject(body)
-                val choices: JSONArray = souborJSON.getJSONArray("choices")
-                val message = choices.getJSONObject(0).getString("message")
-                val messageObject = JSONObject(message)
-                val content = messageObject.optString("content")
+                    Log.v("data", body)
 
-                callback(content.toString())
+                    try {
+                        val jsonResponse = JSONObject(body)
+                        val choices: JSONArray = jsonResponse.getJSONArray("choices")
+                        if (choices.length() > 0) {
+                            val message = choices.getJSONObject(0).getString("message")
+                            val messageObject = JSONObject(message)
+                            val content = messageObject.optString("content")
+                            callback(content)
+                        } else {
+                            Log.e("error", "No choices found in the response.")
+                        }
+                    } catch (e: JSONException) {
+                        Log.e("error", "Error parsing JSON response: ${e.message}")
+                    }
+                } else {
+                    Log.v("data", "empty")
+                }
             }
         })
     }
+
 
     private fun updateUI(response: DetectIntentResponse) {
 
@@ -238,12 +247,67 @@ class Chat : AppCompatActivity() {
 
         } else {
 
-            getResponse(message) { result ->
+            addMessageToList("Typing...",true)
+
+            Log.d("OTAZKA", otazka)
+
+            getResponse(otazka) { result ->
 
                 runOnUiThread {
+
+                    messageList.remove(Message("Typing...", true))
                     addMessageToList(result, true)
                 }
             }
         }
+    }
+
+    private fun readJSON(): String? {
+
+        var json: String? = null
+
+        try {
+
+            val vstup: InputStream = assets.open("data-uzivatele.json")
+            json = vstup.bufferedReader().use{it.readText()}
+
+            val arr = JSONArray(json)
+
+            /*for (i in 0 until arr.length()){
+
+                var objektJSON = arr.getJSONObject(i)
+                arrayList.add(objektJSON.getString("steps_per_day"))
+            }*/
+
+            var objektJSON = arr.getJSONObject(2)
+
+            val kroky = "Kroky: " + objektJSON.getString("steps_per_day") + " kroků"
+            val spanek = "Spánek: " + objektJSON.getString("hours_of_sleep_per_day") + " hodin"
+            val aktivniPohyb = "Aktivní pohyb: " + objektJSON.getString("active_minutes") + " minut"
+
+            val motivacniHlaska = "Vytvoř jednovětnou motivační hlášku pro člověka, který vykonal tyto aktivity za jeden den: $kroky $spanek $aktivniPohyb"
+
+            arrayList.add(motivacniHlaska)
+
+            addMessageToList("Typing...",true)
+
+            /** Motivační hláška **/
+
+            getResponse(motivacniHlaska) { result ->
+
+                runOnUiThread {
+
+                    messageList.remove(Message("Typing...", true))
+                    addMessageToList(result, true)
+                }
+            }
+
+
+        } catch (e:Exception){
+
+            Log.e("ERROR VSTUP", e.toString())
+        }
+
+        return json
     }
 }

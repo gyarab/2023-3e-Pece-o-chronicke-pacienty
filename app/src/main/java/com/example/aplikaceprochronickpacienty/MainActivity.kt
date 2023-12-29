@@ -24,13 +24,13 @@ class MainActivity : AppCompatActivity() {
 
             when (item.itemId) {
 
-                R.id.navigation_chat -> {
-                    startActivity(Intent(applicationContext, Chat::class.java))
-                    overridePendingTransition(0, 0)
+                R.id.navigation_home -> {
                     return@setOnNavigationItemSelectedListener true
                 }
 
-                R.id.navigation_home -> {
+                R.id.navigation_chat -> {
+                    startActivity(Intent(applicationContext, Chat::class.java))
+                    overridePendingTransition(0, 0)
                     return@setOnNavigationItemSelectedListener true
                 }
 
@@ -43,14 +43,5 @@ class MainActivity : AppCompatActivity() {
                 else -> return@setOnNavigationItemSelectedListener false
             }
         }
-
-
-
-        //val navController = findNavController(R.id.nav_host_fragment_activity_main)
-
-        //val appBarConfiguration = AppBarConfiguration(setOf(
-        //        R.id.navigation_home, R.id.navigation_chat, R.id.navigation_settings))
-        //setupActionBarWithNavController(navController, appBarConfiguration)
-        //navView.setupWithNavController(navController)
     }
 }

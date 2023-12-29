@@ -1,0 +1,23 @@
+[
+  {
+    "steps_per_day": 10000,
+    "hours_of_sleep_per_day": 7.5,
+    "active_minutes": 30,
+    "motivation_text_for_user": "Keep up the great work! You're on your way to achieving your fitness goals."
+  },
+
+  {
+    "steps_per_day": 5000,
+    "hours_of_sleep_per_day": 6,
+    "active_minutes": 15,
+    "motivation_text_for_user": "Nice progress! Aim for a little more sleep and activity to further improve your health and well-being."
+  },
+
+  {
+    "steps_per_day": 2000,
+    "hours_of_sleep_per_day": 5,
+    "active_minutes": 5,
+    "motivation_text_for_user": "Don't be discouraged. Even small steps towards a healthy lifestyle can make a big difference."
+  }
+
+]

@@ -5,7 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="8dp"
+    android:paddingTop="20dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:paddingBottom="20dp"
     >
 
     <TextView
@@ -16,14 +19,14 @@
         android:background="@drawable/sablona_zprava_poslana"
         android:fontFamily="@font/open_sans"
         android:includeFontPadding="false"
-        android:lineSpacingExtra="10sp"
+        android:lineSpacingExtra="5sp"
         android:maxWidth="200dp"
         android:paddingStart="14sp"
         android:paddingTop="10dp"
         android:paddingEnd="14sp"
         android:paddingBottom="10dp"
         android:textColor="@color/white"
-        android:textSize="20sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="wrap">
@@ -45,9 +48,9 @@
         android:paddingTop="8dp"
         android:paddingEnd="12sp"
         android:paddingBottom="8dp"
-        android:lineSpacingExtra="10sp"
+        android:lineSpacingExtra="5sp"
         android:textColor="@android:color/black"
-        android:textSize="20sp"
+        android:textSize="16sp"
 
         app:layout_constraintTop_toBottomOf="@id/message_send"
         app:layout_constraintWidth_max="wrap"

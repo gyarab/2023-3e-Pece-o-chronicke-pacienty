@@ -22,15 +22,15 @@ class Settings : AppCompatActivity() {
 
             when (item.itemId) {
 
-                R.id.navigation_chat -> {
+                R.id.navigation_home -> {
+
                     startActivity(Intent(applicationContext, MainActivity::class.java))
                     overridePendingTransition(0, 0)
                     return@setOnNavigationItemSelectedListener true
                 }
 
-                R.id.navigation_home -> {
-
-                    startActivity(Intent(applicationContext, MainActivity::class.java))
+                R.id.navigation_chat -> {
+                    startActivity(Intent(applicationContext, Chat::class.java))
                     overridePendingTransition(0, 0)
                     return@setOnNavigationItemSelectedListener true
                 }
