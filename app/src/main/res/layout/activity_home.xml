@@ -6,11 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="?attr/actionBarSize"
-    tools:context=".MainActivity">
+    tools:context=".navbar.Home">
 
     <TextView
         android:id="@+id/text_main"
-        android:text="Main"
+        android:text="Home"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

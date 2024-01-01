@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("com.google.gms.google-services")
 }
 
 
@@ -64,6 +65,8 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.google.material)
     implementation(libs.androidx.activity)
+    implementation(libs.androidx.annotation)
+    implementation(libs.firebase.database.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -85,4 +88,7 @@ dependencies {
 
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // Firebase
+    implementation(libs.firebase.auth)
 }

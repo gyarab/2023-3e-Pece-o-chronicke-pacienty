@@ -1,4 +1,4 @@
-package com.example.aplikaceprochronickpacienty
+package com.example.aplikaceprochronickpacienty.navbar
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +8,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
+import com.example.aplikaceprochronickpacienty.BuildConfig
+import com.example.aplikaceprochronickpacienty.R
 import com.google.api.gax.core.FixedCredentialsProvider
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.auth.oauth2.ServiceAccountCredentials
@@ -76,7 +78,7 @@ class Chat : AppCompatActivity() {
 
                 R.id.navigation_home -> {
 
-                    startActivity(Intent(applicationContext, MainActivity::class.java))
+                    startActivity(Intent(applicationContext, Home::class.java))
                     overridePendingTransition(0, 0)
                     return@setOnNavigationItemSelectedListener true
                 }
@@ -133,7 +135,7 @@ class Chat : AppCompatActivity() {
     private fun setUpBot() {
 
         try {
-            val stream = this.resources.openRawResource(R.raw.google_dialogflow_credentials)
+            val stream = this.resources.openRawResource(R.raw.dialogflow_credentials)
             val credentials: GoogleCredentials = GoogleCredentials.fromStream(stream)
                 .createScoped("https://www.googleapis.com/auth/cloud-platform")
             val projectId: String = (credentials as ServiceAccountCredentials).projectId

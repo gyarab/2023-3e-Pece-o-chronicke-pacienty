@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "963610977379",
+    "project_id": "aplikace-pro-chronicke-pacient",
+    "storage_bucket": "aplikace-pro-chronicke-pacient.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:963610977379:android:83adf98c1ab65fdc954456",
+        "android_client_info": {
+          "package_name": "com.example.aplikaceprochronickpacienty"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtzzn5nRW97cAXXqs3GmgTnirFTkN6N1w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
