@@ -15,20 +15,20 @@
         android:theme="@style/Theme.AplikaceProChronickéPacienty"
         tools:targetApi="31">
         <activity
+            android:name=".prihlaseni.ObnoveniHesla"
+            android:exported="false" />
+        <activity
             android:name=".prihlaseni.Registrace"
-            android:exported="true" >
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name=".prihlaseni.Prihlaseni"
-            android:exported="true" >
-
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".navbar.Settings"
             android:exported="false" />
@@ -38,8 +38,7 @@
         <activity
             android:name=".navbar.Home"
             android:exported="true"
-            android:label="@string/app_name">
-        </activity>
+            android:label="@string/app_name"></activity>
 
         <meta-data
             android:name="preloaded_fonts"

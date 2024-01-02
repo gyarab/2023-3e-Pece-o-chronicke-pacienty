@@ -141,7 +141,7 @@
                 android:layout_marginTop="25dp"
                 android:text="@string/registrovat_se"
                 android:textColor="@color/white"
-                app:backgroundTint="#6200ee">
+                app:backgroundTint="@color/modro_fialova">
 
             </Button>
 

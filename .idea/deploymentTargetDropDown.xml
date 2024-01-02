@@ -2,6 +2,12 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="Chat">
+        <State />
+      </entry>
+      <entry key="Prihlaseni">
+        <State />
+      </entry>
       <entry key="app">
         <State />
       </entry>

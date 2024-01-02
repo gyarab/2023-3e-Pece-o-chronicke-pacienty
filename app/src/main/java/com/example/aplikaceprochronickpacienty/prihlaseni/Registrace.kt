@@ -21,6 +21,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.aplikaceprochronickpacienty.R
+import com.example.aplikaceprochronickpacienty.navbar.Home
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
@@ -310,17 +313,44 @@ class Registrace : AppCompatActivity() {
                 val uzivatelskeJmeno = registraceUzivatelskeJmeno.text.toString()
                 val heslo = registraceHeslo.text.toString()
 
-                val udajeUzivatele = UdajeUzivatele(jmenoPrijmeni, email, uzivatelskeJmeno, heslo)
-                referenceFirebase.child(uzivatelskeJmeno).setValue(udajeUzivatele)
+                FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, heslo)
 
-                Toast.makeText(
-                    this@Registrace,
-                    "Zaregistrovali jste se úspěšně!",
-                    Toast.LENGTH_SHORT
-                ).show()
+                    .addOnCompleteListener { zprava ->
 
-                val intent = Intent(this@Registrace, Prihlaseni::class.java)
-                startActivity(intent)
+                        if (zprava.isSuccessful) {
+
+                            val uzivatelFirebase: FirebaseUser = zprava.result!!.user!!
+
+                            val prihlaseni: Intent = Intent(
+                                this@Registrace,
+                                Prihlaseni::class.java
+                            )
+
+                            prihlaseni.putExtra("user_id", uzivatelFirebase.uid)
+                            prihlaseni.putExtra("email_id", email)
+
+                            val udajeUzivatele =
+                                UdajeUzivatele(jmenoPrijmeni, email, uzivatelskeJmeno, heslo)
+                            referenceFirebase.child(uzivatelskeJmeno).setValue(udajeUzivatele)
+
+                            Toast.makeText(
+                                this@Registrace,
+                                "Zaregistrovali jste se úspěšně!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            startActivity(prihlaseni)
+                            finish()
+
+                        } else {
+
+                            Toast.makeText(
+                                this@Registrace,
+                                "Nastala chyba " + zprava.exception.toString(),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
             }
         }
     }

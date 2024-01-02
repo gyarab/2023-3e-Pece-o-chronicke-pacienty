@@ -69,6 +69,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
+                    android:layout_marginBottom="5dp"
                     android:autofillHints="@string/heslo"
                     android:background="@drawable/border_registrace"
                     android:drawableStart="@drawable/ic_password"
@@ -91,7 +92,6 @@
                     android:background="@null"
                     android:paddingEnd="15dp"
                     android:paddingTop="30dp"
-                    android:paddingBottom="30dp"
                     android:src="@drawable/ic_eye_hide"
                     tools:ignore="RtlSymmetry">
 
@@ -99,13 +99,29 @@
 
             </RelativeLayout>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/zapomenuti_hesla"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="10dp"
+                android:textColor="@color/modro_fialova"
+                android:textSize="14dp"
+                android:gravity="right"
+                android:paddingEnd="10dp"
+                android:text="@string/zapomenuti_hesla"
+                tools:ignore="RtlHardcoded,RtlSymmetry">
+
+
+            </TextView>
+
             <Button
                 android:id="@+id/prihlaseni_button"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:textColor="@color/white"
                 android:text="@string/prihlasit"
-                app:backgroundTint="#6200ee">
+                app:backgroundTint="@color/modro_fialova">
 
             </Button>
 

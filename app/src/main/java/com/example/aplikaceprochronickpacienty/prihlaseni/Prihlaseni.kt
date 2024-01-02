@@ -36,6 +36,8 @@ class Prihlaseni : AppCompatActivity() {
     // Zobrazit a Skrýt heslo
     private lateinit var prihlaseniEye: ImageButton
 
+    // Zapomenutí hesla
+    private lateinit var zapomenutiHesla: TextView
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,10 +52,19 @@ class Prihlaseni : AppCompatActivity() {
         prihlaseni_button = findViewById(R.id.prihlaseni_button)
         prihlaseniZaregistrujteSe = findViewById(R.id.prihlaseni_nemateUcetZaregistrujteSe)
 
-        // Po kliknutí je uživatel přesměrován na Přihlášení
+        zapomenutiHesla = findViewById(R.id.zapomenuti_hesla)
+
+        // Po kliknutí je uživatel přesměrován na Registraci
         prihlaseniZaregistrujteSe.setOnClickListener {
 
             val intent = Intent(this@Prihlaseni, Registrace::class.java)
+            startActivity(intent)
+        }
+
+        // Po kliknutí je uživatel přesměrován na Zapomenutí hesla
+        zapomenutiHesla.setOnClickListener {
+
+            val intent = Intent(this@Prihlaseni, ObnoveniHesla::class.java)
             startActivity(intent)
         }
 
