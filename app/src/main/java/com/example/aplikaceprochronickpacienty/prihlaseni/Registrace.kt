@@ -24,8 +24,11 @@ import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.navbar.Home
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 
 class Registrace : AppCompatActivity() {
@@ -128,6 +131,47 @@ class Registrace : AppCompatActivity() {
 
             return !TextUtils.isEmpty(email.text.toString()) && Patterns.EMAIL_ADDRESS.matcher(email.text.toString())
                 .matches()
+        }
+
+        /** Komtrola zda email se nachází v databázi **/
+         fun emailExistuje(email: EditText): Boolean {
+
+            val emailText = email.text.toString()
+
+            var vysledek: Boolean = false
+
+            val databazeReference: DatabaseReference =
+                FirebaseDatabase.getInstance().getReference("users")
+
+            databazeReference.addListenerForSingleValueEvent(object : ValueEventListener {
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+
+                    val emails = mutableListOf<String>()
+
+                    for (uzivatelSnapshot in snapshot.children) {
+
+                        val vsechnyEmaily = uzivatelSnapshot.child("email").getValue(String::class.java)
+                        vsechnyEmaily?.let { emails.add(it) }
+                    }
+
+                    if(emails.contains(emailText)) {
+
+                        email.error = "Tento email je již zaregistrovaný"
+
+                    } else {
+
+                        email.error = null
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                }
+            })
+
+            Log.d("VYSLEDEk", vysledek.toString())
+
+            return vysledek
         }
 
         fun checkUzivatel(uzivatel: EditText): Boolean {
@@ -263,14 +307,27 @@ class Registrace : AppCompatActivity() {
 
         fun kontrolaEmail(): Boolean {
 
-            return if (!checkEmail(registraceEmail)) {
+            return when {
 
-                registraceEmail.error = "Tento email není validný"
-                false
+                (registraceEmail.text.toString().isEmpty()) -> {
 
-            } else {
+                    registraceEmail.error = "Email nemůže být prázdný"
+                    false
+                }
 
-                kontrolaChyby(registraceEmail, "Email nemůže být prázdný")
+                !checkEmail(registraceEmail) -> {
+
+                    registraceEmail.error = "Tento email není platný"
+                    false
+                }
+
+                emailExistuje(registraceEmail) -> {
+
+                    registraceEmail.error = "Tento email není zaregistrovaný"
+                    false
+                }
+
+                else -> true
             }
         }
 
@@ -281,16 +338,29 @@ class Registrace : AppCompatActivity() {
 
         fun kontrolaHeslo(): Boolean {
 
-            return if (!checkHeslo(registraceHeslo)) {
+            return when {
 
-                registraceHeslo.error =
-                    "Heslo musí obsahovat minimálně osm znaků, včetně písmen (velká a malá), čísel a speciálních znaků"
-                false
+                !checkHeslo(registraceHeslo) -> {
+                    Toast.makeText(
+                        this@Registrace,
+                        "Heslo musí obsahovat minimálně osm znaků, včetně písmen (velká a malá), čísel a speciálních znaků",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    false
+                }
 
-            } else {
+                registraceHeslo.text.isEmpty() -> {
+                    Toast.makeText(
+                        this@Registrace,
+                        "Heslo nemůže být prázdné",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    false
+                }
 
-                kontrolaChyby(registraceHeslo, "Heslo nemůže být prázdné")
+                else -> true
             }
+
         }
 
         registrace_button.setOnClickListener {
@@ -319,18 +389,21 @@ class Registrace : AppCompatActivity() {
 
                         if (zprava.isSuccessful) {
 
-                            val uzivatelFirebase: FirebaseUser = zprava.result!!.user!!
+                            val uzivatelFirebaseAuth: FirebaseUser = zprava.result!!.user!!
 
-                            val prihlaseni: Intent = Intent(
+                            val prihlaseni = Intent(
                                 this@Registrace,
                                 Prihlaseni::class.java
                             )
 
-                            prihlaseni.putExtra("user_id", uzivatelFirebase.uid)
+                            // Firebase Auth
+                            prihlaseni.putExtra("user_id", uzivatelFirebaseAuth.uid)
                             prihlaseni.putExtra("email_id", email)
 
+                            // Firebase Realtime database
                             val udajeUzivatele =
-                                UdajeUzivatele(jmenoPrijmeni, email, uzivatelskeJmeno, heslo)
+                                UdajeUzivatele(jmenoPrijmeni, email, uzivatelskeJmeno)
+
                             referenceFirebase.child(uzivatelskeJmeno).setValue(udajeUzivatele)
 
                             Toast.makeText(
@@ -346,7 +419,7 @@ class Registrace : AppCompatActivity() {
 
                             Toast.makeText(
                                 this@Registrace,
-                                "Nastala chyba " + zprava.exception.toString(),
+                                "Došlo k chybě " + zprava.exception.toString(),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }

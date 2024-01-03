@@ -19,7 +19,7 @@
             android:exported="false" />
         <activity
             android:name=".prihlaseni.Registrace"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".prihlaseni.Prihlaseni"
             android:exported="true">

@@ -1,33 +1,46 @@
 package com.example.aplikaceprochronickpacienty.prihlaseni
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.util.Log
+import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.navbar.Home
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.Query
 import com.google.firebase.database.ValueEventListener
+
 
 class Prihlaseni : AppCompatActivity() {
 
-    private lateinit var prihlaseniUzivatelskeJmeno: EditText
+
+    private lateinit var prihlaseniEmail: EditText
     private lateinit var prihlaseniHeslo: EditText
 
-    // Přihlášení přes odkaz
+    // Přesměrování přes odkaz
     private lateinit var prihlaseniZaregistrujteSe: TextView
 
     // Tlačítko registrace
@@ -39,6 +52,12 @@ class Prihlaseni : AppCompatActivity() {
     // Zapomenutí hesla
     private lateinit var zapomenutiHesla: TextView
 
+    private lateinit var prihlaseni_google_btn: Button
+    private lateinit var prihlaseni_google_client: GoogleSignInClient
+    val RC_SIGN_IN: Int = 1
+    lateinit var gso: GoogleSignInOptions
+    lateinit var mAuth: FirebaseAuth
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,13 +65,22 @@ class Prihlaseni : AppCompatActivity() {
         supportActionBar?.hide()
         setContentView(R.layout.activity_prihlaseni)
 
-        prihlaseniUzivatelskeJmeno = findViewById(R.id.prihlaseni_uzivatelske_jmeno)
+        prihlaseniEmail = findViewById(R.id.prihlaseni_email)
         prihlaseniHeslo = findViewById(R.id.prihlaseni_heslo)
-
         prihlaseni_button = findViewById(R.id.prihlaseni_button)
         prihlaseniZaregistrujteSe = findViewById(R.id.prihlaseni_nemateUcetZaregistrujteSe)
-
         zapomenutiHesla = findViewById(R.id.zapomenuti_hesla)
+
+        // Přihlášení přes Google
+        prihlaseni_google_btn = findViewById(R.id.prihlaseni_pres_google_btn)
+
+        mAuth = FirebaseAuth.getInstance()
+
+        createRequest()
+
+        prihlaseni_google_btn.setOnClickListener {
+            signIn();
+        }
 
         // Po kliknutí je uživatel přesměrován na Registraci
         prihlaseniZaregistrujteSe.setOnClickListener {
@@ -70,7 +98,7 @@ class Prihlaseni : AppCompatActivity() {
 
         prihlaseni_button.setOnClickListener {
 
-            if (!kontrolaUzivatelskehoJmena() or !kontrolaHesla()) {
+            if (!kontrolaEmail() or !kontrolaHesla()) {
 
                 Toast.makeText(
                     this@Prihlaseni,
@@ -111,47 +139,197 @@ class Prihlaseni : AppCompatActivity() {
         }
     }
 
-    private fun kontrolaChyby(editText: EditText, zprava: String): Boolean {
+    /** Přihlášení přes Google **/
+    private fun createRequest() {
 
-        val text = editText.text.toString()
+        gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+        prihlaseni_google_client = GoogleSignIn.getClient(this, gso);
+    }
 
-        return if (text.isEmpty()) {
+    private fun signIn() {
+        val signInIntent = prihlaseni_google_client.signInIntent
+        startActivityForResult(signInIntent, RC_SIGN_IN)
+    }
 
-            editText.error = zprava
-            false
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
 
-        } else {
+        if (requestCode == RC_SIGN_IN) {
 
-            editText.error = null
-            true
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            val exception = task.exception
+
+            try {
+
+                val account = task.getResult(ApiException::class.java)!!
+                firebaseAuthWithGoogle(account)
+            } catch (e: ApiException) {
+
+                Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT)
+                    .show()
+            }
+
         }
     }
 
+    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
 
-    private fun kontrolaUzivatelskehoJmena(): Boolean {
+        mAuth.signInWithCredential(credential)
 
-        return kontrolaChyby(prihlaseniUzivatelskeJmeno, "Uživatelské jméno nemůže být prázdné")
+            .addOnCompleteListener(this) { task ->
+
+                if (task.isSuccessful) {
+
+                    val googleIntent = Intent(this, Home::class.java)
+
+                    googleIntent.putExtra("email", account.email)
+                    googleIntent.putExtra("name", account.displayName)
+
+                    startActivity(googleIntent)
+
+                } else {
+
+                    Toast.makeText(this@Prihlaseni, task.exception.toString(), Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+    }
+
+    /** Kontrola emailu - zda je validní **/
+    private fun checkEmail(email: EditText): Boolean {
+
+        return !TextUtils.isEmpty(email.text.toString()) && Patterns.EMAIL_ADDRESS.matcher(email.text.toString())
+            .matches()
+    }
+
+    /** Komtrola zda email se nachází v databázi **/
+    private fun emailExistuje(email: EditText): Boolean {
+
+        val emailText = email.text.toString()
+
+        val databazeReference: DatabaseReference =
+            FirebaseDatabase.getInstance().getReference("users")
+
+        databazeReference.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val emails = mutableListOf<String>()
+
+                for (uzivatelSnapshot in snapshot.children) {
+
+                    val vsechnyEmaily = uzivatelSnapshot.child("email").getValue(String::class.java)
+                    vsechnyEmaily?.let { emails.add(it) }
+                }
+
+                if (!emails.contains(emailText)) {
+
+                    email.error = "Tento email není zaregistrovaný"
+
+                } else {
+
+                    email.error = null
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+
+        return false
+    }
+
+    private fun kontrolaEmail(): Boolean {
+
+        return when {
+
+            (prihlaseniEmail.text.toString().isEmpty()) -> {
+
+                prihlaseniEmail.error = "Email nemůže být prázdný"
+                false
+            }
+
+            !checkEmail(prihlaseniEmail) -> {
+
+                prihlaseniEmail.error = "Tento email není platný"
+                false
+            }
+
+            emailExistuje(prihlaseniEmail) -> {
+
+                prihlaseniEmail.error = "Tento email není zaregistrovaný"
+                false
+            }
+
+            else -> true
+        }
     }
 
     private fun kontrolaHesla(): Boolean {
 
-        return kontrolaChyby(prihlaseniHeslo, "Heslo nemůže být prázdné")
+        return if (prihlaseniHeslo.text.toString().isEmpty()) {
+
+            Toast.makeText(
+                this@Prihlaseni,
+                "Heslo nemůže být prázdné",
+                Toast.LENGTH_SHORT,
+            ).show()
+
+            false
+
+        } else {
+
+            true
+        }
     }
 
     private fun kontrolaUzivatele() {
 
-        val uzivatel: String = prihlaseniUzivatelskeJmeno.getText().toString().trim()
+        val uzivatel: String = prihlaseniEmail.getText().toString().trim()
         val heslo: String = prihlaseniHeslo.getText().toString().trim()
 
-        val databazeFirebase: DatabaseReference =
-            FirebaseDatabase.getInstance().getReference("users")
+        //val databazeFirebase: DatabaseReference =
+        //    FirebaseDatabase.getInstance().getReference("users")
 
-        val kontrolaJmena: Query =
-            databazeFirebase.orderByChild("uzivatelskeJmeno").equalTo(uzivatel)
+        //val kontrolaJmena: Query =
+        //    databazeFirebase.orderByChild("uzivatelskeJmeno").equalTo(uzivatel)
 
-        Log.d("KONTROLA JMENA", kontrolaJmena.toString())
+        //Log.d("KONTROLA JMENA", kontrolaJmena.toString())
 
-        kontrolaJmena.addListenerForSingleValueEvent(object : ValueEventListener {
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(uzivatel, heslo)
+
+            .addOnCompleteListener(this) { task ->
+
+                if (task.isSuccessful) {
+
+                    Toast.makeText(
+                        this@Prihlaseni,
+                        "Přihlášení proběhlo úspěšně",
+                        Toast.LENGTH_SHORT,
+                    ).show()
+
+                    val intent = Intent(
+                        this@Prihlaseni,
+                        Home::class.java
+                    )
+
+                    startActivity(intent)
+
+                } else {
+
+                    Toast.makeText(
+                        this@Prihlaseni,
+                        "Nesprávné heslo",
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
+
+        /*kontrolaJmena.addListenerForSingleValueEvent(object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
@@ -166,6 +344,7 @@ class Prihlaseni : AppCompatActivity() {
                     Log.d("HESLO MOJE", heslo)
 
                     Log.d("UZIVATEL", prihlaseniUzivatelskeJmeno.text.toString())
+
 
 
                     if (hesloZfirebase.toString() == heslo) {
@@ -208,7 +387,7 @@ class Prihlaseni : AppCompatActivity() {
 
             override fun onCancelled(error: DatabaseError) {
             }
-        })
+        })*/
 
     }
 

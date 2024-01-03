@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "963610977379",
+    "firebase_url": "https://aplikace-pro-chronicke-pacient-default-rtdb.firebaseio.com",
     "project_id": "aplikace-pro-chronicke-pacient",
     "storage_bucket": "aplikace-pro-chronicke-pacient.appspot.com"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.aplikaceprochronickpacienty"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "963610977379-a5u0of9gt31bajq44kfnhqu2rsrr4ugs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.aplikaceprochronickpacienty",
+            "certificate_hash": "47e8d75313df769037a1c62bc7ced37fdf6fb006"
+          }
+        },
+        {
+          "client_id": "963610977379-399461i9muuc71lr1olra6tuigdcnluc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDtzzn5nRW97cAXXqs3GmgTnirFTkN6N1w"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "963610977379-399461i9muuc71lr1olra6tuigdcnluc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

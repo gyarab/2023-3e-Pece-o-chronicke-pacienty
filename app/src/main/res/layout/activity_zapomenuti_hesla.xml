@@ -64,8 +64,8 @@
                 android:layout_height="55dp"
                 android:text="@string/resetovat_heslo"
                 android:drawableLeft="@drawable/ic_password_reset"
-
                 android:paddingStart="10dp"
+                android:paddingEnd="35dp"
                 app:backgroundTint="@color/modro_fialova"
                 android:textColor="@color/white" />
 
