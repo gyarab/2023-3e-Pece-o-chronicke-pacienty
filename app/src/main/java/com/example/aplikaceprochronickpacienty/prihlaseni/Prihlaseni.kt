@@ -1,7 +1,6 @@
 package com.example.aplikaceprochronickpacienty.prihlaseni
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -15,16 +14,14 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.aplikaceprochronickpacienty.R
-import com.example.aplikaceprochronickpacienty.navbar.Home
+import com.example.aplikaceprochronickpacienty.navbar.Prehled
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.DataSnapshot
@@ -54,9 +51,9 @@ class Prihlaseni : AppCompatActivity() {
 
     private lateinit var prihlaseni_google_btn: Button
     private lateinit var prihlaseni_google_client: GoogleSignInClient
-    val RC_SIGN_IN: Int = 1
-    lateinit var gso: GoogleSignInOptions
-    lateinit var mAuth: FirebaseAuth
+    private val RC_SIGN_IN: Int = 1
+    private lateinit var googleSignInOptions: GoogleSignInOptions
+    private var googleSignIn = false
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,49 +68,9 @@ class Prihlaseni : AppCompatActivity() {
         prihlaseniZaregistrujteSe = findViewById(R.id.prihlaseni_nemateUcetZaregistrujteSe)
         zapomenutiHesla = findViewById(R.id.zapomenuti_hesla)
 
-        // Přihlášení přes Google
-        prihlaseni_google_btn = findViewById(R.id.prihlaseni_pres_google_btn)
-
-        mAuth = FirebaseAuth.getInstance()
-
-        createRequest()
-
-        prihlaseni_google_btn.setOnClickListener {
-            signIn();
-        }
-
-        // Po kliknutí je uživatel přesměrován na Registraci
-        prihlaseniZaregistrujteSe.setOnClickListener {
-
-            val intent = Intent(this@Prihlaseni, Registrace::class.java)
-            startActivity(intent)
-        }
-
-        // Po kliknutí je uživatel přesměrován na Zapomenutí hesla
-        zapomenutiHesla.setOnClickListener {
-
-            val intent = Intent(this@Prihlaseni, ObnoveniHesla::class.java)
-            startActivity(intent)
-        }
-
-        prihlaseni_button.setOnClickListener {
-
-            if (!kontrolaEmail() or !kontrolaHesla()) {
-
-                Toast.makeText(
-                    this@Prihlaseni,
-                    "Prosím vyplňte chybějící údaje",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-            } else {
-                kontrolaUzivatele()
-
-            }
-        }
+        prihlaseniUzivatele()
 
         // Viditelnost při psaní hesla
-
         prihlaseniEye = findViewById(R.id.registrace_eye_show)
 
         prihlaseniEye.setOnClickListener {
@@ -139,64 +96,152 @@ class Prihlaseni : AppCompatActivity() {
         }
     }
 
-    /** Přihlášení přes Google **/
-    private fun createRequest() {
+    /** Hlavní funkce pro přihlášení uživatele **/
+    private fun prihlaseniUzivatele() {
 
-        gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        val uzivatel = FirebaseAuth.getInstance().currentUser
+
+        if (uzivatel != null) {
+            Log.d("JMENO", uzivatel.displayName.toString())
+            Log.d("EMAIL", uzivatel.email.toString())
+        }
+
+        if (uzivatel != null) {
+
+            // Uživatel je přihlášen
+            val intent = Intent(this@Prihlaseni, Prehled::class.java)
+            startActivity(intent)
+
+        } else {
+
+            /** Uživatel není přihlášen **/
+
+            // Výchozí přihlášení
+            prihlaseni_button.setOnClickListener {
+
+                if (!kontrolaEmail() or !kontrolaHesla()) {
+
+                    return@setOnClickListener
+
+                } else {
+                    kontrolaUzivatele()
+
+                }
+            }
+
+            // Přihlášení přes Google
+            prihlaseni_google_btn = findViewById(R.id.prihlaseni_pres_google_btn)
+
+            vytvoreniZadostiGoogle()
+
+            prihlaseni_google_btn.setOnClickListener {
+
+                googleSignIn = true
+                prihlaseniIntent();
+            }
+
+            // Po kliknutí je uživatel přesměrován na Registraci
+            prihlaseniZaregistrujteSe.setOnClickListener {
+
+                val intent = Intent(this@Prihlaseni, Registrace::class.java)
+                startActivity(intent)
+            }
+
+            // Po kliknutí je uživatel přesměrován na Zapomenutí hesla
+            zapomenutiHesla.setOnClickListener {
+
+                val intent = Intent(this@Prihlaseni, ObnoveniHesla::class.java)
+                startActivity(intent)
+            }
+        }
+    }
+
+    /** Přihlášení přes Google **/
+    private fun vytvoreniZadostiGoogle() {
+
+        // Nastavení přihlášení
+        googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
-        prihlaseni_google_client = GoogleSignIn.getClient(this, gso);
+
+        // Google Client Set up
+        prihlaseni_google_client = GoogleSignIn.getClient(this, googleSignInOptions)
     }
 
-    private fun signIn() {
+    /** Vytvoření okna pro přihlášení přes Google **/
+    private fun prihlaseniIntent() {
         val signInIntent = prihlaseni_google_client.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    /** Pokus o přihlášení přes Google **/
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(zadost: Int, vysledek: Int, data: Intent?) {
 
-        if (requestCode == RC_SIGN_IN) {
+        super.onActivityResult(zadost, vysledek, data)
 
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            val exception = task.exception
+        if (zadost == RC_SIGN_IN) {
+
+            val zadost = GoogleSignIn.getSignedInAccountFromIntent(data)
 
             try {
 
-                val account = task.getResult(ApiException::class.java)!!
+                val account = zadost.getResult(ApiException::class.java)!!
                 firebaseAuthWithGoogle(account)
+
             } catch (e: ApiException) {
 
-                Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT)
+                Toast.makeText(this, "Přihlášení se nezdařilo", Toast.LENGTH_SHORT)
                     .show()
             }
 
         }
     }
 
+    /** Autentizace uživatele přes Firebase **/
     private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
+
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
 
-        mAuth.signInWithCredential(credential)
+        FirebaseAuth.getInstance().signInWithCredential(credential)
 
-            .addOnCompleteListener(this) { task ->
+            .addOnCompleteListener(this) { zprava ->
 
-                if (task.isSuccessful) {
+                if (zprava.isSuccessful) {
 
-                    val googleIntent = Intent(this, Home::class.java)
+                    if (!account.email?.let { emailNeexistuje(it,null) }!!) {
 
-                    googleIntent.putExtra("email", account.email)
-                    googleIntent.putExtra("name", account.displayName)
+                        return@addOnCompleteListener
 
-                    startActivity(googleIntent)
+                    } else {
+
+                        // Realtime Firebase
+                        pridatUzivatele_Realtime(account)
+
+                        // Google Auth - pokračování
+                        val googleIntent = Intent(this, Prehled::class.java)
+                        startActivity(googleIntent)
+                    }
 
                 } else {
 
-                    Toast.makeText(this@Prihlaseni, task.exception.toString(), Toast.LENGTH_SHORT)
+                    Toast.makeText(this@Prihlaseni, zprava.exception.toString(), Toast.LENGTH_SHORT)
                         .show()
                 }
             }
+    }
+
+    /** Přidání uživatele do Firebase - Realtime database  **/
+    private fun pridatUzivatele_Realtime(account: GoogleSignInAccount) {
+
+        val databazeFirebase = FirebaseDatabase.getInstance()
+        val referenceFirebase = databazeFirebase.getReference("users")
+
+        val udajeUzivatele = UdajeUzivatele(account.displayName, account.email, account.givenName)
+
+        // V databazi Firebase Realtime se vytvori novy uzivatel se udaji
+        account.givenName?.let { referenceFirebase.child(it).setValue(udajeUzivatele) }
     }
 
     /** Kontrola emailu - zda je validní **/
@@ -206,10 +251,8 @@ class Prihlaseni : AppCompatActivity() {
             .matches()
     }
 
-    /** Komtrola zda email se nachází v databázi **/
-    private fun emailExistuje(email: EditText): Boolean {
-
-        val emailText = email.text.toString()
+    /** Kontrola zda email se nachází v databázi **/
+    private fun emailNeexistuje(email: String, editText: EditText?): Boolean {
 
         val databazeReference: DatabaseReference =
             FirebaseDatabase.getInstance().getReference("users")
@@ -226,13 +269,18 @@ class Prihlaseni : AppCompatActivity() {
                     vsechnyEmaily?.let { emails.add(it) }
                 }
 
-                if (!emails.contains(emailText)) {
+                if (!emails.contains(email)) {
 
-                    email.error = "Tento email není zaregistrovaný"
+                    if (editText != null) {
+                        editText.error = "Tento email není zaregistrovaný"
+                    }
 
-                } else {
+                } else if (emails.contains(email) && googleSignIn) {
 
-                    email.error = null
+                    Toast.makeText(this@Prihlaseni, "Tento email je již zaregistrovaný", Toast.LENGTH_SHORT)
+                        .show()
+
+                    googleSignIn = false
                 }
             }
 
@@ -243,6 +291,7 @@ class Prihlaseni : AppCompatActivity() {
         return false
     }
 
+    /** Finální kontrola emailu uživatele **/
     private fun kontrolaEmail(): Boolean {
 
         return when {
@@ -259,9 +308,8 @@ class Prihlaseni : AppCompatActivity() {
                 false
             }
 
-            emailExistuje(prihlaseniEmail) -> {
+            emailNeexistuje(prihlaseniEmail.text.toString(),prihlaseniEmail) -> {
 
-                prihlaseniEmail.error = "Tento email není zaregistrovaný"
                 false
             }
 
@@ -269,6 +317,7 @@ class Prihlaseni : AppCompatActivity() {
         }
     }
 
+    /** Finální kontrola hesla uživatele **/
     private fun kontrolaHesla(): Boolean {
 
         return if (prihlaseniHeslo.text.toString().isEmpty()) {
@@ -287,6 +336,7 @@ class Prihlaseni : AppCompatActivity() {
         }
     }
 
+    /** Celková kontrola uživatele **/
     private fun kontrolaUzivatele() {
 
         val uzivatel: String = prihlaseniEmail.getText().toString().trim()
@@ -314,7 +364,7 @@ class Prihlaseni : AppCompatActivity() {
 
                     val intent = Intent(
                         this@Prihlaseni,
-                        Home::class.java
+                        Prehled::class.java
                     )
 
                     startActivity(intent)

@@ -26,7 +26,10 @@
     <string name="nemate_zatim_ucet_zaregistrujte_se">Nemáte zatím účet? <b>Zaregistrujte se</b></string>
     <string name="zapomenuti_hesla">Zapomněli jste heslo?</string>
     <string name="zapomenut_hesla">Zapomenutí hesla</string>
-    <string name="resetovat_heslo">Resetovat heslo</string>
+    <string name="obnovit_heslo">Obnovit heslo</string>
     <string name="nebo">NEBO</string>
     <string name="pokracovat_pres_google">Pokračovat přes Google</string>
+    <string name="profil">Profil</string>
+    <string name="prehled">Přehled</string>
+    <string name="odhlasit_se">Odhlásit se</string>
 </resources>

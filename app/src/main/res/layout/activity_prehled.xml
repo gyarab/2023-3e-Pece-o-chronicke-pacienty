@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="?attr/actionBarSize"
-    tools:context=".navbar.Home">
+    tools:context=".navbar.Prehled">
 
     <TextView
         android:id="@+id/text_main"

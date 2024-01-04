@@ -6,19 +6,19 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.aplikaceprochronickpacienty.R
-import com.example.aplikaceprochronickpacienty.databinding.ActivityHomeBinding
+import com.example.aplikaceprochronickpacienty.databinding.ActivityPrehledBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class Home : AppCompatActivity() {
+class Prehled : AppCompatActivity() {
 
-    private lateinit var binding: ActivityHomeBinding
+    private lateinit var binding: ActivityPrehledBinding
     private lateinit var textView: TextView
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityHomeBinding.inflate(layoutInflater)
+        binding = ActivityPrehledBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val navView: BottomNavigationView = findViewById(R.id.bottom_nav)
@@ -40,7 +40,7 @@ class Home : AppCompatActivity() {
                 }
 
                 R.id.navigation_settings -> {
-                    startActivity(Intent(applicationContext, Settings::class.java))
+                    startActivity(Intent(applicationContext, Ucet::class.java))
                     overridePendingTransition(0, 0)
                     return@setOnNavigationItemSelectedListener true
                 }
@@ -51,9 +51,9 @@ class Home : AppCompatActivity() {
 
         textView = findViewById(R.id.text_main)
 
-        val email = intent.getStringExtra("email")
+        /*val email = intent.getStringExtra("email")
         val displayName = intent.getStringExtra("name")
 
-        textView.text = email + "\n" + displayName
+        textView.text = email + "\n" + displayName*/
     }
 }

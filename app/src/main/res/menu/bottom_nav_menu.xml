@@ -4,7 +4,7 @@
     <item
         android:id="@+id/navigation_home"
         android:icon="@drawable/ic_home_black_24dp"
-        android:title="@string/title_home" />
+        android:title="@string/prehled" />
 
     <item
         android:id="@+id/navigation_chat"
@@ -13,7 +13,7 @@
 
     <item
         android:id="@+id/navigation_settings"
-        android:icon="@drawable/ic_settings_black_24dp"
-        android:title="@string/settings" />
+        android:icon="@drawable/ic_account"
+        android:title="@string/profil" />
 
 </menu>

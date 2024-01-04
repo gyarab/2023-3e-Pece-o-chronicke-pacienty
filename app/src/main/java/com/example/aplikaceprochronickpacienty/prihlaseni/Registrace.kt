@@ -11,7 +11,6 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.util.Log
 import android.util.Patterns
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -21,7 +20,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.aplikaceprochronickpacienty.R
-import com.example.aplikaceprochronickpacienty.navbar.Home
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
@@ -275,7 +273,7 @@ class Registrace : AppCompatActivity() {
             }
         }
 
-
+        /** Kontrola, zda text ve vstupu není prázdný **/
         fun kontrolaChyby(editText: EditText, zprava: String): Boolean {
 
             val text = editText.text.toString()
@@ -292,6 +290,7 @@ class Registrace : AppCompatActivity() {
             }
         }
 
+        /** Kontrola slov celého jména **/
         fun kontrolaJmenoAprijmeni(): Boolean {
 
             return if (!checkPocetSlov(registraceJmenoPrijmeni)) {
@@ -304,7 +303,7 @@ class Registrace : AppCompatActivity() {
             }
         }
 
-
+        /** Kontrola emailu **/
         fun kontrolaEmail(): Boolean {
 
             return when {
@@ -331,11 +330,19 @@ class Registrace : AppCompatActivity() {
             }
         }
 
+        /** Kontrola uživatelského jména, zda není prázdné **/
         fun kontrolaUzivatelskeJmeno(): Boolean {
 
             return kontrolaChyby(registraceUzivatelskeJmeno, "Uživatelské jméno nemůže být prázdné")
         }
 
+        /** Kontrola hesla, musí obsahovat minimálně:
+         *
+         * - osm znaků
+         * - malé a velké písmeno
+         * - speciální znak (tečka, čárka, atd.)
+         *
+         * **/
         fun kontrolaHeslo(): Boolean {
 
             return when {
@@ -363,8 +370,10 @@ class Registrace : AppCompatActivity() {
 
         }
 
+        /** Kliknutí na tlačítko registrace **/
         registrace_button.setOnClickListener {
 
+            // Kontrola, jestli všechny metody jsou vyplněné správně
             if (!kontrolaJmenoAprijmeni() or !kontrolaEmail() or !kontrolaUzivatelskeJmeno() or !kontrolaHeslo()) {
 
                 Toast.makeText(
@@ -383,10 +392,12 @@ class Registrace : AppCompatActivity() {
                 val uzivatelskeJmeno = registraceUzivatelskeJmeno.text.toString()
                 val heslo = registraceHeslo.text.toString()
 
+                // Vytvoření uživatele v databázi Firebase - Auth, s emailem a heslem
                 FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, heslo)
 
                     .addOnCompleteListener { zprava ->
 
+                        // Pokud je žádost úspěšná, spustí se okno přihlášení
                         if (zprava.isSuccessful) {
 
                             val uzivatelFirebaseAuth: FirebaseUser = zprava.result!!.user!!

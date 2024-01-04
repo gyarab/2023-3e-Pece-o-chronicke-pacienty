@@ -34,7 +34,7 @@ class ObnoveniHesla : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         supportActionBar?.hide()
-        setContentView(R.layout.activity_zapomenuti_hesla)
+        setContentView(R.layout.activity_obnoveni_hesla)
 
         email = findViewById(R.id.reset_email)
         button_reset = findViewById(R.id.reset_button)
@@ -127,11 +127,9 @@ class ObnoveniHesla : AppCompatActivity() {
             } else {
 
                 // FirebaseAuth - ověření
-                firebaseAuth = FirebaseAuth.getInstance()
-
                 Log.d("EMAIL", emailText)
 
-                firebaseAuth.sendPasswordResetEmail(emailText).addOnSuccessListener {
+                FirebaseAuth.getInstance().sendPasswordResetEmail(emailText).addOnSuccessListener {
 
                     Toast.makeText(
                         this@ObnoveniHesla,
@@ -142,15 +140,6 @@ class ObnoveniHesla : AppCompatActivity() {
                     val intent = Intent(this@ObnoveniHesla, Prihlaseni::class.java)
                     startActivity(intent)
 
-                }
-
-                firebaseAuth.sendPasswordResetEmail(emailText).addOnCanceledListener {
-
-                    Toast.makeText(
-                        this@ObnoveniHesla,
-                        "Při posílání zprávy na váš email došlo k chybě",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
             }
         }

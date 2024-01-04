@@ -78,7 +78,7 @@ class Chat : AppCompatActivity() {
 
                 R.id.navigation_home -> {
 
-                    startActivity(Intent(applicationContext, Home::class.java))
+                    startActivity(Intent(applicationContext, Prehled::class.java))
                     overridePendingTransition(0, 0)
                     return@setOnNavigationItemSelectedListener true
                 }
@@ -88,7 +88,7 @@ class Chat : AppCompatActivity() {
                 }
 
                 R.id.navigation_settings -> {
-                    startActivity(Intent(applicationContext, Settings::class.java))
+                    startActivity(Intent(applicationContext, Ucet::class.java))
                     overridePendingTransition(0, 0)
                     return@setOnNavigationItemSelectedListener true
                 }
