@@ -32,4 +32,6 @@
     <string name="profil">Profil</string>
     <string name="prehled">Přehled</string>
     <string name="odhlasit_se">Odhlásit se</string>
+    <string name="profilov_obrazek_uzivatele">Profilový obrázek uživatele</string>
+    <string name="vyberte_obrazek">Vyberte obrázek</string>
 </resources>
