@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("com.google.gms.google-services")
+    id("kotlin-kapt")
 }
 
 
@@ -89,8 +90,21 @@ dependencies {
     // OkHttp
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
-    // Firebase
+    // Firebase database
     implementation(libs.firebase.auth)
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+
+    // Room database
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-ktx:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
+
+    // Lifecycle components
+    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
+
+    // CSV
+    implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.2")
 }

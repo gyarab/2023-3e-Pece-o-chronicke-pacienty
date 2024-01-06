@@ -295,14 +295,14 @@ class Chat : AppCompatActivity() {
 
             /** Motivační hláška **/
 
-            getResponse(motivacniHlaska) { result ->
+            /*getResponse(motivacniHlaska) { result ->
 
                 runOnUiThread {
 
                     messageList.remove(Message("Typing...", true))
                     addMessageToList(result, true)
                 }
-            }
+            }*/
 
 
         } catch (e:Exception){
