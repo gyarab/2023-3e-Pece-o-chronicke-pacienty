@@ -66,7 +66,7 @@ class Prehled : AppCompatActivity() {
 
         uzivatelViewModel = ViewModelProvider(this).get(UzivatelViewModel::class.java)
 
-        ulozitData()
+        //ulozitData()
 
         /*val email = intent.getStringExtra("email")
         val displayName = intent.getStringExtra("name")

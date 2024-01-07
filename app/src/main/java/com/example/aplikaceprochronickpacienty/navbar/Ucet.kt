@@ -3,15 +3,16 @@ package com.example.aplikaceprochronickpacienty.navbar
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.text.method.ScrollingMovementMethod
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.prihlaseni.Prihlaseni
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 
@@ -26,6 +27,9 @@ class Ucet : AppCompatActivity() {
     private lateinit var ucet_vyska: TextView
     private lateinit var ucet_vaha: TextView
     private lateinit var ucet_vek: TextView
+
+    private lateinit var odhlaseni_google_client: GoogleSignInClient
+    private lateinit var googleSignOutOptions: GoogleSignInOptions
 
 
     @SuppressLint("MissingInflatedId")
@@ -92,6 +96,14 @@ class Ucet : AppCompatActivity() {
         odhlasitButton.setOnClickListener {
 
             // Odhlášení z Firebase - Auth
+            googleSignOutOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build()
+
+            // Google Client Set up
+            odhlaseni_google_client = GoogleSignIn.getClient(this, googleSignOutOptions)
+            odhlaseni_google_client.signOut()
             FirebaseAuth.getInstance().signOut()
 
             // Přesunutí na aktivitu Přihlášení

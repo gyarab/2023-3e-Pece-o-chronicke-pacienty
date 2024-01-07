@@ -1,5 +1,6 @@
 package com.example.aplikaceprochronickpacienty.prihlaseni
 
+import android.R.attr.name
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.Drawable
@@ -20,8 +21,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.aplikaceprochronickpacienty.R
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -407,15 +410,24 @@ class Registrace : AppCompatActivity() {
                                 Prihlaseni::class.java
                             )
 
-                            // Firebase Auth
-                            prihlaseni.putExtra("user_id", uzivatelFirebaseAuth.uid)
-                            prihlaseni.putExtra("email_id", email)
+                            val profileUpdates = UserProfileChangeRequest.Builder()
+                                .setDisplayName(jmenoPrijmeni)
+                                .build()
+
+                            uzivatelFirebaseAuth.updateProfile(profileUpdates).addOnCompleteListener(
+                                OnCompleteListener<Void?> { task ->
+
+                                    Log.d("JMENO", uzivatelFirebaseAuth.displayName.toString())
+                                })
+
 
                             // Firebase Realtime database
                             val udajeUzivatele =
                                 UdajeUzivatele(jmenoPrijmeni, email, uzivatelskeJmeno)
 
                             referenceFirebase.child(uzivatelskeJmeno).setValue(udajeUzivatele)
+
+                            referenceFirebase.child("registrovaneEmaily").child("emaily").setValue(email)
 
                             Toast.makeText(
                                 this@Registrace,
@@ -424,7 +436,6 @@ class Registrace : AppCompatActivity() {
                             ).show()
 
                             startActivity(prihlaseni)
-                            finish()
 
                         } else {
 

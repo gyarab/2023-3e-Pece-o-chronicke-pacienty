@@ -54,6 +54,7 @@ class Prihlaseni : AppCompatActivity() {
     private val RC_SIGN_IN: Int = 1
     private lateinit var googleSignInOptions: GoogleSignInOptions
     private var googleSignIn = false
+    private var emails: MutableList<String> = mutableListOf()
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,12 +100,28 @@ class Prihlaseni : AppCompatActivity() {
     /** Hlavní funkce pro přihlášení uživatele **/
     private fun prihlaseniUzivatele() {
 
-        val uzivatel = FirebaseAuth.getInstance().currentUser
+        var prihlasit = false
 
-        if (uzivatel != null) {
-            Log.d("JMENO", uzivatel.displayName.toString())
-            Log.d("EMAIL", uzivatel.email.toString())
-        }
+        val databazeFirebase = FirebaseDatabase.getInstance()
+        val referenceFirebase = databazeFirebase.getReference("users")
+
+        referenceFirebase.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (uzivatelSnapshot in snapshot.children) {
+
+                    val vsechnyEmaily = uzivatelSnapshot.child("emaily").getValue(String::class.java)
+                    vsechnyEmaily?.let { emails.add(it) }
+                }
+
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+
+        val uzivatel = FirebaseAuth.getInstance().currentUser
 
         if (uzivatel != null) {
 
@@ -132,9 +149,9 @@ class Prihlaseni : AppCompatActivity() {
             // Přihlášení přes Google
             prihlaseni_google_btn = findViewById(R.id.prihlaseni_pres_google_btn)
 
-            vytvoreniZadostiGoogle()
-
             prihlaseni_google_btn.setOnClickListener {
+
+                vytvoreniZadostiGoogle()
 
                 googleSignIn = true
                 prihlaseniIntent();
@@ -204,17 +221,28 @@ class Prihlaseni : AppCompatActivity() {
 
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
 
-        FirebaseAuth.getInstance().signInWithCredential(credential)
+        if (emails.contains(account.email)) {
 
-            .addOnCompleteListener(this) { zprava ->
+            Toast.makeText(
+                this@Prihlaseni,
+                "Tento email je již zaregistrovaný",
+                Toast.LENGTH_SHORT
+            )
+                .show()
 
-                if (zprava.isSuccessful) {
+            Log.d("EMAILY",emails.toString())
 
-                    if (!account.email?.let { emailNeexistuje(it,null) }!!) {
+            prihlaseni_google_client.signOut()
 
-                        return@addOnCompleteListener
+            return
 
-                    } else {
+        } else {
+
+            FirebaseAuth.getInstance().signInWithCredential(credential)
+
+                .addOnCompleteListener(this) { zprava ->
+
+                    if (zprava.isSuccessful) {
 
                         // Realtime Firebase
                         pridatUzivatele_Realtime(account)
@@ -222,14 +250,19 @@ class Prihlaseni : AppCompatActivity() {
                         // Google Auth - pokračování
                         val googleIntent = Intent(this, Prehled::class.java)
                         startActivity(googleIntent)
+
+
+                    } else {
+
+                        Toast.makeText(
+                            this@Prihlaseni,
+                            zprava.exception.toString(),
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
                     }
-
-                } else {
-
-                    Toast.makeText(this@Prihlaseni, zprava.exception.toString(), Toast.LENGTH_SHORT)
-                        .show()
                 }
-            }
+        }
     }
 
     /** Přidání uživatele do Firebase - Realtime database  **/
@@ -254,39 +287,27 @@ class Prihlaseni : AppCompatActivity() {
     /** Kontrola zda email se nachází v databázi **/
     private fun emailNeexistuje(email: String, editText: EditText?): Boolean {
 
-        val databazeReference: DatabaseReference =
-            FirebaseDatabase.getInstance().getReference("users")
+        Log.d("EMAILY", emails.toString())
 
-        databazeReference.addListenerForSingleValueEvent(object : ValueEventListener {
+        if (!emails.contains(email)) {
 
-            override fun onDataChange(snapshot: DataSnapshot) {
-
-                val emails = mutableListOf<String>()
-
-                for (uzivatelSnapshot in snapshot.children) {
-
-                    val vsechnyEmaily = uzivatelSnapshot.child("email").getValue(String::class.java)
-                    vsechnyEmaily?.let { emails.add(it) }
-                }
-
-                if (!emails.contains(email)) {
-
-                    if (editText != null) {
-                        editText.error = "Tento email není zaregistrovaný"
-                    }
-
-                } else if (emails.contains(email) && googleSignIn) {
-
-                    Toast.makeText(this@Prihlaseni, "Tento email je již zaregistrovaný", Toast.LENGTH_SHORT)
-                        .show()
-
-                    googleSignIn = false
-                }
+            if (editText != null) {
+                editText.error = "Tento email není zaregistrovaný"
             }
 
-            override fun onCancelled(error: DatabaseError) {
-            }
-        })
+        } else if (emails.contains(email) && googleSignIn) {
+
+            Toast.makeText(
+                this@Prihlaseni,
+                "Tento email je již zaregistrovaný",
+                Toast.LENGTH_SHORT
+            )
+                .show()
+
+            prihlaseni_google_client.signOut()
+
+            googleSignIn = false
+        }
 
         return false
     }
@@ -308,7 +329,7 @@ class Prihlaseni : AppCompatActivity() {
                 false
             }
 
-            emailNeexistuje(prihlaseniEmail.text.toString(),prihlaseniEmail) -> {
+            emailNeexistuje(prihlaseniEmail.text.toString(), prihlaseniEmail) -> {
 
                 false
             }
