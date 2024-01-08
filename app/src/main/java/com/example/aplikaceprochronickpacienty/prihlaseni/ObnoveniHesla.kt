@@ -17,6 +17,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.aplikaceprochronickpacienty.R
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class ObnoveniHesla : AppCompatActivity() {
 
@@ -28,7 +32,8 @@ class ObnoveniHesla : AppCompatActivity() {
 
     private lateinit var prihlaseniZaregistrujteSe:TextView
 
-    private lateinit var firebaseAuth: FirebaseAuth
+    private var mapa: HashMap<String, Boolean> = HashMap()
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,9 +98,37 @@ class ObnoveniHesla : AppCompatActivity() {
             }
         })
 
+        val databazeFirebase = FirebaseDatabase.getInstance()
+        val referenceFirebase = databazeFirebase.getReference("users")
+
+        // Získání typu emailu uživatele
+        referenceFirebase.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                for (uzivatelSnapshot in snapshot.children) {
+
+                    val emaily = uzivatelSnapshot.child("email").getValue(String::class.java)
+                    val googleUcet = uzivatelSnapshot.child("googleUcet").getValue(Boolean::class.java)
+
+                    if (emaily != null && googleUcet != null) {
+
+                        mapa.put(emaily,googleUcet)
+                        Log.d("MAPA",mapa.toString())
+                    }
+                }
+
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+
         fun kontrolaEmail(): Boolean {
 
             emailText = email.text.toString()
+
+            val ucetGoogle = mapa.get(emailText)
 
             return when {
                 !checkEmail(email) -> {
@@ -110,6 +143,18 @@ class ObnoveniHesla : AppCompatActivity() {
                     false
                 }
 
+                (!mapa.containsKey(emailText) && ucetGoogle == false) -> {
+
+                    email.error = "Tento email není zaregistrovaný"
+                    false
+                }
+
+                (mapa.containsKey(emailText) && ucetGoogle == true) -> {
+
+                    email.error = "Tento typ emailu je Google"
+                    false
+                }
+
                 else -> true
             }
         }
@@ -120,7 +165,7 @@ class ObnoveniHesla : AppCompatActivity() {
 
                 Toast.makeText(
                     this@ObnoveniHesla,
-                    "Prosím vyplňte email",
+                    "Někde nastala chyba",
                     Toast.LENGTH_SHORT
                 ).show()
 

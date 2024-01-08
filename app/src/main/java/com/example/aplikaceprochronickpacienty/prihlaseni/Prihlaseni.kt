@@ -2,6 +2,7 @@ package com.example.aplikaceprochronickpacienty.prihlaseni
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.text.method.HideReturnsTransformationMethod
@@ -53,8 +54,7 @@ class Prihlaseni : AppCompatActivity() {
     private lateinit var prihlaseni_google_client: GoogleSignInClient
     private val RC_SIGN_IN: Int = 1
     private lateinit var googleSignInOptions: GoogleSignInOptions
-    private var googleSignIn = false
-    private var emails: MutableList<String> = mutableListOf()
+    private var mapa: HashMap<String, Boolean> = HashMap()
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,8 +100,6 @@ class Prihlaseni : AppCompatActivity() {
     /** Hlavní funkce pro přihlášení uživatele **/
     private fun prihlaseniUzivatele() {
 
-        var prihlasit = false
-
         val databazeFirebase = FirebaseDatabase.getInstance()
         val referenceFirebase = databazeFirebase.getReference("users")
 
@@ -111,8 +109,14 @@ class Prihlaseni : AppCompatActivity() {
 
                 for (uzivatelSnapshot in snapshot.children) {
 
-                    val vsechnyEmaily = uzivatelSnapshot.child("emaily").getValue(String::class.java)
-                    vsechnyEmaily?.let { emails.add(it) }
+                    val emaily = uzivatelSnapshot.child("email").getValue(String::class.java)
+                    val googleUcet = uzivatelSnapshot.child("googleUcet").getValue(Boolean::class.java)
+
+                    if (emaily != null && googleUcet != null) {
+
+                        mapa.put(emaily,googleUcet)
+                        Log.d("MAPA",mapa.toString())
+                    }
                 }
 
             }
@@ -153,7 +157,6 @@ class Prihlaseni : AppCompatActivity() {
 
                 vytvoreniZadostiGoogle()
 
-                googleSignIn = true
                 prihlaseniIntent();
             }
 
@@ -221,7 +224,9 @@ class Prihlaseni : AppCompatActivity() {
 
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
 
-        if (emails.contains(account.email)) {
+        val ucetGoogle = mapa.get(account.email)
+
+        if (mapa.containsKey(account.email) && ucetGoogle == false) {
 
             Toast.makeText(
                 this@Prihlaseni,
@@ -230,7 +235,7 @@ class Prihlaseni : AppCompatActivity() {
             )
                 .show()
 
-            Log.d("EMAILY",emails.toString())
+            Log.d("EMAILY",mapa.keys.toString())
 
             prihlaseni_google_client.signOut()
 
@@ -271,7 +276,7 @@ class Prihlaseni : AppCompatActivity() {
         val databazeFirebase = FirebaseDatabase.getInstance()
         val referenceFirebase = databazeFirebase.getReference("users")
 
-        val udajeUzivatele = UdajeUzivatele(account.displayName, account.email, account.givenName)
+        val udajeUzivatele = UdajeUzivatele(account.displayName, account.email, account.givenName, true)
 
         // V databazi Firebase Realtime se vytvori novy uzivatel se udaji
         account.givenName?.let { referenceFirebase.child(it).setValue(udajeUzivatele) }
@@ -287,15 +292,15 @@ class Prihlaseni : AppCompatActivity() {
     /** Kontrola zda email se nachází v databázi **/
     private fun emailNeexistuje(email: String, editText: EditText?): Boolean {
 
-        Log.d("EMAILY", emails.toString())
+        val ucetGoogle = mapa.get(email)
 
-        if (!emails.contains(email)) {
+        if (!mapa.containsKey(email) && ucetGoogle == false) {
 
             if (editText != null) {
                 editText.error = "Tento email není zaregistrovaný"
             }
 
-        } else if (emails.contains(email) && googleSignIn) {
+        } else if (mapa.containsKey(email) && ucetGoogle == true) {
 
             Toast.makeText(
                 this@Prihlaseni,
@@ -305,8 +310,6 @@ class Prihlaseni : AppCompatActivity() {
                 .show()
 
             prihlaseni_google_client.signOut()
-
-            googleSignIn = false
         }
 
         return false

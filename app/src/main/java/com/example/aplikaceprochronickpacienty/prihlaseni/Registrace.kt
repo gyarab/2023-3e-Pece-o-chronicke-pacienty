@@ -1,6 +1,5 @@
 package com.example.aplikaceprochronickpacienty.prihlaseni
 
-import android.R.attr.name
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.Drawable
@@ -18,6 +17,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.aplikaceprochronickpacienty.R
@@ -103,7 +103,7 @@ class Registrace : AppCompatActivity() {
 
         /** Přidání údajů do mapy **/
 
-        var mapa: HashMap<EditText, Drawable?> = HashMap<EditText, Drawable?>()
+        val mapa: HashMap<EditText, Drawable?> = HashMap<EditText, Drawable?>()
 
         mapa.put(registraceJmenoPrijmeni, person)
         mapa.put(registraceEmail, email)
@@ -394,6 +394,7 @@ class Registrace : AppCompatActivity() {
                 val email = registraceEmail.text.toString()
                 val uzivatelskeJmeno = registraceUzivatelskeJmeno.text.toString()
                 val heslo = registraceHeslo.text.toString()
+                val googleUcet = false.toString()
 
                 // Vytvoření uživatele v databázi Firebase - Auth, s emailem a heslem
                 FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, heslo)
@@ -423,11 +424,9 @@ class Registrace : AppCompatActivity() {
 
                             // Firebase Realtime database
                             val udajeUzivatele =
-                                UdajeUzivatele(jmenoPrijmeni, email, uzivatelskeJmeno)
+                                UdajeUzivatele(jmenoPrijmeni, email, uzivatelskeJmeno, false)
 
                             referenceFirebase.child(uzivatelskeJmeno).setValue(udajeUzivatele)
-
-                            referenceFirebase.child("registrovaneEmaily").child("emaily").setValue(email)
 
                             Toast.makeText(
                                 this@Registrace,

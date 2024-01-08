@@ -112,18 +112,17 @@
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent">
 
-                        <TableRow
-                            android:layout_width="fill_parent"
-                            android:layout_height="fill_parent"
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_marginTop="12dp"
                             android:layout_marginEnd="16dp"
                             android:background="@drawable/ucet_pozadi_table_zacatek">
 
                             <TextView
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_column="1"
                                 android:layout_marginStart="16dp"
                                 android:layout_marginTop="16dp"
                                 android:layout_marginBottom="8dp"
@@ -132,38 +131,32 @@
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
 
-                            <Space
-                                android:layout_width="0dp"
-                                android:layout_height="0dp"
-                                android:layout_weight="1" />
 
                             <TextView
                                 android:id="@+id/ucet_email"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_column="2"
                                 android:layout_marginStart="16dp"
                                 android:layout_marginTop="16dp"
                                 android:layout_marginEnd="24dp"
                                 android:layout_marginBottom="8dp"
                                 android:text="email@gmail.com"
                                 android:textColor="@color/tmave_seda"
-                                android:textSize="12sp" />
+                                android:textSize="15sp" />
 
-                        </TableRow>
+                        </LinearLayout>
 
-                        <TableRow
-                            android:layout_width="fill_parent"
-                            android:layout_height="fill_parent"
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_marginTop="4dp"
                             android:layout_marginEnd="16dp"
                             android:background="@drawable/ucet_pozadi_table_body">
 
                             <TextView
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_column="1"
                                 android:layout_marginStart="16dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
@@ -172,16 +165,10 @@
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
 
-                            <Space
-                                android:layout_width="0dp"
-                                android:layout_height="0dp"
-                                android:layout_weight="1" />
-
                             <TextView
                                 android:id="@+id/ucet_rok_narozeni"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_column="2"
                                 android:layout_marginStart="16dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
@@ -189,20 +176,19 @@
                                 android:textColor="@color/tmave_seda"
                                 android:textSize="15sp" />
 
-                        </TableRow>
+                        </LinearLayout>
 
-                        <TableRow
-                            android:layout_width="fill_parent"
-                            android:layout_height="fill_parent"
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_marginTop="4dp"
                             android:layout_marginEnd="16dp"
                             android:background="@drawable/ucet_pozadi_table_body">
 
                             <TextView
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_column="1"
                                 android:layout_marginStart="16dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
@@ -211,16 +197,10 @@
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
 
-                            <Space
-                                android:layout_width="0dp"
-                                android:layout_height="0dp"
-                                android:layout_weight="1" />
-
                             <TextView
                                 android:id="@+id/ucet_vyska"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_column="2"
                                 android:layout_marginStart="16dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
@@ -228,20 +208,19 @@
                                 android:textColor="@color/tmave_seda"
                                 android:textSize="15sp" />
 
-                        </TableRow>
+                        </LinearLayout>
 
-                        <TableRow
-                            android:layout_width="fill_parent"
-                            android:layout_height="fill_parent"
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_marginTop="4dp"
                             android:layout_marginEnd="16dp"
                             android:background="@drawable/ucet_pozadi_table_body">
 
                             <TextView
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_column="1"
                                 android:layout_marginStart="16dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
@@ -250,37 +229,31 @@
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
 
-                            <Space
-                                android:layout_width="0dp"
-                                android:layout_height="0dp"
-                                android:layout_weight="1" />
-
                             <TextView
                                 android:id="@+id/ucet_vaha"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_column="2"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="23dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
                                 android:text="100 kg"
                                 android:textColor="@color/tmave_seda"
                                 android:textSize="15sp" />
 
-                        </TableRow>
+                        </LinearLayout>
 
-                        <TableRow
-                            android:layout_width="fill_parent"
-                            android:layout_height="fill_parent"
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_marginTop="4dp"
                             android:layout_marginEnd="16dp"
+                            android:orientation="horizontal"
                             android:background="@drawable/ucet_pozadi_table_end">
 
                             <TextView
-                                android:layout_width="match_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_column="1"
                                 android:layout_marginStart="16dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="12dp"
@@ -289,24 +262,18 @@
                                 android:textSize="15sp"
                                 android:textStyle="bold" />
 
-                            <Space
-                                android:layout_width="0dp"
-                                android:layout_height="0dp"
-                                android:layout_weight="1" />
-
                             <TextView
                                 android:id="@+id/ucet_vek"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_column="2"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="31dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="12dp"
                                 android:text="20 let"
                                 android:textColor="@color/tmave_seda"
                                 android:textSize="15sp" />
 
-                        </TableRow>
+                        </LinearLayout>
 
                     </TableLayout>
 
