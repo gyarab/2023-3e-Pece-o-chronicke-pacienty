@@ -107,4 +107,10 @@ dependencies {
 
     // CSV
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.9.2")
+
+    // Donut
+    implementation("app.futured.donut:donut:2.2.0")
+
+    // Chart
+    implementation("com.diogobernardino:williamchart:3.10.1")
 }

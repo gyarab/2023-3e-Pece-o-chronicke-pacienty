@@ -65,6 +65,7 @@ class Chat : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
+        supportActionBar?.hide()
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
