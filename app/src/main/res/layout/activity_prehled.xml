@@ -10,6 +10,15 @@
     android:paddingTop="?attr/actionBarSize"
     tools:context=".navbar.Prehled">
 
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <app.futured.donut.DonutProgressView
         android:id="@+id/prehled_donut_bar"

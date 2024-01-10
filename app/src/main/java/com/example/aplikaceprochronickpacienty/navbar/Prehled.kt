@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import app.futured.donut.DonutProgressView
 import app.futured.donut.DonutSection
@@ -94,7 +95,6 @@ class Prehled : AppCompatActivity() {
         )*/
 
 
-
         // Donut bar setup
         prehled_donut_bar?.let { donutView ->
 
@@ -107,16 +107,28 @@ class Prehled : AppCompatActivity() {
                 color = Color.parseColor("#03BFFA"))*/
         }
 
-        // Chart bar setup
-        binding.apply {
+        val barSet = listOf(
+            "JAN" to 4F,
+            "FEB" to 7F,
+            "MAR" to 2F,
+            "MAY" to 2.3F,
+            "APR" to 5F,
+            "JUN" to 4F
+        )
 
-            prehledBarChart.animation.duration = animationDuration
-            prehledBarChart.animate(barSet)
+        // Parametry grafu chartBar
+        prehled_chart_bar?.let { chartBar ->
+
+            // délka animace vykreslení grafu
+            chartBar.animation.duration = 1000L
+
+            // přidání údajů do grafu
+            chartBar.animate(barSet)
         }
 
 
-    // Vkládání dat do databáze
-    ulozitData()
+        // Vkládání dat do databáze
+        ulozitData()
 
         /*val email = intent.getStringExtra("email")
         val displayName = intent.getStringExtra("name")
@@ -155,7 +167,8 @@ class Prehled : AppCompatActivity() {
                         // Vytvoreni objektu Uzivatele
                         val uzivatel =
 
-                            Uzivatel(i++,
+                            Uzivatel(
+                                i++,
                                 id_uzivatel,
                                 datum_uzivatel,
                                 vaha_uzivatel,
@@ -177,26 +190,5 @@ class Prehled : AppCompatActivity() {
             Log.e("ERROR VSTUP", e.toString())
         }
 
-    }
-
-    // Parametry grafu
-    companion object {
-
-        private val barSet = listOf(
-            "JAN" to 4F,
-            "FEB" to 7F,
-            "MAR" to 2F,
-            "MAY" to 2.3F,
-            "APR" to 5F,
-            "JUN" to 4F
-        )
-
-        private val horizontalBarSet = listOf(
-            "PORRO" to 5F,
-            "FUSCE" to 6.4F,
-            "EGET" to 3F
-        )
-
-        private const val animationDuration = 1000L
     }
 }
