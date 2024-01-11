@@ -6,17 +6,22 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import app.futured.donut.DonutProgressView
 import app.futured.donut.DonutSection
+import com.db.williamchart.ExperimentalFeature
 import com.db.williamchart.view.BarChartView
+import com.db.williamchart.view.LineChartView
 import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.databinding.ActivityPrehledBinding
 import com.example.aplikaceprochronickpacienty.roomDB.Uzivatel
-import com.example.aplikaceprochronickpacienty.roomDB.UzivatelViewModel
+import com.example.aplikaceprochronickpacienty.roomDB.UzivatelDatabase
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.InputStream
 
 
@@ -24,14 +29,20 @@ class Prehled : AppCompatActivity() {
 
     private lateinit var binding: ActivityPrehledBinding
 
-    // ROOM
-    private lateinit var uzivatelViewModel: UzivatelViewModel
-
     // Donut
     private var prehled_donut_bar: DonutProgressView? = null
 
-    // Chart
+    // BarChart
     private var prehled_chart_bar: BarChartView? = null
+
+    // BarChart
+    private var prehled_line_bar: LineChartView? = null
+
+    // ROOM Database
+    private lateinit var roomDatabase: UzivatelDatabase
+
+    private var vaha: ArrayList<Double> = ArrayList()
+    private var datum: ArrayList<String> = ArrayList()
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,11 +80,17 @@ class Prehled : AppCompatActivity() {
             }
         }
 
-        uzivatelViewModel = ViewModelProvider(this).get(UzivatelViewModel::class.java)
+        // Databáze ROOM
+        roomDatabase = UzivatelDatabase.getDatabase(this)
+
+        // Vkládání dat do databáze
+        saveData()
 
         prehled_donut_bar = findViewById(R.id.prehled_donut_bar)
 
         prehled_chart_bar = findViewById(R.id.prehled_barChart)
+
+        prehled_line_bar = findViewById(R.id.prehled_lineChart)
 
 
         val kroky = DonutSection(
@@ -81,19 +98,6 @@ class Prehled : AppCompatActivity() {
             color = Color.parseColor("#BC13FE"),
             amount = 3f
         )
-
-        /*val kalorie = DonutSection(
-            name = "section_2",
-            color = Color.parseColor("#ff30a2"),
-            amount = 3f
-        )
-
-        val vaha = DonutSection(
-            name = "section_2",
-            color = Color.parseColor("#09dbd0"),
-            amount = 1f
-        )*/
-
 
         // Donut bar setup
         prehled_donut_bar?.let { donutView ->
@@ -107,13 +111,15 @@ class Prehled : AppCompatActivity() {
                 color = Color.parseColor("#03BFFA"))*/
         }
 
+        // Informace o grafu BarChart
         val barSet = listOf(
-            "JAN" to 4F,
-            "FEB" to 7F,
-            "MAR" to 2F,
-            "MAY" to 2.3F,
-            "APR" to 5F,
-            "JUN" to 4F
+            "PO" to 4F,
+            "ÚT" to 12F,
+            "ST" to 2F,
+            "ČT" to 2F,
+            "PÁ" to 5F,
+            "SO" to 4F,
+            "NE" to 1F
         )
 
         // Parametry grafu chartBar
@@ -126,10 +132,6 @@ class Prehled : AppCompatActivity() {
             chartBar.animate(barSet)
         }
 
-
-        // Vkládání dat do databáze
-        ulozitData()
-
         /*val email = intent.getStringExtra("email")
         val displayName = intent.getStringExtra("name")
 
@@ -138,7 +140,8 @@ class Prehled : AppCompatActivity() {
 
     var i = 1
 
-    fun ulozitData() {
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun saveData() {
 
         try {
 
@@ -176,19 +179,69 @@ class Prehled : AppCompatActivity() {
                                 kroky_uzivatel
                             )
 
-                        println(uzivatel)
+                        GlobalScope.launch(Dispatchers.IO) {
 
-                        // Pridani dat do databaze
-                        uzivatelViewModel.pridatUzivateleViewModel(uzivatel)
+                            roomDatabase.uzivatelDao().pridatUzivatele(uzivatel)
+                        }
                     }
-
                 }
             }
+
+            // Načtení dat
+            readData()
 
         } catch (e: Exception) {
 
             Log.e("ERROR VSTUP", e.toString())
         }
 
+    }
+
+    private suspend fun displayData(uzivatelList: List<Uzivatel>) {
+
+        val set = mutableListOf<Pair<String, Float>>()
+
+        withContext(Dispatchers.Main) {
+
+            for (uzivatel in uzivatelList) {
+
+                vaha.add(uzivatel.WeightDayKG)
+                datum.add(uzivatel.Date)
+            }
+
+            for (i in 0..vaha.size step 3) {
+
+                set.add(datum.get(i) to vaha.get(i).toFloat())
+
+                println(vaha)
+            }
+        }
+
+        // Parametry grafu lineBar
+        linearChart(set)
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun readData() {
+
+        GlobalScope.launch {
+
+            val uzivatelList: List<Uzivatel> = roomDatabase.uzivatelDao().findIdBySubjectId(2285)
+            displayData(uzivatelList)
+        }
+    }
+
+    private fun linearChart(set: MutableList<Pair<String, Float>>) {
+
+        prehled_line_bar?.let { lineChart ->
+
+            lineChart.gradientFillColors =
+                intArrayOf(
+                    Color.parseColor("#BC13FE"),
+                    Color.TRANSPARENT
+                )
+            lineChart.animation.duration = 1000L
+            lineChart.animate(set)
+        }
     }
 }

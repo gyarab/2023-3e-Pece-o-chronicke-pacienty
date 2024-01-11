@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,85 +8,149 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/tmave_fialova"
-    android:paddingTop="?attr/actionBarSize"
+
     tools:context=".navbar.Prehled">
 
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:ignore="MissingConstraints">
 
-
-    <app.futured.donut.DonutProgressView
-        android:id="@+id/prehled_donut_bar"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:background="@drawable/prehled_pozadi_kroky"
-        android:padding="25dp"
-        app:donut_bgLineColor="@color/tmave_fialova"
-        app:donut_gapAngle="270"
-        app:donut_gapWidth="20"
-        app:donut_strokeWidth="30dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints" />
-
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginBottom="40dp"
-        app:layout_constraintBottom_toBottomOf="@+id/prehled_donut_bar"
-        app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
-        app:layout_constraintStart_toStartOf="@+id/prehled_donut_bar"
-        app:layout_constraintTop_toTopOf="@+id/prehled_donut_bar">
-
-        <TextView
-            android:id="@+id/prehled_pocet_kroku"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:fontFamily="@font/montserrat_bold"
-            android:text="8,530"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="50sp"
-            app:layout_constraintBottom_toBottomOf="@+id/prehled_donut_bar"
-            app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
-            app:layout_constraintStart_toStartOf="@+id/prehled_donut_bar"
-            app:layout_constraintTop_toTopOf="@+id/prehled_donut_bar" />
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Kroky"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textAlignment="center"
-            android:fontFamily="@font/open_sans"
-            android:layout_marginTop="10dp"
-            app:layout_constraintBottom_toBottomOf="@+id/prehled_donut_bar"
-            app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
-            app:layout_constraintStart_toStartOf="@+id/prehled_donut_bar"
-            app:layout_constraintTop_toBottomOf="@+id/prehled_pocet_kroku" />
+            <app.futured.donut.DonutProgressView
+                android:id="@+id/prehled_donut_bar"
+                android:layout_width="325dp"
+                android:layout_height="325dp"
+                android:layout_marginTop="32dp"
+                android:background="@drawable/prehled_pozadi_kroky"
+                android:padding="25dp"
+                app:donut_bgLineColor="@color/tmave_fialova"
+                app:donut_gapAngle="270"
+                app:donut_gapWidth="20"
+                app:donut_strokeWidth="30dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Zbývá 1400 kroků"
-            android:textAlignment="center"
-            android:textColor="@color/neon_fialova"
-            android:textSize="18sp"
-            android:fontFamily="@font/open_sans"
-            android:layout_marginTop="30dp" />
 
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/linearLayout3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="40dp"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="@+id/prehled_donut_bar"
+                app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
+                app:layout_constraintStart_toStartOf="@+id/prehled_donut_bar"
+                app:layout_constraintTop_toTopOf="@+id/prehled_donut_bar">
+
+                <TextView
+                    android:id="@+id/prehled_pocet_kroku"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="@font/montserrat_bold"
+                    android:text="8,530"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="50sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/prehled_donut_bar"
+                    app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
+                    app:layout_constraintStart_toStartOf="@+id/prehled_donut_bar"
+                    app:layout_constraintTop_toTopOf="@+id/prehled_donut_bar" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/open_sans"
+                    android:text="Kroky"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/prehled_donut_bar"
+                    app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
+                    app:layout_constraintStart_toStartOf="@+id/prehled_donut_bar"
+                    app:layout_constraintTop_toBottomOf="@+id/prehled_pocet_kroku" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="25dp"
+                    android:fontFamily="@font/open_sans"
+                    android:text="Zbývá 1400 kroků"
+                    android:textAlignment="center"
+                    android:textColor="@color/neon_fialova"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <com.db.williamchart.view.BarChartView
+                android:id="@+id/prehled_barChart"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_marginTop="64dp"
+                app:chart_axis="xy"
+                app:chart_barsColor="@color/neon_fialova"
+                app:chart_barsRadius="4dp"
+                app:chart_labelsColor="@color/neon_fialova"
+                app:chart_labelsSize="15sp"
+                app:chart_spacing="20dp"
+                app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
+                app:layout_constraintStart_toStartOf="@+id/prehled_donut_bar"
+                app:layout_constraintTop_toBottomOf="@+id/prehled_donut_bar" />
+
+
+            <TextView
+                android:id="@+id/tvChartData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/open_sans"
+                android:text="Průběh vaší váhy"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toTopOf="@id/prehled_lineChart"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/prehled_barChart" />
+
+            <com.db.williamchart.view.LineChartView
+                android:id="@+id/prehled_lineChart"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_marginTop="64dp"
+                app:chart_axis="y"
+                app:chart_gridEffect="dotted"
+                app:chart_labelsColor="@color/neon_fialova"
+                app:chart_labelsSize="10sp"
+                app:chart_lineColor="@color/neon_fialova"
+                app:chart_lineThickness="2dp"
+                app:chart_smoothLine="true"
+                app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
+                app:layout_constraintStart_toStartOf="@+id/prehled_donut_bar"
+                app:layout_constraintTop_toBottomOf="@+id/prehled_barChart" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="64dp"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="25sp"
+                app:layout_constraintEnd_toEndOf="@+id/prehled_lineChart"
+                app:layout_constraintStart_toStartOf="@+id/prehled_lineChart"
+                app:layout_constraintTop_toBottomOf="@+id/prehled_lineChart" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
@@ -97,22 +162,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:menu="@menu/bottom_nav_menu"
-    />
+        app:menu="@menu/bottom_nav_menu" />
 
-    <com.db.williamchart.view.BarChartView
-        android:id="@+id/prehled_barChart"
-        android:layout_width="0dp"
-        android:layout_height="150dp"
-        app:chart_axis="x"
-        app:chart_barsColor="@color/neon_fialova"
-        app:chart_barsRadius="4dp"
-        app:chart_labelsColor="@color/neon_fialova"
-        app:chart_labelsSize="15sp"
-        app:chart_spacing="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_nav"
-        app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
-        app:layout_constraintStart_toStartOf="@+id/prehled_donut_bar"
-        app:layout_constraintTop_toBottomOf="@+id/prehled_donut_bar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

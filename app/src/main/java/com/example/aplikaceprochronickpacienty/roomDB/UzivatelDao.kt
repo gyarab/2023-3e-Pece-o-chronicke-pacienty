@@ -9,10 +9,13 @@ import androidx.room.Query
 @Dao
 interface UzivatelDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun pridatUzivateleDao(uzivatel: Uzivatel)
-
     @Query("SELECT * FROM uzivatel_table ORDER BY uzivatel_id ASC")
-    fun readAllDataDao(): LiveData<List<Uzivatel>>
+    fun readAllData(): LiveData<List<Uzivatel>>
+
+    @Query("SELECT * FROM uzivatel_table WHERE SubjectId = :subjectId")
+    suspend fun findIdBySubjectId(subjectId : Int): List<Uzivatel>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun pridatUzivatele(uzivatel: Uzivatel)
 
 }
