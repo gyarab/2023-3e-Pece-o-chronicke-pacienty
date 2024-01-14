@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
@@ -84,7 +83,7 @@
                     android:fontFamily="@font/open_sans"
                     android:text="Zbývá 1400 kroků"
                     android:textAlignment="center"
-                    android:textColor="@color/neon_fialova"
+                    android:textColor="@color/neon_zluta"
                     android:textSize="18sp" />
 
             </LinearLayout>
@@ -95,9 +94,9 @@
                 android:layout_height="150dp"
                 android:layout_marginTop="64dp"
                 app:chart_axis="xy"
-                app:chart_barsColor="@color/neon_fialova"
+                app:chart_barsColor="@color/neon_ruzova"
                 app:chart_barsRadius="4dp"
-                app:chart_labelsColor="@color/neon_fialova"
+                app:chart_labelsColor="@color/neon_ruzova"
                 app:chart_labelsSize="15sp"
                 app:chart_spacing="20dp"
                 app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
@@ -109,31 +108,94 @@
                 android:id="@+id/tvChartData"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="64dp"
+                android:layout_marginBottom="32dp"
                 android:fontFamily="@font/open_sans"
                 android:text="Průběh vaší váhy"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                app:layout_constraintBottom_toTopOf="@id/prehled_lineChart"
+                app:layout_constraintBottom_toTopOf="@+id/vyber_togglebutton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/prehled_barChart" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/vyber_togglebutton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                app:cardCornerRadius="20dp"
+                app:layout_constraintBottom_toTopOf="@+id/prehled_lineChart"
+                app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
+                app:layout_constraintStart_toStartOf="@+id/prehled_donut_bar"
+                app:layout_constraintTop_toBottomOf="@+id/tvChartData"
+                app:strokeColor="@android:color/transparent"
+                app:strokeWidth="0dp">
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/prehled_tabLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:backgroundTint="@android:color/white"
+                    app:tabBackground="@drawable/prehled_toggle_btn_selector"
+                    app:tabGravity="fill"
+                    app:tabIndicatorColor="@android:color/transparent"
+                    app:tabIndicatorHeight="0dp"
+                    app:tabMode="fixed"
+                    app:tabRippleColor="@android:color/transparent"
+                    app:tabSelectedTextColor="@android:color/white"
+                    app:tabTextColor="@android:color/black">
+
+                    <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TÝDEN" />
+
+                    <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MĚSÍC" />
+
+                    <com.google.android.material.tabs.TabItem
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ROK" />
+
+                </com.google.android.material.tabs.TabLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
 
             <com.db.williamchart.view.LineChartView
                 android:id="@+id/prehled_lineChart"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
-                android:layout_marginTop="64dp"
+                android:layout_marginTop="32dp"
                 app:chart_axis="y"
                 app:chart_gridEffect="dotted"
-                app:chart_labelsColor="@color/neon_fialova"
+                app:chart_labelsColor="@color/neon_modra"
                 app:chart_labelsSize="10sp"
-                app:chart_lineColor="@color/neon_fialova"
-                app:chart_lineThickness="2dp"
+                app:chart_lineColor="@color/neon_modra"
+                app:chart_lineThickness="1dp"
                 app:chart_smoothLine="true"
                 app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
                 app:layout_constraintStart_toStartOf="@+id/prehled_donut_bar"
-                app:layout_constraintTop_toBottomOf="@+id/prehled_barChart" />
+                app:layout_constraintTop_toBottomOf="@+id/vyber_togglebutton">
+
+            </com.db.williamchart.view.LineChartView>
+
+            <TextView
+                android:id="@+id/prehled_souradnice_linearChart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                app:layout_constraintEnd_toEndOf="@+id/prehled_lineChart"
+                app:layout_constraintStart_toStartOf="@+id/prehled_lineChart"
+                app:layout_constraintTop_toBottomOf="@+id/prehled_lineChart" />
 
             <TextView
                 android:layout_width="match_parent"

@@ -4,11 +4,16 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import app.futured.donut.DonutProgressView
 import app.futured.donut.DonutSection
 import com.db.williamchart.ExperimentalFeature
+import com.db.williamchart.data.AxisType
+import com.db.williamchart.data.Paddings
+import com.db.williamchart.data.Scale
+import com.db.williamchart.data.configuration.ChartConfiguration
 import com.db.williamchart.view.BarChartView
 import com.db.williamchart.view.LineChartView
 import com.example.aplikaceprochronickpacienty.R
@@ -17,6 +22,7 @@ import com.example.aplikaceprochronickpacienty.roomDB.Uzivatel
 import com.example.aplikaceprochronickpacienty.roomDB.UzivatelDatabase
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.play.integrity.internal.t
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -95,7 +101,7 @@ class Prehled : AppCompatActivity() {
 
         val kroky = DonutSection(
             name = "kroky",
-            color = Color.parseColor("#BC13FE"),
+            color = Color.parseColor("#ffc412"),
             amount = 3f
         )
 
@@ -212,8 +218,6 @@ class Prehled : AppCompatActivity() {
             for (i in 0..vaha.size step 3) {
 
                 set.add(datum.get(i) to vaha.get(i).toFloat())
-
-                println(vaha)
             }
         }
 
@@ -223,7 +227,6 @@ class Prehled : AppCompatActivity() {
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun readData() {
-
         GlobalScope.launch {
 
             val uzivatelList: List<Uzivatel> = roomDatabase.uzivatelDao().findIdBySubjectId(2285)
@@ -231,16 +234,32 @@ class Prehled : AppCompatActivity() {
         }
     }
 
+    @OptIn(ExperimentalFeature::class)
+    @SuppressLint("SetTextI18n")
     private fun linearChart(set: MutableList<Pair<String, Float>>) {
 
         prehled_line_bar?.let { lineChart ->
 
             lineChart.gradientFillColors =
                 intArrayOf(
-                    Color.parseColor("#BC13FE"),
+                    Color.parseColor("#09dbd0"),
                     Color.TRANSPARENT
                 )
             lineChart.animation.duration = 1000L
+
+            // Vypsání souřadnice grafu při dotyku uživatele
+            lineChart.onDataPointTouchListener = { index, _, _ ->
+
+                val x = set[index].first
+                val y = set[index].second
+
+                val barvaX = "<font color='#ffc412'>X: </font>"
+                val barvaY = "<font color='#ffc412'> Y: </font>"
+                binding.prehledSouradniceLinearChart.text = Html.fromHtml(barvaX + x + barvaY + "$y")
+
+                println("[X: $x, Y: $y]")
+            }
+
             lineChart.animate(set)
         }
     }

@@ -34,6 +34,5 @@
     <string name="odhlasit_se">Odhlásit se</string>
     <string name="profilov_obrazek_uzivatele">Profilový obrázek uživatele</string>
     <string name="vyberte_obrazek">Vyberte obrázek</string>
-<!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -13,4 +13,8 @@
     <color name="modro_fialova">#6200ee</color>
     <color name="tmave_fialova">#1f002c</color>
     <color name="neon_fialova">#BC13FE</color>
+    <color name="neon_modra">#09dbd0</color>
+    <color name="neon_ruzova">#ff30a2</color>
+    <color name="neon_zluta">#ffc412</color>
+
 </resources>
