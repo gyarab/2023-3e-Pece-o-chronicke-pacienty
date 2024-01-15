@@ -6,14 +6,14 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isNotEmpty
 import app.futured.donut.DonutProgressView
 import app.futured.donut.DonutSection
+import co.yml.charts.common.extensions.isNotNull
 import com.db.williamchart.ExperimentalFeature
-import com.db.williamchart.data.AxisType
-import com.db.williamchart.data.Paddings
-import com.db.williamchart.data.Scale
-import com.db.williamchart.data.configuration.ChartConfiguration
 import com.db.williamchart.view.BarChartView
 import com.db.williamchart.view.LineChartView
 import com.example.aplikaceprochronickpacienty.R
@@ -22,7 +22,7 @@ import com.example.aplikaceprochronickpacienty.roomDB.Uzivatel
 import com.example.aplikaceprochronickpacienty.roomDB.UzivatelDatabase
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.play.integrity.internal.t
+import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -50,12 +50,25 @@ class Prehled : AppCompatActivity() {
     private var vaha: ArrayList<Double> = ArrayList()
     private var datum: ArrayList<String> = ArrayList()
 
+    // Souřadnice dotyku LineChart
+    private lateinit var prehled_souradnice_linearChart: TextView
+
+    // TabLayout
+    private lateinit var prehled_tabLayout: TabLayout
+
+    // Aktuální položka v TabLayout
+    private var tabItem: String = "TYDEN"
+
+    private var tydenClick: Int = 0
+    private var mesicClick: Int = 0
+    private var rokClick: Int = 0
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         supportActionBar?.hide()
-        binding = ActivityPrehledBinding.inflate(layoutInflater)
+        val binding: ActivityPrehledBinding = ActivityPrehledBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val navView: BottomNavigationView = findViewById(R.id.bottom_nav)
@@ -98,6 +111,12 @@ class Prehled : AppCompatActivity() {
 
         prehled_line_bar = findViewById(R.id.prehled_lineChart)
 
+        prehled_tabLayout = findViewById(R.id.prehled_tabLayout)
+
+        prehled_souradnice_linearChart = findViewById(R.id.prehled_souradnice_linearChart)
+
+        // Získání konkrétní položky z tabulky
+        getItemFromTable()
 
         val kroky = DonutSection(
             name = "kroky",
@@ -144,8 +163,52 @@ class Prehled : AppCompatActivity() {
         textView.text = email + "\n" + displayName*/
     }
 
+    /** Výběr položky z tabulky **/
+    private fun setItemTable(item: String) {
+
+        tabItem = item
+
+        // Načtení grafu
+        readData()
+    }
+
+    /** Nastavení aktuálního elementu při kliknutí **/
+    private fun getItemFromTable() {
+
+        for (i in 0 until prehled_tabLayout.tabCount) {
+
+            val tab: TabLayout.Tab? = prehled_tabLayout.getTabAt(i)
+
+            // Zvolení elementu v TableLayout
+            tab?.view?.setOnClickListener {
+
+                when (i) {
+
+                    0 -> {
+
+                        setItemTable("TYDEN")
+                        tydenClick++
+                    }
+
+                    1 -> {
+
+                        setItemTable("MESIC")
+                        mesicClick++
+                    }
+
+                    2 -> {
+
+                        setItemTable("ROK")
+                        rokClick++
+                    }
+                }
+            }
+        }
+    }
+
     var i = 1
 
+    /** Přenos dat uživatele z csv souboru do databáze **/
     @OptIn(DelicateCoroutinesApi::class)
     private fun saveData() {
 
@@ -203,30 +266,83 @@ class Prehled : AppCompatActivity() {
 
     }
 
+    private fun displayChart(
+        set: MutableList<Pair<String, Float>>,
+        vaha: ArrayList<Double>,
+        datum: ArrayList<String>,
+        uzivatelList: List<Uzivatel>
+    ) {
+
+        when (tabItem) {
+
+            "TYDEN" -> {
+
+                addUserInfo(uzivatelList, vaha, datum, set, tydenClick, 7)
+            }
+
+            "MESIC" -> {
+
+                addUserInfo(uzivatelList, vaha, datum, set, mesicClick, 30)
+            }
+
+            "ROK" -> {
+
+                addUserInfo(uzivatelList, vaha, datum, set, rokClick, 365)
+            }
+        }
+    }
+
+    private fun addUserInfo(
+        uzivatelList: List<Uzivatel>,
+        vaha: ArrayList<Double>,
+        datum: ArrayList<String>,
+        set: MutableList<Pair<String, Float>>,
+        number: Int,
+        size: Int
+    ) {
+
+        if (number == 0) {
+
+            for (uzivatel in uzivatelList) {
+
+                vaha.add(uzivatel.WeightDayKG)
+                datum.add(uzivatel.Date)
+                //println(uzivatel.Date)
+            }
+
+            for (i in 0..size step 3) {
+
+                set.add(datum[i] to vaha[i].toFloat())
+            }
+
+        } else {
+
+            for (i in 0..size step 3) {
+
+                set.add(datum[i] to vaha[i].toFloat())
+            }
+        }
+    }
+
+    /** Zobrazení dat uživatele do grafu LineChart **/
     private suspend fun displayData(uzivatelList: List<Uzivatel>) {
 
         val set = mutableListOf<Pair<String, Float>>()
 
         withContext(Dispatchers.Main) {
 
-            for (uzivatel in uzivatelList) {
+            displayChart(set, vaha, datum, uzivatelList)
 
-                vaha.add(uzivatel.WeightDayKG)
-                datum.add(uzivatel.Date)
-            }
-
-            for (i in 0..vaha.size step 3) {
-
-                set.add(datum.get(i) to vaha.get(i).toFloat())
-            }
         }
 
         // Parametry grafu lineBar
         linearChart(set)
     }
 
+    /** Načtení dat uživatele z databáze **/
     @OptIn(DelicateCoroutinesApi::class)
     private fun readData() {
+
         GlobalScope.launch {
 
             val uzivatelList: List<Uzivatel> = roomDatabase.uzivatelDao().findIdBySubjectId(2285)
@@ -234,6 +350,7 @@ class Prehled : AppCompatActivity() {
         }
     }
 
+    /** Nastavení grafu LineChart **/
     @OptIn(ExperimentalFeature::class)
     @SuppressLint("SetTextI18n")
     private fun linearChart(set: MutableList<Pair<String, Float>>) {
@@ -245,6 +362,7 @@ class Prehled : AppCompatActivity() {
                     Color.parseColor("#09dbd0"),
                     Color.TRANSPARENT
                 )
+
             lineChart.animation.duration = 1000L
 
             // Vypsání souřadnice grafu při dotyku uživatele
@@ -255,7 +373,8 @@ class Prehled : AppCompatActivity() {
 
                 val barvaX = "<font color='#ffc412'>X: </font>"
                 val barvaY = "<font color='#ffc412'> Y: </font>"
-                binding.prehledSouradniceLinearChart.text = Html.fromHtml(barvaX + x + barvaY + "$y")
+                prehled_souradnice_linearChart.text =
+                    Html.fromHtml(barvaX + x + barvaY + "$y")
 
                 println("[X: $x, Y: $y]")
             }

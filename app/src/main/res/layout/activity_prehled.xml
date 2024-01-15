@@ -25,7 +25,7 @@
                 android:layout_width="325dp"
                 android:layout_height="325dp"
                 android:layout_marginTop="32dp"
-                android:background="@drawable/prehled_pozadi_kroky"
+                android:background="@drawable/prehled_pozadi_graf"
                 android:padding="25dp"
                 app:donut_bgLineColor="@color/tmave_fialova"
                 app:donut_gapAngle="270"
@@ -90,8 +90,10 @@
 
             <com.db.williamchart.view.BarChartView
                 android:id="@+id/prehled_barChart"
+                android:background="@drawable/prehled_pozadi_graf"
+                android:padding="15dp"
                 android:layout_width="0dp"
-                android:layout_height="150dp"
+                android:layout_height="200dp"
                 android:layout_marginTop="64dp"
                 app:chart_axis="xy"
                 app:chart_barsColor="@color/neon_ruzova"
@@ -170,8 +172,10 @@
 
             <com.db.williamchart.view.LineChartView
                 android:id="@+id/prehled_lineChart"
+                android:background="@drawable/prehled_pozadi_graf"
+                android:padding="15dp"
                 android:layout_width="0dp"
-                android:layout_height="150dp"
+                android:layout_height="200dp"
                 android:layout_marginTop="32dp"
                 app:chart_axis="y"
                 app:chart_gridEffect="dotted"
@@ -190,7 +194,7 @@
                 android:id="@+id/prehled_souradnice_linearChart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""
+                android:text="Souradnice"
                 android:textSize="20sp"
                 android:textColor="@color/white"
                 app:layout_constraintEnd_toEndOf="@+id/prehled_lineChart"
