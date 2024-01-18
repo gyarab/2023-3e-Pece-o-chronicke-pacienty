@@ -77,6 +77,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/prehled_pocet_kroku" />
 
                 <TextView
+                    android:id="@+id/prehled_zbyvajici_kroky"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="25dp"

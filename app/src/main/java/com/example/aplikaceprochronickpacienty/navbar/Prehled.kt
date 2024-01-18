@@ -26,6 +26,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStream
+import kotlin.math.roundToInt
 
 
 class Prehled : AppCompatActivity() {
@@ -45,19 +46,24 @@ class Prehled : AppCompatActivity() {
 
     private var weight: ArrayList<Double> = ArrayList()
     private var date: ArrayList<String> = ArrayList()
-    private var kalorie: ArrayList<Double> = ArrayList()
-    private var dny: ArrayList<String> = ArrayList()
+    private var data: ArrayList<Any> = ArrayList()
+
+    // TextView - zbývající kroky uživatele pro dosažení cíle
+    private lateinit var prehled_zbyvajici_kroky: TextView
+
+    // TextView - Počet kroků uživatele
+    private lateinit var prehled_pocet_kroku: TextView
 
     // Souřadnice dotyku LineChart
     private lateinit var prehled_souradnice_linearChart: TextView
 
     // TabLayout
-    private lateinit var prehled_tabLayout1: TabLayout
-    private lateinit var prehled_tabLayout2: TabLayout
+    private lateinit var prehled_tabLayoutBar: TabLayout
+    private lateinit var prehled_tabLayoutLine: TabLayout
 
     // Aktuální položka v TabLayout
-    private var tabItem1: String = "KALORIE"
-    private var tabItem2: String = "TYDEN"
+    private var tabItemBar: String = "KALORIE"
+    private var tabItemLine: String = "TYDEN"
 
     val tyden = listOf(
         "PO",
@@ -66,7 +72,8 @@ class Prehled : AppCompatActivity() {
         "ČT",
         "PÁ",
         "SO",
-        "NE").reversed()
+        "NE"
+    )
 
 
     // BarChart
@@ -120,139 +127,27 @@ class Prehled : AppCompatActivity() {
         // Vkládání dat do databáze
         saveData()
 
+        prehled_pocet_kroku = findViewById(R.id.prehled_pocet_kroku)
+
+        prehled_zbyvajici_kroky = findViewById(R.id.prehled_zbyvajici_kroky)
+
         prehled_donut_bar = findViewById(R.id.prehled_donut_bar)
 
         prehled_chart_bar = findViewById(R.id.prehled_barChart)
 
         prehled_line_bar = findViewById(R.id.prehled_lineChart)
 
-        prehled_tabLayout1 = findViewById(R.id.prehled_tabLayout1)
+        prehled_tabLayoutBar = findViewById(R.id.prehled_tabLayout1)
 
-        prehled_tabLayout2 = findViewById(R.id.prehled_tabLayout2)
+        prehled_tabLayoutLine = findViewById(R.id.prehled_tabLayout2)
 
         prehled_souradnice_linearChart = findViewById(R.id.prehled_souradnice_linearChart)
+
 
         // Získání konkrétní položky z tabulky
         getItemFromTableBarChart()
         getItemFromTableLineChart()
-
-        val kroky = DonutSection(
-            name = "kroky",
-            color = Color.parseColor("#ffc412"),
-            amount = 3f
-        )
-
-        // Donut bar setup
-        prehled_donut_bar?.let { donutView ->
-
-            donutView.cap = 5f
-            donutView.submitData(listOf(kroky))
-
-            /*donutView.addAmount(
-                sectionName = "drink_amount_water",
-                amount = 0.5f,
-                color = Color.parseColor("#03BFFA"))*/
-        }
-
-        // Informace o grafu BarChart
-        /*val barSet = listOf(
-            "PO" to 4F,
-            "ÚT" to 12F,
-            "ST" to 2F,
-            "ČT" to 2F,
-            "PÁ" to 5F,
-            "SO" to 4F,
-            "NE" to 1F
-        )
-
-        // Parametry grafu chartBar
-        prehled_chart_bar?.let { chartBar ->
-
-            // délka animace vykreslení grafu
-            chartBar.animation.duration = 1000L
-
-            // přidání údajů do grafu
-            chartBar.animate(barSet)
-        }*/
-
-        /*val email = intent.getStringExtra("email")
-        val displayName = intent.getStringExtra("name")
-
-        textView.text = email + "\n" + displayName*/
     }
-
-    /** Výběr položky z tabulky **/
-    private fun setItemTable(item: String) {
-
-
-        tabItem2 = item
-
-        // Načtení grafu
-        readData()
-    }
-
-    /** Nastavení aktuálního elementu při kliknutí **/
-    private fun getItemFromTableLineChart() {
-
-        for (i in 0 until prehled_tabLayout2.tabCount) {
-
-            val tab: TabLayout.Tab? = prehled_tabLayout2.getTabAt(i)
-
-            // Zvolení elementu v TableLayout
-            tab?.view?.setOnClickListener {
-
-                when (i) {
-
-                    0 -> {
-
-                        setItemTable("TYDEN")
-                        tydenClick++
-                    }
-
-                    1 -> {
-
-                        setItemTable("MESIC")
-                        mesicClick++
-                    }
-
-                    2 -> {
-
-                        setItemTable("ROK")
-                        rokClick++
-                    }
-                }
-            }
-        }
-    }
-
-    private fun getItemFromTableBarChart() {
-
-        for (i in 0 until prehled_tabLayout1.tabCount) {
-
-            val tab: TabLayout.Tab? = prehled_tabLayout1.getTabAt(i)
-
-            // Zvolení elementu v TableLayout
-            tab?.view?.setOnClickListener {
-
-                when (i) {
-
-                    0 -> {
-
-                        tabItem1 = "KALORIE"
-                        kalorieClick++
-                    }
-
-                    1 -> {
-
-                        tabItem1 = "KROKY"
-                        krokyClick++
-                    }
-                }
-            }
-        }
-    }
-
-    var i = 1
 
     /** Přenos dat uživatele z csv souboru do databáze **/
     @OptIn(DelicateCoroutinesApi::class)
@@ -312,53 +207,128 @@ class Prehled : AppCompatActivity() {
 
     }
 
-    private fun displayBarChart(
-        set: MutableList<Pair<String, Float>>,
-        kalorie: ArrayList<Double>,
-        uzivatelList: List<Uzivatel>
-    ) {
+    /** Nastavení posluchače události při kliknutí na TabLayout **/
+    private fun tabClickListener(tabLayout: TabLayout, onClickAction: (Int) -> Unit) {
+        for (i in 0 until tabLayout.tabCount) {
+            val tab: TabLayout.Tab? = tabLayout.getTabAt(i)
 
-        when (tabItem1) {
-
-            "KALORIE" -> {
-
-                addUserInfoBarChart(uzivatelList, kalorie, set, kalorieClick, 7)
-            }
-
-            "KROKY" -> {
-
-                addUserInfoBarChart(uzivatelList, kalorie, set, krokyClick, 7)
+            tab?.view?.setOnClickListener {
+                onClickAction(i)
             }
         }
     }
 
-    /** Vložení informací o grafu LineChart **/
-    private fun addUserInfoBarChart(
-        uzivatelList: List<Uzivatel>,
-        kalorie: ArrayList<Double>,
+    private fun getItemFromTableBarChart() {
+
+        tabClickListener(prehled_tabLayoutBar) { index ->
+
+            when (index) {
+
+                0 -> {
+
+                    tabItemBar = "KALORIE"
+                    kalorieClick++
+                }
+
+                1 -> {
+
+                    tabItemBar = "KROKY"
+                    krokyClick++
+                }
+            }
+
+            readData()
+        }
+    }
+
+    /** Nastavení aktuálního elementu při kliknutí **/
+    private fun getItemFromTableLineChart() {
+
+        tabClickListener(prehled_tabLayoutLine) { index ->
+
+            when (index) {
+
+                0 -> {
+
+                    tabItemLine = "TYDEN"
+                    tydenClick++
+                }
+
+                1 -> {
+
+                    tabItemLine = "MESIC"
+                    mesicClick++
+                }
+
+                2 -> {
+
+                    tabItemLine = "ROK"
+                    rokClick++
+                }
+
+            }
+            readData()
+        }
+    }
+
+    var i = 1
+
+    /** Zobrazení grafu BarChart s kaloriemi a kroky pacienty za týden **/
+    private fun displayBarChart(
         set: MutableList<Pair<String, Float>>,
-        number: Int,
-        size: Int,
+        data: MutableList<Any>,
+        uzivatelList: List<Uzivatel>
     ) {
 
-        if (number == 0) {
+        when (tabItemBar) {
 
-            for (uzivatel in uzivatelList) {
+            "KALORIE" -> {
 
-                val zaokrouhleniKalorii = "%.1f".format(uzivatel.EnergyIntakeDayKJ)
-                kalorie.add(zaokrouhleniKalorii.toDouble())
+                addUserInfoBarChart(set, data, uzivatelList)
+                println("KALORIE")
             }
 
-            for (i in (tyden.size - 1) downTo maxOf((tyden.size - 1) - size, 0)) {
+            "KROKY" -> {
 
-                set.add(tyden.get(i) to kalorie[i].toFloat())
+                addUserInfoBarChart(set, data, uzivatelList)
+                println("KROKY")
             }
+        }
+    }
 
-        } else {
 
-            for (i in (tyden.size - 1) downTo maxOf((tyden.size - 1) - size, 0)) {
+    /** Vložení informací do grafu BarChart **/
+    private fun addUserInfoBarChart(
+        set: MutableList<Pair<String, Float>>,
+        data: MutableList<Any>,
+        uzivatelList: List<Uzivatel>,
+    ) {
 
-                set.add(tyden.get(i) to kalorie[i].toFloat())
+        for (uzivatel in uzivatelList) {
+
+            if (tabItemBar == "KALORIE") {
+
+                val zaokrouhleniKalorii =
+                    String.format("%.1f", uzivatel.EnergyIntakeDayKJ).toDouble()
+
+                data.add(zaokrouhleniKalorii)
+
+            } else {
+
+                data.add(uzivatel.StepsCountDay)
+            }
+        }
+
+        var x = -1
+
+        for (i in data.size - 7 until data.size) {
+
+            x++
+
+            if (x < 7) {
+
+                set.add((tyden[x] to data[i]) as Pair<String, Float>)
+
             }
         }
     }
@@ -371,11 +341,12 @@ class Prehled : AppCompatActivity() {
         uzivatelList: List<Uzivatel>
     ) {
 
-        when (tabItem2) {
+        when (tabItemLine) {
 
             "TYDEN" -> {
 
                 addUserInfoLineChart(uzivatelList, vaha, datum, set, tydenClick, 7)
+                println("MESIC")
             }
 
             "MESIC" -> {
@@ -408,17 +379,24 @@ class Prehled : AppCompatActivity() {
                 datum.add(uzivatel.Date)
             }
 
-            for (i in (datum.size - 1) downTo maxOf((datum.size - 1) - size, 0) step 2) {
-
-                set.add(datum[i] to vaha[i].toFloat())
-            }
+            pridatDatumVahu(datum, size, set, vaha)
 
         } else {
 
-            for (i in (datum.size - 1) downTo maxOf((datum.size - 1) - size, 0) step 2) {
+            pridatDatumVahu(datum, size, set, vaha)
+        }
+    }
 
-                set.add(datum[i] to vaha[i].toFloat())
-            }
+    /** Přidání do listu grafu váhu a datum **/
+    private fun pridatDatumVahu(
+        datum: ArrayList<String>,
+        size: Int,
+        set: MutableList<Pair<String, Float>>,
+        vaha: ArrayList<Double>
+    ) {
+        for (i in (datum.size - 1) downTo maxOf((datum.size - 1) - size, 0) step 2) {
+
+            set.add(datum[i] to vaha[i].toFloat())
         }
     }
 
@@ -431,8 +409,14 @@ class Prehled : AppCompatActivity() {
 
         withContext(Dispatchers.Main) {
 
+            displayBarChart(barSet, data, uzivatelList)
             displayLineChart(lineSet, weight, date, uzivatelList)
-            displayBarChart(barSet, kalorie, uzivatelList)
+        }
+
+        runOnUiThread {
+
+            // Parametry grafu DonutProgressView
+            donutProgressView(uzivatelList)
         }
 
         // Parametry grafu BarChart
@@ -453,6 +437,63 @@ class Prehled : AppCompatActivity() {
         }
     }
 
+    /** Nastavení grafu DonutProgressView **/
+    @SuppressLint("SetTextI18n")
+    private fun donutProgressView(uzivatelList: List<Uzivatel>) {
+
+        // Donut bar setup
+        prehled_donut_bar?.let { donutView ->
+
+            val kroky = ArrayList<Float>()
+
+            for (uzivatel in uzivatelList) {
+
+                kroky.add(uzivatel.StepsCountDay.toFloat())
+            }
+
+            val dnesniKroky = kroky.last().roundToInt()
+
+            val donut = DonutSection(
+                name = "kroky",
+                color = Color.parseColor("#ffc412"),
+                amount = dnesniKroky.toFloat()
+            )
+
+            donutView.animationDurationMs = 3000
+            donutView.cap = 12000f
+            donutView.submitData(listOf(donut))
+
+            if (dnesniKroky.toString().length == 4) {
+
+                val pridaniCarky = dnesniKroky.toString().substring(0, 1) + "," + dnesniKroky.toString().substring(1)
+                prehled_pocet_kroku.text = pridaniCarky
+            }
+
+            else if (dnesniKroky.toString().length == 5) {
+
+                val pridaniCarky = dnesniKroky.toString().substring(0, 2) + "," + dnesniKroky.toString().substring(2)
+                prehled_pocet_kroku.text = pridaniCarky
+                prehled_pocet_kroku.textSize = 45F
+            }
+
+            if (dnesniKroky >= donutView.cap) {
+
+                prehled_zbyvajici_kroky.text = "SPLNĚNO! \uD83C\uDF89"
+
+            } else {
+
+                prehled_zbyvajici_kroky.text =
+                    "Zbývá " + (donutView.cap - dnesniKroky).roundToInt().toString() + " kroků"
+            }
+
+            /*donutView.addAmount(
+                sectionName = "drink_amount_water",
+                amount = 0.5f,
+                color = Color.parseColor("#03BFFA"))*/
+        }
+    }
+
+    /** Nastavení grafu BarChart **/
     @OptIn(ExperimentalFeature::class)
     private fun barChart(set: MutableList<Pair<String, Float>>) {
 
