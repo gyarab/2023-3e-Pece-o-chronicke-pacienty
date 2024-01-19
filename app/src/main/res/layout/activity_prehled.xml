@@ -31,6 +31,7 @@
                 app:donut_gapAngle="270"
                 app:donut_gapWidth="20"
                 app:donut_strokeWidth="30dp"
+                app:donut_animateChanges="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -51,26 +52,24 @@
                     android:id="@+id/prehled_pocet_kroku"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="30dp"
                     android:fontFamily="@font/montserrat_bold"
                     android:text="8,530"
                     android:textAlignment="center"
-                    android:textColor="@color/white"
+                    android:textColor="@color/neon_zluta"
                     android:textSize="50sp"
                     app:layout_constraintBottom_toBottomOf="@+id/prehled_donut_bar"
                     app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
                     app:layout_constraintStart_toStartOf="@+id/prehled_donut_bar"
                     app:layout_constraintTop_toTopOf="@+id/prehled_donut_bar" />
 
-                <TextView
+                <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:fontFamily="@font/open_sans"
-                    android:text="Kroky"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="20sp"
+                    android:src="@drawable/prehled_ic_steps"
+                    android:scaleX="1.25"
+                    android:scaleY="1.25"
+                    android:contentDescription="@string/kroky"
                     app:layout_constraintBottom_toBottomOf="@+id/prehled_donut_bar"
                     app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
                     app:layout_constraintStart_toStartOf="@+id/prehled_donut_bar"
@@ -80,7 +79,6 @@
                     android:id="@+id/prehled_zbyvajici_kroky"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="25dp"
                     android:fontFamily="@font/open_sans"
                     android:text="Zbývá 1400 kroků"
                     android:textAlignment="center"
@@ -173,7 +171,6 @@
                 android:textSize="25sp"
                 android:textStyle="bold"
                 android:layout_marginTop="64dp"
-
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/prehled_barChart" />

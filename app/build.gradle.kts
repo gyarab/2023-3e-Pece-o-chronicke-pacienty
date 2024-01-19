@@ -122,6 +122,5 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics:1.5.4")
     implementation("androidx.compose.ui:ui-tooling-preview:1.5.4")
     implementation("androidx.compose.material3:material3:1.1.2")
-
     implementation("androidx.activity:activity-compose:1.3.0-alpha07")
 }

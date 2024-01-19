@@ -3,9 +3,13 @@ package com.example.aplikaceprochronickpacienty.navbar
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
+import android.util.TypedValue
+import android.view.animation.AlphaAnimation
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import app.futured.donut.DonutProgressView
@@ -26,6 +30,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStream
+import java.text.SimpleDateFormat
+import java.util.Locale
 import kotlin.math.roundToInt
 
 
@@ -75,6 +81,8 @@ class Prehled : AppCompatActivity() {
         "NE"
     )
 
+    val listDnu = ArrayList<String>()
+
 
     // BarChart
     private var kalorieClick: Int = 0
@@ -84,6 +92,8 @@ class Prehled : AppCompatActivity() {
     private var tydenClick: Int = 0
     private var mesicClick: Int = 0
     private var rokClick: Int = 0
+
+    private var click: String = "BAR LINE"
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -207,6 +217,74 @@ class Prehled : AppCompatActivity() {
 
     }
 
+    /** Získání podle datumu aktuálního dnu v týdnu **/
+    private fun currentDayInWeek(datum: List<String>) {
+
+        for (i in (datum.size - 7)..<datum.size) {
+
+            val aktualniDatum = datum[i]
+
+            println("DATUM: " + aktualniDatum)
+
+            val datumFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+
+            val getDatum = datumFormat.parse(aktualniDatum)
+
+            var denVtydnu =
+                getDatum?.let { SimpleDateFormat("EEEE", Locale.getDefault()).format(it) }
+
+            println(denVtydnu)
+
+            when (denVtydnu) {
+
+                "Monday" -> {
+
+                    denVtydnu = "PO"
+
+                }
+
+                "Tuesday" -> {
+
+                    denVtydnu = "ÚT"
+
+                }
+
+                "Wednesday" -> {
+
+                    denVtydnu = "ST"
+
+                }
+
+                "Thursday" -> {
+
+                    denVtydnu = "ČT"
+
+                }
+
+                "Friday" -> {
+
+                    denVtydnu = "PÁ"
+
+                }
+
+                "Saturday" -> {
+
+                    denVtydnu = "SO"
+
+                }
+
+                else -> {
+
+                    denVtydnu = "NE"
+                }
+            }
+
+            listDnu.add(denVtydnu)
+        }
+
+        println(listDnu)
+    }
+
     /** Nastavení posluchače události při kliknutí na TabLayout **/
     private fun tabClickListener(tabLayout: TabLayout, onClickAction: (Int) -> Unit) {
         for (i in 0 until tabLayout.tabCount) {
@@ -237,6 +315,7 @@ class Prehled : AppCompatActivity() {
                 }
             }
 
+            click = "BAR"
             readData()
         }
     }
@@ -267,6 +346,7 @@ class Prehled : AppCompatActivity() {
                 }
 
             }
+            click = "LINE"
             readData()
         }
     }
@@ -285,13 +365,11 @@ class Prehled : AppCompatActivity() {
             "KALORIE" -> {
 
                 addUserInfoBarChart(set, data, uzivatelList)
-                println("KALORIE")
             }
 
             "KROKY" -> {
 
                 addUserInfoBarChart(set, data, uzivatelList)
-                println("KROKY")
             }
         }
     }
@@ -304,6 +382,8 @@ class Prehled : AppCompatActivity() {
         uzivatelList: List<Uzivatel>,
     ) {
 
+        val datumy = ArrayList<String>()
+
         for (uzivatel in uzivatelList) {
 
             if (tabItemBar == "KALORIE") {
@@ -313,11 +393,22 @@ class Prehled : AppCompatActivity() {
 
                 data.add(zaokrouhleniKalorii)
 
+
             } else {
 
                 data.add(uzivatel.StepsCountDay)
             }
         }
+
+        for (uzivatel in uzivatelList) {
+
+            // přidání všech dat uživatele z databáze
+            datumy.add(uzivatel.Date)
+        }
+
+        println("DATUMY: " + datumy)
+
+        currentDayInWeek(datumy)
 
         var x = -1
 
@@ -327,7 +418,7 @@ class Prehled : AppCompatActivity() {
 
             if (x < 7) {
 
-                set.add((tyden[x] to data[i]) as Pair<String, Float>)
+                set.add((listDnu[x] to data[i]) as Pair<String, Float>)
 
             }
         }
@@ -346,7 +437,6 @@ class Prehled : AppCompatActivity() {
             "TYDEN" -> {
 
                 addUserInfoLineChart(uzivatelList, vaha, datum, set, tydenClick, 7)
-                println("MESIC")
             }
 
             "MESIC" -> {
@@ -419,11 +509,28 @@ class Prehled : AppCompatActivity() {
             donutProgressView(uzivatelList)
         }
 
-        // Parametry grafu BarChart
-        barChart(barSet)
+        // Při kliknutí se zobrazí animace vybraného grafu
+        when (click) {
 
-        // Parametry grafu LineChart
-        linearChart(lineSet)
+            // Při prvním kliknutí se zobrazí animace obou grafů
+            "BAR LINE" -> {
+
+                barChart(barSet)
+                linearChart(lineSet)
+
+            }
+
+            // Parametry grafu BarChart
+            "BAR" -> {
+
+                barChart(barSet)
+            }
+
+            // Parametry grafu LineChart
+            "LINE" -> {
+                linearChart(lineSet)
+            }
+        }
     }
 
     /** Načtení dat uživatele z databáze **/
@@ -438,7 +545,7 @@ class Prehled : AppCompatActivity() {
     }
 
     /** Nastavení grafu DonutProgressView **/
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "ResourceAsColor")
     private fun donutProgressView(uzivatelList: List<Uzivatel>) {
 
         // Donut bar setup
@@ -465,13 +572,18 @@ class Prehled : AppCompatActivity() {
 
             if (dnesniKroky.toString().length == 4) {
 
-                val pridaniCarky = dnesniKroky.toString().substring(0, 1) + "," + dnesniKroky.toString().substring(1)
+                val pridaniCarky =
+                    dnesniKroky.toString().substring(0, 1) + "," + dnesniKroky.toString()
+                        .substring(1)
+
                 prehled_pocet_kroku.text = pridaniCarky
-            }
 
-            else if (dnesniKroky.toString().length == 5) {
+            } else if (dnesniKroky.toString().length == 5) {
 
-                val pridaniCarky = dnesniKroky.toString().substring(0, 2) + "," + dnesniKroky.toString().substring(2)
+                val pridaniCarky =
+                    dnesniKroky.toString().substring(0, 2) + "," + dnesniKroky.toString()
+                        .substring(2)
+
                 prehled_pocet_kroku.text = pridaniCarky
                 prehled_pocet_kroku.textSize = 45F
             }
@@ -480,10 +592,40 @@ class Prehled : AppCompatActivity() {
 
                 prehled_zbyvajici_kroky.text = "SPLNĚNO! \uD83C\uDF89"
 
+                // první zobrazení grafu
+                if (click == "BAR LINE") {
+
+                    // Animace textu
+                    prehled_zbyvajici_kroky.animate().scaleX(0F).scaleY(0F).setDuration(500)
+
+                        .withEndAction(Runnable {
+                            prehled_zbyvajici_kroky.animate().scaleX(1F).scaleY(1F).setDuration(1500)
+                        })
+                }
+
             } else {
 
                 prehled_zbyvajici_kroky.text =
                     "Zbývá " + (donutView.cap - dnesniKroky).roundToInt().toString() + " kroků"
+            }
+
+            // první zobrazení grafu
+            if (click == "BAR LINE") {
+
+                // Fade in - efekt pro zobrazení kroků
+                val fadeIn = AlphaAnimation(0.0f, 1.0f)
+                prehled_pocet_kroku.startAnimation(fadeIn)
+                fadeIn.setDuration(4000)
+                fadeIn.fillAfter = true
+
+                val myShader: Shader = LinearGradient(
+                    0F, 0F, 0F, 150F,
+                    Color.parseColor("#ff30a2"),
+                    Color.parseColor("#FFDC72"),
+                    Shader.TileMode.CLAMP
+                )
+
+                prehled_pocet_kroku.paint.shader = myShader
             }
 
             /*donutView.addAmount(
