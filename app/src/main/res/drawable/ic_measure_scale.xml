@@ -1,0 +1,19 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="25dp" android:viewportHeight="33.752" android:viewportWidth="33.752" android:width="25dp">
+      
+    <path android:fillColor="@color/neon_zluta" android:pathData="M22.717,33.752L11.033,33.752a2.035,2.035 0,0 1,-2.033 -2.032L9,2.033a2.035,2.035 0,0 1,2.033 -2.033h11.684a2.035,2.035 0,0 1,2.033 2.033v29.687A2.035,2.035 0,0 1,22.717 33.752ZM11.033,2 L11,31.72 22.717,31.752 22.75,2.033a0.032,0.032 0,0 0,-0.033 -0.033Z"/>
+      
+    <path android:fillColor="@color/neon_zluta" android:pathData="M15.752,5.815h-5.75a1,1 0,1 1,0 -2h5.75a1,1 0,0 1,0 2Z"/>
+      
+    <path android:fillColor="@color/neon_zluta" android:pathData="M13.812,9.815h-3.812a1,1 0,1 1,0 -2h3.812a1,1 0,0 1,0 2Z"/>
+      
+    <path android:fillColor="@color/neon_zluta" android:pathData="M13.812,13.877h-3.812a1,1 0,1 1,0 -2h3.812a1,1 0,0 1,0 2Z"/>
+      
+    <path android:fillColor="@color/neon_zluta" android:pathData="M15.752,17.815h-5.75a1,1 0,1 1,0 -2h5.75a1,1 0,0 1,0 2Z"/>
+      
+    <path android:fillColor="@color/neon_zluta" android:pathData="M13.812,21.69h-3.812a1,1 0,1 1,0 -2h3.812a1,1 0,0 1,0 2Z"/>
+      
+    <path android:fillColor="@color/neon_zluta" android:pathData="M13.812,25.752h-3.812a1,1 0,1 1,0 -2h3.812a1,1 0,0 1,0 2Z"/>
+      
+    <path android:fillColor="@color/neon_zluta" android:pathData="M15.752,29.815h-5.75a1,1 0,1 1,0 -2h5.75a1,1 0,0 1,0 2Z"/>
+    
+</vector>

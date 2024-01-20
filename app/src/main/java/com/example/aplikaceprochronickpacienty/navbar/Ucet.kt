@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.example.aplikaceprochronickpacienty.R
+import com.example.aplikaceprochronickpacienty.nastaveni.Nastaveni
 import com.example.aplikaceprochronickpacienty.prihlaseni.Prihlaseni
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -21,7 +22,12 @@ class Ucet : AppCompatActivity() {
 
     private lateinit var jmenoUzivatele: TextView
     private lateinit var odhlasitButton: Button
-    private lateinit var imageview: ImageView
+    private lateinit var ikonaUzivatele: ImageView
+
+    // Nastavení
+    private lateinit var ucet_nastaveni: TextView
+
+    // Údaje uživatele
     private lateinit var ucet_email: TextView
     private lateinit var ucet_datum_narozeni: TextView
     private lateinit var ucet_vyska: TextView
@@ -34,6 +40,7 @@ class Ucet : AppCompatActivity() {
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         supportActionBar?.hide()
@@ -68,9 +75,17 @@ class Ucet : AppCompatActivity() {
             }
         }
 
+        // Celé jméno uživatele
         jmenoUzivatele = findViewById(R.id.ucet_jmeno_uzivatele)
+
+        // Tlačítko pro odhálšení uživatele
         odhlasitButton = findViewById(R.id.ucet_odhlasit_button)
-        imageview = findViewById(R.id.ucet_imageview)
+
+        // Ikona uživatele
+        ikonaUzivatele = findViewById(R.id.ucet_imageview)
+
+        // Nastavení
+        ucet_nastaveni = findViewById(R.id.ucet_nastaveni)
 
         // Udáje uživatele
         ucet_email = findViewById(R.id.ucet_email)
@@ -108,6 +123,12 @@ class Ucet : AppCompatActivity() {
 
             // Přesunutí na aktivitu Přihlášení
             startActivity(Intent(this , Prihlaseni::class.java))
+        }
+
+        // Přesměrování uživatele na aktivitu Nastavení
+        ucet_nastaveni.setOnClickListener {
+
+            startActivity(Intent(this,Nastaveni::class.java))
         }
     }
 }

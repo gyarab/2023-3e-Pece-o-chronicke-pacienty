@@ -50,10 +50,13 @@ class Prihlaseni : AppCompatActivity() {
     // Zapomenutí hesla
     private lateinit var zapomenutiHesla: TextView
 
+    // Přihlášení přes Google
     private lateinit var prihlaseni_google_btn: Button
     private lateinit var prihlaseni_google_client: GoogleSignInClient
     private val RC_SIGN_IN: Int = 1
     private lateinit var googleSignInOptions: GoogleSignInOptions
+
+    // Kontrola účtu - výchozí či Google
     private var mapa: HashMap<String, Boolean> = HashMap()
 
     @SuppressLint("MissingInflatedId")
@@ -110,12 +113,13 @@ class Prihlaseni : AppCompatActivity() {
                 for (uzivatelSnapshot in snapshot.children) {
 
                     val emaily = uzivatelSnapshot.child("email").getValue(String::class.java)
-                    val googleUcet = uzivatelSnapshot.child("googleUcet").getValue(Boolean::class.java)
+                    val googleUcet =
+                        uzivatelSnapshot.child("googleUcet").getValue(Boolean::class.java)
 
                     if (emaily != null && googleUcet != null) {
 
-                        mapa.put(emaily,googleUcet)
-                        Log.d("MAPA",mapa.toString())
+                        mapa.put(emaily, googleUcet)
+                        Log.d("MAPA", mapa.toString())
                     }
                 }
 
@@ -235,7 +239,7 @@ class Prihlaseni : AppCompatActivity() {
             )
                 .show()
 
-            Log.d("EMAILY",mapa.keys.toString())
+            Log.d("EMAILY", mapa.keys.toString())
 
             prihlaseni_google_client.signOut()
 
@@ -276,7 +280,8 @@ class Prihlaseni : AppCompatActivity() {
         val databazeFirebase = FirebaseDatabase.getInstance()
         val referenceFirebase = databazeFirebase.getReference("users")
 
-        val udajeUzivatele = UdajeUzivatele(account.displayName, account.email, account.givenName, true)
+        val udajeUzivatele =
+            UdajeUzivatele(account.displayName, account.email, account.givenName, true)
 
         // V databazi Firebase Realtime se vytvori novy uzivatel se udaji
         account.givenName?.let { referenceFirebase.child(it).setValue(udajeUzivatele) }
@@ -366,14 +371,6 @@ class Prihlaseni : AppCompatActivity() {
         val uzivatel: String = prihlaseniEmail.getText().toString().trim()
         val heslo: String = prihlaseniHeslo.getText().toString().trim()
 
-        //val databazeFirebase: DatabaseReference =
-        //    FirebaseDatabase.getInstance().getReference("users")
-
-        //val kontrolaJmena: Query =
-        //    databazeFirebase.orderByChild("uzivatelskeJmeno").equalTo(uzivatel)
-
-        //Log.d("KONTROLA JMENA", kontrolaJmena.toString())
-
         FirebaseAuth.getInstance().signInWithEmailAndPassword(uzivatel, heslo)
 
             .addOnCompleteListener(this) { task ->
@@ -402,67 +399,6 @@ class Prihlaseni : AppCompatActivity() {
                     ).show()
                 }
             }
-
-        /*kontrolaJmena.addListenerForSingleValueEvent(object : ValueEventListener {
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-
-                if (snapshot.exists()) {
-
-                    prihlaseniUzivatelskeJmeno.error = null
-
-                    val hesloZfirebase =
-                        snapshot.child(uzivatel).child("heslo").getValue(String::class.java)
-
-                    Log.d("HESLO FIREBASE", hesloZfirebase.toString())
-                    Log.d("HESLO MOJE", heslo)
-
-                    Log.d("UZIVATEL", prihlaseniUzivatelskeJmeno.text.toString())
-
-
-
-                    if (hesloZfirebase.toString() == heslo) {
-
-                        prihlaseniUzivatelskeJmeno.error = null
-
-                        val jmenoPrijmeniZfirebase =
-                            snapshot.child(uzivatel).child("jmenoPrijmeni").getValue(
-                                String::class.java
-                            )
-                        val emailZfirebase = snapshot.child(uzivatel).child("email").getValue(
-                            String::class.java
-                        )
-                        val uzivatelskeJmenoZfirebase =
-                            snapshot.child(uzivatel).child("uzivatelskeJmeno").getValue(
-                                String::class.java
-                            )
-
-                        val intent: Intent = Intent(
-                            this@Prihlaseni,
-                            Home::class.java
-                        )
-
-                        intent.putExtra("jmenoPrijmeni", jmenoPrijmeniZfirebase)
-                        intent.putExtra("email", emailZfirebase)
-                        intent.putExtra("uzivatelskeJmeno", uzivatelskeJmenoZfirebase)
-                        intent.putExtra("heslo", hesloZfirebase)
-
-                        startActivity(intent)
-
-                    } else {
-                        prihlaseniHeslo.error = "Nesprávné heslo"
-
-                    }
-
-                } else {
-                    prihlaseniUzivatelskeJmeno.error = "Uživatel neexistuje"
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-            }
-        })*/
-
     }
 
 }

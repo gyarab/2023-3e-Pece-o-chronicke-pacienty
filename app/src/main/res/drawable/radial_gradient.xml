@@ -1,16 +1,14 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-    <!-- Bottom Right Corner Gradient -->
     <item>
         <shape android:shape="rectangle">
             <gradient
-                android:type="linear"
                 android:angle="315"
-                android:centerX="50%"
                 android:centerColor="@color/white"
-            android:startColor="#5B33B5"
-            android:endColor="#5B33B5" />
+                android:centerX="50%"
+                android:endColor="#5B33B5"
+                android:startColor="#5B33B5"
+                android:type="linear" />
         </shape>
     </item>
 

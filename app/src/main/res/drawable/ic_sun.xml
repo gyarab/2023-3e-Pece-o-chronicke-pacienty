@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="25dp"
+    android:height="25dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+
+    <path
+        android:fillColor="@color/neon_zluta"
+        android:pathData="M 0 239.908 H 68.958 V 272.093 H 0 V 239.908 Z" />
+    <path
+        android:fillColor="@color/neon_zluta"
+        android:pathData="M 443.059 239.908 H 512 V 272.093 H 443.059 V 239.908 Z" />
+    <path
+        android:fillColor="@color/neon_zluta"
+        android:pathData="M 26.248 370.057 L 42.341 397.943 L 102.053 363.464 L 85.961 335.586 Z" />
+    <path
+        android:fillColor="@color/neon_zluta"
+        android:pathData="M 485.752 141.934 L 469.658 114.057 L 409.947 148.536 L 426.039 176.413 Z" />
+    <path
+        android:fillColor="@color/neon_zluta"
+        android:pathData="M 114.065 469.658 L 141.943 485.752 L 176.422 426.039 L 148.544 409.947 Z" />
+    <path
+        android:fillColor="@color/neon_zluta"
+        android:pathData="M 397.952 42.341 L 370.057 26.248 L 335.596 85.961 L 363.473 102.053 Z" />
+    <path
+        android:fillColor="@color/neon_zluta"
+        android:pathData="M 239.916 443.051 H 272.101 V 512 H 239.916 V 443.051 Z" />
+    <path
+        android:fillColor="@color/neon_zluta"
+        android:pathData="M 239.916 0 H 272.101 V 68.949 H 239.916 V 0 Z" />
+    <path
+        android:fillColor="@color/neon_zluta"
+        android:pathData="M 335.596 426.039 L 370.057 485.752 L 397.952 469.658 L 363.473 409.947 Z" />
+    <path
+        android:fillColor="@color/neon_zluta"
+        android:pathData="M 176.422 85.961 L 141.943 26.248 L 114.065 42.341 L 148.544 102.053 Z" />
+    <path
+        android:fillColor="@color/neon_zluta"
+        android:pathData="M 409.947 363.464 L 469.658 397.943 L 485.752 370.057 L 426.039 335.586 Z" />
+    <path
+        android:fillColor="@color/neon_zluta"
+        android:pathData="M 102.053 148.536 L 42.341 114.057 L 26.248 141.934 L 85.961 176.413 Z" />
+    <path
+        android:fillColor="@color/neon_zluta"
+        android:pathData="M256.009,99.926c-86.207,0-156.074,69.877-156.074,156.074c0,86.197,69.868,156.074,156.074,156.074 c86.188,0,156.074-69.878,156.074-156.074C412.083,169.802,342.197,99.926,256.009,99.926z" />
+</vector>
