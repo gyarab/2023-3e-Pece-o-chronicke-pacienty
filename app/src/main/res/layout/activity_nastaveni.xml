@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/linear_gradient">
+    style="@style/NastaveniBackground">
 
 
     <LinearLayout
@@ -13,8 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/nastaveni_pozadi_element"
         android:orientation="vertical"
+        style="@style/NastaveniCardBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,25 +28,24 @@
 
             <ImageButton
                 android:id="@+id/nastaveni_button_zpet"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="50dp"
+                android:layout_height="75dp"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="15dp"
                 android:background="@null"
                 android:contentDescription="@string/zpet"
                 android:paddingBottom="6dp"
-                android:src="@drawable/nastaveni_ic_arrow_left" />
+                android:src="@drawable/nastaveni_ic_arrow_left"
+                style="@style/NastaveniTitle"/>
 
             <TextView
+                style="@style/NastaveniTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
                 android:fontFamily="@font/montserrat_bold"
                 android:padding="15dp"
                 android:text="Nastavení"
                 android:textAlignment="center"
-                android:textColor="@color/modro_fialova"
                 android:textSize="25sp" />
 
         </RelativeLayout>
@@ -64,9 +63,9 @@
                 android:drawablePadding="16dp"
                 android:padding="10dp"
                 android:text="Oznamení"
-                android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                style="@style/NastaveniNadpisColor"
                 app:drawableStartCompat="@drawable/ic_notifications" />
 
             <androidx.appcompat.widget.SwitchCompat
@@ -87,7 +86,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
                 android:layout_marginEnd="15dp"
-                android:background="@color/seda" />
+                style="@style/NastaveniLineColor" />
 
             <View
                 android:layout_width="match_parent"
@@ -95,7 +94,7 @@
                 android:layout_alignParentTop="@id/ucet_switch_oznameni"
                 android:layout_marginStart="50dp"
                 android:layout_marginEnd="15dp"
-                android:background="@color/seda" />
+                style="@style/NastaveniLineColor" />
 
         </RelativeLayout>
 
@@ -112,9 +111,9 @@
                 android:drawablePadding="16dp"
                 android:padding="10dp"
                 android:text="Dark mode"
-                android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                style="@style/NastaveniNadpisColor"
                 app:drawableStartCompat="@drawable/ic_dark_theme" />
 
             <androidx.appcompat.widget.SwitchCompat
@@ -134,7 +133,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
                 android:layout_marginEnd="15dp"
-                android:background="@color/seda" />
+                style="@style/NastaveniLineColor" />
 
         </RelativeLayout>
 
@@ -151,9 +150,9 @@
                 android:drawablePadding="16dp"
                 android:padding="10dp"
                 android:text="Cíle"
-                android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                style="@style/NastaveniNadpisColor"
                 app:drawableStartCompat="@drawable/ic_goal" />
 
             <View
@@ -163,7 +162,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
                 android:layout_marginEnd="15dp"
-                android:background="@color/seda" />
+                style="@style/NastaveniLineColor" />
 
         </RelativeLayout>
 
@@ -181,9 +180,9 @@
                 android:padding="8dp"
                 android:paddingStart="50dp"
                 android:text="Kroky"
-                android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                style="@style/NastaveniTextColor"
                 app:drawableStartCompat="@drawable/nastaveni_ic_steps"
                 tools:ignore="RtlSymmetry" />
 
@@ -198,9 +197,8 @@
                 android:hint="12,000"
                 android:inputType="text"
                 android:padding="8dp"
-                android:textColor="@color/black"
-                android:textColorHint="@color/tmave_seda"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                style="@style/NastaveniDescriptionColor"/>
 
             <View
                 android:layout_width="match_parent"
@@ -209,7 +207,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
                 android:layout_marginEnd="15dp"
-                android:background="@color/seda" />
+                style="@style/NastaveniLineColor" />
 
         </RelativeLayout>
 
@@ -228,10 +226,11 @@
                 android:padding="8dp"
                 android:paddingStart="50dp"
                 android:text="Váha"
-                android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:drawableStartCompat="@drawable/ic_weight" />
+                style="@style/NastaveniVaha"
+                app:drawableStartCompat="@drawable/ic_weight"
+                tools:ignore="RtlSymmetry" />
 
             <EditText
                 android:id="@+id/nastaveni_vaha_editext"
@@ -244,9 +243,8 @@
                 android:hint="120 kg"
                 android:inputType="text"
                 android:padding="8dp"
-                android:textColor="@color/black"
-                android:textColorHint="@color/tmave_seda"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                style="@style/NastaveniDescriptionColor"/>
 
             <View
                 android:layout_width="match_parent"
@@ -255,7 +253,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
                 android:layout_marginEnd="15dp"
-                android:background="@color/seda" />
+                style="@style/NastaveniLineColor" />
 
         </RelativeLayout>
 
@@ -273,9 +271,9 @@
                 android:drawablePadding="16dp"
                 android:padding="10dp"
                 android:text="Změnit údaje"
-                android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                style="@style/NastaveniNadpisColor"
                 app:drawableStartCompat="@drawable/ic_edit" />
 
             <View
@@ -285,7 +283,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
                 android:layout_marginEnd="15dp"
-                android:background="@color/seda" />
+                style="@style/NastaveniLineColor" />
 
         </RelativeLayout>
 
@@ -304,9 +302,9 @@
                 android:padding="8dp"
                 android:paddingStart="50dp"
                 android:text="Datum narození"
-                android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                style="@style/NastaveniTextColor"
                 app:drawableStartCompat="@drawable/ic_birthday_cake" />
 
             <EditText
@@ -320,9 +318,8 @@
                 android:hint="DD.MM.YY"
                 android:inputType="text"
                 android:padding="8dp"
-                android:textColor="@color/black"
-                android:textColorHint="@color/tmave_seda"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                style="@style/NastaveniDescriptionColor"/>
 
             <View
                 android:layout_width="match_parent"
@@ -331,7 +328,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
                 android:layout_marginEnd="15dp"
-                android:background="@color/seda" />
+                style="@style/NastaveniLineColor" />
 
         </RelativeLayout>
 
@@ -350,9 +347,9 @@
                 android:padding="8dp"
                 android:paddingStart="50dp"
                 android:text="Výška"
-                android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                style="@style/NastaveniTextColor"
                 app:drawableStartCompat="@drawable/ic_measure_scale" />
 
             <EditText
@@ -366,9 +363,8 @@
                 android:hint="180 cm"
                 android:inputType="text"
                 android:padding="8dp"
-                android:textColor="@color/black"
-                android:textColorHint="@color/tmave_seda"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                style="@style/NastaveniDescriptionColor"/>
 
             <View
                 android:layout_width="match_parent"
@@ -377,7 +373,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
                 android:layout_marginEnd="15dp"
-                android:background="@color/seda" />
+                style="@style/NastaveniLineColor" />
 
         </RelativeLayout>
 
@@ -385,7 +381,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="10dp"
             android:orientation="horizontal">
 
             <TextView
@@ -397,9 +393,9 @@
                 android:padding="8dp"
                 android:paddingStart="50dp"
                 android:text="Váha"
-                android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                style="@style/NastaveniVaha"
                 app:drawableStartCompat="@drawable/ic_weight" />
 
             <EditText
@@ -413,9 +409,8 @@
                 android:hint="125 kg"
                 android:inputType="text"
                 android:padding="8dp"
-                android:textColor="@color/black"
-                android:textColorHint="@color/tmave_seda"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                style="@style/NastaveniDescriptionColor"/>
 
         </RelativeLayout>
 

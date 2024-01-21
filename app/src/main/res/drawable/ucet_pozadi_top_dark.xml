@@ -5,12 +5,15 @@
     <gradient
         android:angle="270"
         android:centerColor="@color/white"
+        android:centerX="50%"
         android:type="linear" />
 
     <gradient
         android:endColor="@color/white"
-        android:gradientRadius="600dp"
-        android:startColor="@color/modro_fialova"
+        android:gradientRadius="575dp"
+        android:startColor="@color/neon_ruzova"
         android:type="radial" />
 
+    <corners android:radius="32dp"
+        />
 </shape>

@@ -13,4 +13,122 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <!--  Navigation bar  -->
+
+    <style name="Navbar">
+
+        <item name="android:background">@color/white</item>
+
+    </style>
+
+    <!--  Nastavení  -->
+
+    <style name="NastaveniCardBackground">
+
+        <item name="android:background">@drawable/nastaveni_pozadi_element_white</item>
+
+    </style>
+
+    <style name="NastaveniTitle">
+
+        <item name="android:textColor">@color/modro_fialova</item>
+
+        <item name="android:tint">@color/modro_fialova</item>
+
+    </style>
+
+    <style name="NastaveniNadpisColor">
+
+        <item name="android:drawableTint">@color/modro_fialova</item>
+
+        <item name="android:textColor">@color/black</item>
+
+    </style>
+
+    <style name="NastaveniVaha">
+
+        <item name="android:drawableTint">@color/neon_fialova</item>
+
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="NastaveniTextColor">
+
+        <item name="android:textColor">@color/black</item>
+
+    </style>
+
+    <style name="NastaveniDescriptionColor">
+
+        <item name="android:textColorHint">@color/tmave_seda</item>
+
+        <item name="android:textColor">@color/black</item>
+
+    </style>
+
+    <style name="NastaveniBackground">
+
+        <item name="android:background">@drawable/nastaveni_pozadi_white</item>
+
+    </style>
+
+    <style name="NastaveniLineColor">
+
+        <item name="android:background">@color/seda</item>
+
+    </style>
+
+    <!--  Účet  -->
+
+    <style name="UcetBackground">
+
+        <item name="android:background">@color/white</item>
+
+    </style>
+
+    <style name="UcetPozadiBody">
+
+        <item name="android:background">@drawable/ucet_pozadi_body_white</item>
+
+    </style>
+
+    <style name="UcetPozadiBodyZacatek">
+
+        <item name="android:background">@drawable/ucet_pozadi_table_zacatek_white</item>
+
+    </style>
+
+    <style name="UcetTableBody">
+
+        <item name="android:background">@color/white</item>
+
+    </style>
+
+    <style name="UcetTableEnd">
+
+        <item name="android:background">@drawable/ucet_pozadi_table_end_white</item>
+
+    </style>
+
+    <style name="UcetTableNastaveni">
+
+        <item name="android:background">@drawable/ucet_pozadi_element_white</item>
+
+        <item name="android:textColor">@color/black</item>
+
+    </style>
+
+    <style name="UcetTextColor">
+
+        <item name="android:textColor">@color/black</item>
+
+    </style>
+
+    <style name="UcetProfilePicture">
+
+        <item name="android:background">@drawable/ucet_pozadi_top_white</item>
+
+    </style>
+
 </resources>

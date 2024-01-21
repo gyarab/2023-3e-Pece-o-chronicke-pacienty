@@ -7,7 +7,14 @@
         <shape
             android:shape="rectangle">
 
-            <solid android:color="@color/modro_fialova" />
+            <gradient
+                android:angle="0"
+                android:centerColor="@color/neon_ruzova"
+                android:endColor="@color/modro_fialova"
+                android:startColor="@color/modro_fialova"
+                android:type="linear" />
+
+<!--            <solid android:color="@color/modro_fialova" />-->
 
             <corners android:radius="100dp" />
 

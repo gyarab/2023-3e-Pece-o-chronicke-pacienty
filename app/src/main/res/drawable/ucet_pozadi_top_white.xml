@@ -6,8 +6,6 @@
         android:angle="270"
         android:centerColor="@color/white"
         android:centerX="50%"
-        android:endColor="@color/modro_fialova"
-        android:startColor="@color/modro_fialova"
         android:type="linear" />
 
     <gradient
