@@ -125,10 +125,44 @@
 
     </style>
 
-    <style name="UcetProfilePicture">
+    <!--  Chat  -->
 
-        <item name="android:background">@drawable/ucet_pozadi_top_dark</item>
+    <style name="ChatBackground">
+
+        <item name="android:background">@color/black</item>
 
     </style>
+
+    <style name="ChatDesignInput">
+
+        <item name="android:background">@drawable/chat_pozadi_kruh_dark</item>
+
+        <item name="android:textColor">@color/white</item>
+
+        <item name="android:textColorHint">@color/tmave_seda</item>
+
+    </style>
+
+    <style name="ChatMessageUser">
+
+        <item name="android:textColor">@color/white</item>
+
+    </style>
+
+    <style name="ChatMessageResponse">
+
+        <item name="android:textColor">@color/white</item>
+
+        <item name="android:background">@drawable/zprava_dorucena_dark</item>
+
+    </style>
+
+    <!--  Přehled  -->
+
+<!--    <style name="PrehledBackground">-->
+
+<!--        <item name="android:background">@color/tmave_fialova</item>-->
+
+<!--    </style>-->
 
 </resources>

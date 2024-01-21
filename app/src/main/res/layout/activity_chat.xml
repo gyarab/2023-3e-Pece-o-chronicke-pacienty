@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    style="@style/ChatBackground"
     tools:context=".navbar.Chat">
 
     <FrameLayout
@@ -41,15 +41,13 @@
         android:layout_marginStart="16sp"
         android:layout_marginEnd="8sp"
         android:layout_marginBottom="75dp"
-        android:background="@drawable/chat_pozadi_kruh"
+        style="@style/ChatDesignInput"
         android:ems="10"
         android:hint="@string/napis_svoji_zpravu"
         android:inputType="text"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:textColor="@color/black"
-        android:textColorHint="#cbcbcb"
-
+        android:autofillHints="Napište zprávu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/constraintLayout"
         app:layout_constraintStart_toStartOf="parent" />
@@ -59,7 +57,7 @@
         android:id="@+id/chatView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@drawable/chat_pozadi_top"
+        style="@style/ChatBackground"
         android:orientation="vertical"
         android:layout_marginBottom="15dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

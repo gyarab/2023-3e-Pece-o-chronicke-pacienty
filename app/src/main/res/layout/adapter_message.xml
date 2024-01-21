@@ -9,6 +9,7 @@
     android:paddingLeft="8dp"
     android:paddingRight="8dp"
     android:paddingBottom="20dp"
+    style="@style/ChatBackground"
     >
 
     <TextView
@@ -25,7 +26,7 @@
         android:paddingTop="10dp"
         android:paddingEnd="14sp"
         android:paddingBottom="10dp"
-        android:textColor="@color/white"
+        style="@style/ChatMessageUser"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -40,7 +41,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:autoSizeTextType="uniform"
-        android:background="@drawable/sablona_zprava_dorucena"
         android:fontFamily="@font/open_sans"
         android:includeFontPadding="false"
         android:maxWidth="200dp"
@@ -49,9 +49,8 @@
         android:paddingEnd="12sp"
         android:paddingBottom="8dp"
         android:lineSpacingExtra="5sp"
-        android:textColor="@android:color/black"
+        style="@style/ChatMessageResponse"
         android:textSize="16sp"
-
         app:layout_constraintTop_toBottomOf="@id/message_send"
         app:layout_constraintWidth_max="wrap"
 

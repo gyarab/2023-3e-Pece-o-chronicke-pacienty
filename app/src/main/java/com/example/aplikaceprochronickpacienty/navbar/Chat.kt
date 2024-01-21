@@ -1,15 +1,17 @@
 package com.example.aplikaceprochronickpacienty.navbar
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.example.aplikaceprochronickpacienty.models.Message
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.example.aplikaceprochronickpacienty.BuildConfig
 import com.example.aplikaceprochronickpacienty.R
+import com.example.aplikaceprochronickpacienty.adapters.ChatAdapter
+import com.example.aplikaceprochronickpacienty.databinding.ActivityChatBinding
+import com.example.aplikaceprochronickpacienty.models.Message
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.api.gax.core.FixedCredentialsProvider
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.auth.oauth2.ServiceAccountCredentials
@@ -20,8 +22,6 @@ import com.google.cloud.dialogflow.v2.SessionName
 import com.google.cloud.dialogflow.v2.SessionsClient
 import com.google.cloud.dialogflow.v2.SessionsSettings
 import com.google.cloud.dialogflow.v2.TextInput
-import com.example.aplikaceprochronickpacienty.adapters.ChatAdapter
-import com.example.aplikaceprochronickpacienty.databinding.ActivityChatBinding
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -38,8 +38,8 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
 import java.io.InputStream
-import java.util.ArrayList
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 class Chat : AppCompatActivity() {
 
@@ -55,11 +55,9 @@ class Chat : AppCompatActivity() {
 
     private lateinit var binding: ActivityChatBinding
 
-    private val client = OkHttpClient()
+    private var client = OkHttpClient()
 
     private var otazka: String = ""
-
-    private var arrayList = arrayListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -117,6 +115,13 @@ class Chat : AppCompatActivity() {
             }
         }
 
+        client = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .build()
+
+
         // nacteni souboru JSON a vytvoření motivační hlášky
         readJSON()
 
@@ -173,6 +178,7 @@ class Chat : AppCompatActivity() {
                 val result = sessionsClient?.detectIntent(detectIntentRequest)
 
                 if (result != null) {
+
                     runOnUiThread {
                         updateUI(result)
                     }
@@ -209,32 +215,45 @@ class Chat : AppCompatActivity() {
             .build()
 
         client.newCall(request).enqueue(object : Callback {
+
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("error", "API failed", e)
             }
 
             override fun onResponse(call: Call, response: Response) {
+
                 val body = response.body?.string()
+
                 if (body != null) {
+
                     Log.v("data", body)
 
                     try {
                         val jsonResponse = JSONObject(body)
                         val choices: JSONArray = jsonResponse.getJSONArray("choices")
+
                         if (choices.length() > 0) {
+
                             val message = choices.getJSONObject(0).getString("message")
                             val messageObject = JSONObject(message)
                             val content = messageObject.optString("content")
                             callback(content)
+
                         } else {
+
                             Log.e("error", "No choices found in the response.")
                         }
+
                     } catch (e: JSONException) {
+
                         Log.e("error", "Error parsing JSON response: ${e.message}")
                     }
+
                 } else {
+
                     Log.v("data", "empty")
                 }
+
             }
         })
     }
@@ -290,20 +309,18 @@ class Chat : AppCompatActivity() {
 
             val motivacniHlaska = "Vytvoř jednovětnou motivační hlášku pro člověka, který vykonal tyto aktivity za jeden den: $kroky $spanek $aktivniPohyb"
 
-            arrayList.add(motivacniHlaska)
-
             addMessageToList("Typing...",true)
 
             /** Motivační hláška **/
 
-            /*getResponse(motivacniHlaska) { result ->
+            getResponse(motivacniHlaska) { result ->
 
                 runOnUiThread {
 
                     messageList.remove(Message("Typing...", true))
                     addMessageToList(result, true)
                 }
-            }*/
+            }
 
 
         } catch (e:Exception){
