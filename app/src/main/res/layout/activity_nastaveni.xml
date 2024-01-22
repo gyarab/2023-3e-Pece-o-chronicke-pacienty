@@ -69,7 +69,7 @@
                 app:drawableStartCompat="@drawable/ic_notifications" />
 
             <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/ucet_switch_oznameni"
+                android:id="@+id/nastaveni_switch_oznameni"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="4dp"
@@ -82,7 +82,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_below="@id/ucet_switch_oznameni"
+                android:layout_below="@id/nastaveni_switch_oznameni"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
                 android:layout_marginEnd="15dp"
@@ -91,7 +91,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_alignParentTop="@id/ucet_switch_oznameni"
+                android:layout_alignParentTop="@id/nastaveni_switch_oznameni"
                 android:layout_marginStart="50dp"
                 android:layout_marginEnd="15dp"
                 style="@style/NastaveniLineColor" />
@@ -232,19 +232,36 @@
                 app:drawableStartCompat="@drawable/ic_weight"
                 tools:ignore="RtlSymmetry" />
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="50dp"
+                android:padding="8dp"
+                tools:ignore="RelativeOverlap">
+
             <EditText
                 android:id="@+id/nastaveni_vaha_editext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/nastaveni_vaha"
-                android:layout_marginEnd="50dp"
                 android:autofillHints="Kroky"
                 android:background="@null"
-                android:hint="120 kg"
+                android:hint="120"
                 android:inputType="text"
-                android:padding="8dp"
                 android:textSize="16sp"
+                android:padding="2dp"
+                android:layout_marginEnd="4dp"
                 style="@style/NastaveniDescriptionColor"/>
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="@string/kg"
+                style="@style/NastaveniDescriptionColor" />
+
+            </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
@@ -352,19 +369,36 @@
                 style="@style/NastaveniTextColor"
                 app:drawableStartCompat="@drawable/ic_measure_scale" />
 
-            <EditText
-                android:id="@+id/nastaveni_vyska_editext"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/nastaveni_udaje_vyska"
+                android:layout_alignParentEnd="true"
                 android:layout_marginEnd="15dp"
-                android:autofillHints="Kroky"
-                android:background="@null"
-                android:hint="180 cm"
-                android:inputType="text"
                 android:padding="8dp"
-                android:textSize="15sp"
-                style="@style/NastaveniDescriptionColor"/>
+                tools:ignore="RelativeOverlap">
+
+                <EditText
+                    android:id="@+id/nastaveni_vyska_editext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="Kroky"
+                    android:background="@null"
+                    android:hint="180"
+                    android:inputType="text"
+                    android:textSize="15sp"
+                    android:padding="2dp"
+                    android:layout_marginEnd="4dp"
+                    style="@style/NastaveniDescriptionColor"/>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:text="@string/cm"
+                    style="@style/NastaveniDescriptionColor" />
+
+            </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
@@ -398,21 +432,70 @@
                 style="@style/NastaveniVaha"
                 app:drawableStartCompat="@drawable/ic_weight" />
 
-            <EditText
-                android:id="@+id/nastaveni_vaha_udaje_editext"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignEnd="@+id/nastaveni_udaje_vaha"
+                android:layout_alignParentEnd="true"
                 android:layout_marginEnd="15dp"
-                android:autofillHints="Kroky"
-                android:background="@null"
-                android:hint="125 kg"
-                android:inputType="text"
                 android:padding="8dp"
-                android:textSize="15sp"
-                style="@style/NastaveniDescriptionColor"/>
+                tools:ignore="RelativeOverlap">
+
+                <EditText
+                    android:id="@+id/nastaveni_vaha_udaje_editext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignEnd="@+id/nastaveni_udaje_vaha"
+                    android:autofillHints="Kroky"
+                    android:background="@null"
+                    android:hint="125"
+                    android:inputType="text"
+                    android:textSize="15sp"
+                    android:padding="2dp"
+                    android:layout_marginEnd="4dp"
+                    style="@style/NastaveniDescriptionColor"/>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:text="@string/kg"
+                    style="@style/NastaveniDescriptionColor" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/nastaveni_udaje_vaha"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="15dp"
+                style="@style/NastaveniLineColor" />
 
         </RelativeLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/ucet_odhlasit_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ULOŽIT ZMĚNY"
+                android:textColor="@color/white"
+                app:backgroundTint="#25c275"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            </Button>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 

@@ -16,6 +16,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.navbar.Prehled
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -149,6 +150,7 @@ class Prihlaseni : AppCompatActivity() {
                     return@setOnClickListener
 
                 } else {
+
                     kontrolaUzivatele()
 
                 }
@@ -260,7 +262,6 @@ class Prihlaseni : AppCompatActivity() {
                         val googleIntent = Intent(this, Prehled::class.java)
                         startActivity(googleIntent)
 
-
                     } else {
 
                         Toast.makeText(
@@ -281,10 +282,23 @@ class Prihlaseni : AppCompatActivity() {
         val referenceFirebase = databazeFirebase.getReference("users")
 
         val udajeUzivatele =
-            UdajeUzivatele(account.displayName, account.email, account.givenName, true)
+            UdajeUzivatele(
+                account.displayName,
+                account.email,
+                account.givenName,
+                true,
+                true,
+                true,
+                "",
+                "",
+                0.0,
+                0,
+                0,
+                0.0
+            )
 
-        // V databazi Firebase Realtime se vytvori novy uzivatel se udaji
-        account.givenName?.let { referenceFirebase.child(it).setValue(udajeUzivatele) }
+        // V databazi Firebase Realtime se vytvoří nový uživatel se údaji
+        account.displayName?.let { referenceFirebase.child(it).setValue(udajeUzivatele) }
     }
 
     /** Kontrola emailu - zda je validní **/

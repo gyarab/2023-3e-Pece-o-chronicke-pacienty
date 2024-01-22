@@ -8,13 +8,17 @@ import android.graphics.Shader
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
-import android.util.TypedValue
 import android.view.animation.AlphaAnimation
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import app.futured.donut.DonutProgressView
 import app.futured.donut.DonutSection
 import com.db.williamchart.ExperimentalFeature
+import com.db.williamchart.data.AxisType
+import com.db.williamchart.data.Paddings
+import com.db.williamchart.data.Scale
+import com.db.williamchart.data.configuration.ChartConfiguration
 import com.db.williamchart.view.BarChartView
 import com.db.williamchart.view.LineChartView
 import com.example.aplikaceprochronickpacienty.R
@@ -24,6 +28,12 @@ import com.example.aplikaceprochronickpacienty.roomDB.UzivatelDatabase
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.tabs.TabLayout
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -71,16 +81,6 @@ class Prehled : AppCompatActivity() {
     private var tabItemBar: String = "KALORIE"
     private var tabItemLine: String = "TYDEN"
 
-    val tyden = listOf(
-        "PO",
-        "ÚT",
-        "ST",
-        "ČT",
-        "PÁ",
-        "SO",
-        "NE"
-    )
-
     val listDnu = ArrayList<String>()
 
 
@@ -95,69 +95,124 @@ class Prehled : AppCompatActivity() {
 
     private var click: String = "BAR LINE"
 
+    val formatter: (Float) -> String = { value -> value.toString() }
+
+    private lateinit var chartConfiguration: ChartConfiguration
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
-        supportActionBar?.hide()
-        val binding: ActivityPrehledBinding = ActivityPrehledBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        // Nastavení výchozího grafu
+        chartConfiguration = ChartConfiguration(
+            0,
+            0,
+            Paddings(0F, 0F, 0F, 0F),
+            AxisType.NONE,
+            0F,
+            Scale(0F, 0F),
+            formatter
+        )
 
-        val navView: BottomNavigationView = findViewById(R.id.bottom_nav)
+        if (::chartConfiguration.isInitialized) {
 
-        navView.selectedItemId = R.id.navigation_home
 
-        navView.setOnNavigationItemSelectedListener { item ->
+            supportActionBar?.hide()
+            val binding: ActivityPrehledBinding = ActivityPrehledBinding.inflate(layoutInflater)
+            setContentView(binding.root)
 
-            when (item.itemId) {
+            val navView: BottomNavigationView = findViewById(R.id.bottom_nav)
 
-                R.id.navigation_home -> {
-                    return@setOnNavigationItemSelectedListener true
+            navView.selectedItemId = R.id.navigation_home
+
+            navView.setOnNavigationItemSelectedListener { item ->
+
+                when (item.itemId) {
+
+                    R.id.navigation_home -> {
+                        return@setOnNavigationItemSelectedListener true
+                    }
+
+                    R.id.navigation_chat -> {
+                        startActivity(Intent(applicationContext, Chat::class.java))
+                        overridePendingTransition(0, 0)
+                        return@setOnNavigationItemSelectedListener true
+                    }
+
+                    R.id.navigation_settings -> {
+                        startActivity(Intent(applicationContext, Ucet::class.java))
+                        overridePendingTransition(0, 0)
+                        return@setOnNavigationItemSelectedListener true
+                    }
+
+                    else -> return@setOnNavigationItemSelectedListener false
                 }
-
-                R.id.navigation_chat -> {
-                    startActivity(Intent(applicationContext, Chat::class.java))
-                    overridePendingTransition(0, 0)
-                    return@setOnNavigationItemSelectedListener true
-                }
-
-                R.id.navigation_settings -> {
-                    startActivity(Intent(applicationContext, Ucet::class.java))
-                    overridePendingTransition(0, 0)
-                    return@setOnNavigationItemSelectedListener true
-                }
-
-                else -> return@setOnNavigationItemSelectedListener false
             }
+
+            // Dark mode
+            //getDarkMode("darkMode")
+
+            // Databáze ROOM
+            roomDatabase = UzivatelDatabase.getDatabase(this)
+
+            // Vkládání dat do databáze
+            saveData()
+
+            prehled_pocet_kroku = findViewById(R.id.prehled_pocet_kroku)
+
+            prehled_zbyvajici_kroky = findViewById(R.id.prehled_zbyvajici_kroky)
+
+            prehled_donut_bar = findViewById(R.id.prehled_donut_bar)
+
+            prehled_chart_bar = findViewById(R.id.prehled_barChart)
+
+            prehled_line_bar = findViewById(R.id.prehled_lineChart)
+
+            prehled_tabLayoutBar = findViewById(R.id.prehled_tabLayout1)
+
+            prehled_tabLayoutLine = findViewById(R.id.prehled_tabLayout2)
+
+            prehled_souradnice_linearChart = findViewById(R.id.prehled_souradnice_linearChart)
+
+
+            // Získání konkrétní položky z tabulky
+            getItemFromTableBarChart()
+            getItemFromTableLineChart()
+
+        } else {
+
+            println("ERROR")
         }
-
-        // Databáze ROOM
-        roomDatabase = UzivatelDatabase.getDatabase(this)
-
-        // Vkládání dat do databáze
-        saveData()
-
-        prehled_pocet_kroku = findViewById(R.id.prehled_pocet_kroku)
-
-        prehled_zbyvajici_kroky = findViewById(R.id.prehled_zbyvajici_kroky)
-
-        prehled_donut_bar = findViewById(R.id.prehled_donut_bar)
-
-        prehled_chart_bar = findViewById(R.id.prehled_barChart)
-
-        prehled_line_bar = findViewById(R.id.prehled_lineChart)
-
-        prehled_tabLayoutBar = findViewById(R.id.prehled_tabLayout1)
-
-        prehled_tabLayoutLine = findViewById(R.id.prehled_tabLayout2)
-
-        prehled_souradnice_linearChart = findViewById(R.id.prehled_souradnice_linearChart)
-
-
-        // Získání konkrétní položky z tabulky
-        getItemFromTableBarChart()
-        getItemFromTableLineChart()
     }
+
+//    private fun getDarkMode(switchNazev:String) {
+//
+//        val databazeFirebase: FirebaseDatabase = FirebaseDatabase.getInstance()
+//        val referenceFirebaseUzivatel: DatabaseReference = databazeFirebase.getReference("users")
+//
+//        val uzivatel = FirebaseAuth.getInstance().currentUser!!
+//
+//        referenceFirebaseUzivatel.addListenerForSingleValueEvent(object : ValueEventListener {
+//
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//
+//                val darkMode = uzivatel.displayName?.let { snapshot.child(it).child(switchNazev).getValue(Boolean::class.java) }
+//
+//                if (darkMode == true) {
+//
+//                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+//
+//                } else {
+//
+//                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+//                }
+//            }
+//
+//            override fun onCancelled(error: DatabaseError) {
+//            }
+//        })
+//    }
 
     /** Přenos dat uživatele z csv souboru do databáze **/
     @OptIn(DelicateCoroutinesApi::class)
@@ -599,7 +654,8 @@ class Prehled : AppCompatActivity() {
                     prehled_zbyvajici_kroky.animate().scaleX(0F).scaleY(0F).setDuration(500)
 
                         .withEndAction(Runnable {
-                            prehled_zbyvajici_kroky.animate().scaleX(1F).scaleY(1F).setDuration(1500)
+                            prehled_zbyvajici_kroky.animate().scaleX(1F).scaleY(1F)
+                                .setDuration(1500)
                         })
                 }
 

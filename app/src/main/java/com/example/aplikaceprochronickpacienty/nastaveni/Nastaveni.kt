@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.widget.EditText
 import android.widget.ImageButton
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,13 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SwitchCompat
 import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.navbar.Ucet
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class Nastaveni : AppCompatActivity() {
 
@@ -19,19 +27,44 @@ class Nastaveni : AppCompatActivity() {
 
     // Switch theme
     private lateinit var nastaveni_switch_mode: SwitchCompat
+    var darkModeZapnut: Boolean = true
 
     // Tmavý motiv
-    var nightMode: Boolean = false
-
+    private var nightMode: Boolean = false
     private lateinit var preferences: SharedPreferences
-
     private lateinit var editPreferences: SharedPreferences.Editor
+
+    // Switch oznámení
+    private lateinit var nastaveni_switch_oznameni: SwitchCompat
+    var oznameniZapnuta: Boolean = true
+
+    // Switch oznámení
+    private lateinit var nastaveni_kroky_editext: EditText
+    private lateinit var nastaveni_vaha_editext: EditText
+    private lateinit var nastaveni_datum_narozeni_editext: EditText
+    private lateinit var nastaveni_vyska_editext: EditText
+    private lateinit var nastaveni_vaha_udaje_editext: EditText
+
+    // Firebase Realtime database
+    private lateinit var databazeFirebase: FirebaseDatabase
+    private lateinit var referenceFirebaseUzivatel: DatabaseReference
+
+    // Uživatel Firebase Auth
+    private lateinit var uzivatel: FirebaseUser
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         supportActionBar?.hide()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_nastaveni)
+
+        // Firebase Reference
+        databazeFirebase = FirebaseDatabase.getInstance()
+        referenceFirebaseUzivatel = databazeFirebase.getReference("users")
+
+        // Aktulání uživatel Firebase
+        uzivatel = FirebaseAuth.getInstance().currentUser!!
 
         // Tlačítko Zpět
         nastaveni_button_zpet = findViewById(R.id.nastaveni_button_zpet)
@@ -45,36 +78,135 @@ class Nastaveni : AppCompatActivity() {
         // Dark/White mode
         nastaveni_switch_mode = findViewById(R.id.nastaveni_switch_mode)
 
-        preferences = getSharedPreferences("MODE", Context.MODE_PRIVATE)
-
-        nightMode = preferences.getBoolean("nightMode",false)
-
-        if (nightMode) {
+        // Aktivace tmavého motivu
+        /*if (nightMode) {
 
             nastaveni_switch_mode.isChecked = true
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }
+        }*/
 
-        nastaveni_switch_mode.setOnClickListener {
+        // Nastavení Dark/White motivu
 
-            if (nightMode) {
+        nastaveni_switch_mode = findViewById(R.id.nastaveni_switch_mode)
 
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        // Oznámení
+        nastaveni_switch_oznameni = findViewById(R.id.nastaveni_switch_oznameni)
 
-                editPreferences = preferences.edit()
+        getSwitchDB("oznameni", nastaveni_switch_oznameni)
+        getSwitchDB("darkMode", nastaveni_switch_mode)
 
-                editPreferences.putBoolean("nightMode",false)
+        // Kontrola zda jsou oznámení zapnuta či vypnuta
+        nastaveni_switch_oznameni.setOnCheckedChangeListener { buttonView, isChecked ->
+
+            if (isChecked) {
+
+                println("Oznámení jsou zapnuta!")
+
+                oznameniZapnuta = true
 
             } else {
 
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                println("Oznámení jsou vypnuta!")
 
-                editPreferences = preferences.edit()
-
-                editPreferences.putBoolean("nightMode",true)
+                oznameniZapnuta = false
             }
 
-            editPreferences.apply()
+            oznameniDB(uzivatel)
+            nastaveni_switch_oznameni.isChecked = oznameniZapnuta
         }
+
+        // Kontrola zda je dark mode zapnut či vypnut
+        nastaveni_switch_mode.setOnCheckedChangeListener { buttonView, isChecked ->
+
+
+            if (isChecked) {
+
+                println("Dark mode je zapnut!")
+
+                darkModeZapnut = true
+
+            } else {
+
+                println("Dark mode je vypnut!")
+
+                darkModeZapnut = false
+            }
+
+            // Mód uživatele
+            darkModeDB(uzivatel)
+            nastaveni_switch_mode.isChecked = darkModeZapnut
+
+            preferences = getSharedPreferences("MODE", Context.MODE_PRIVATE)
+
+            nightMode = preferences.getBoolean("nightMode",false)
+
+            if (nightMode) {
+
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }
+
+            nastaveni_switch_mode.setOnClickListener {
+
+                if (nightMode) {
+
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+                    editPreferences = preferences.edit()
+
+                    editPreferences.putBoolean("nightMode",false)
+
+                } else {
+
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+
+                    editPreferences = preferences.edit()
+
+                    editPreferences.putBoolean("nightMode",true)
+                }
+
+                editPreferences.apply()
+            }
+        }
+    }
+
+    private fun oznameniDB(uzivatel: FirebaseUser?) {
+
+        if (uzivatel != null) {
+
+            uzivatel.displayName?.let {
+
+                referenceFirebaseUzivatel.child(it).child("oznameni").setValue(oznameniZapnuta)
+            }
+        }
+    }
+
+    private fun darkModeDB(uzivatel: FirebaseUser?) {
+
+        if (uzivatel != null) {
+
+            uzivatel.displayName?.let {
+
+                referenceFirebaseUzivatel.child(it).child("darkMode").setValue(darkModeZapnut)
+            }
+        }
+    }
+
+    private fun getSwitchDB(switchNazev: String, switchCompat: SwitchCompat) {
+
+        referenceFirebaseUzivatel.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val switchUzivatel = uzivatel.displayName?.let { snapshot.child(it).child(switchNazev).getValue(Boolean::class.java) }
+
+                if (switchUzivatel != null) {
+
+                    switchCompat.isChecked = switchUzivatel
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
     }
 }

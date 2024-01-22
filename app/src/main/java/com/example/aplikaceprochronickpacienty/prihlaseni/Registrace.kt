@@ -135,11 +135,11 @@ class Registrace : AppCompatActivity() {
         }
 
         /** Komtrola zda email se nachází v databázi **/
-         fun emailExistuje(email: EditText): Boolean {
+        fun emailExistuje(email: EditText): Boolean {
 
             val emailText = email.text.toString()
 
-            var vysledek: Boolean = false
+            val vysledek: Boolean = false
 
             val databazeReference: DatabaseReference =
                 FirebaseDatabase.getInstance().getReference("users")
@@ -152,11 +152,12 @@ class Registrace : AppCompatActivity() {
 
                     for (uzivatelSnapshot in snapshot.children) {
 
-                        val vsechnyEmaily = uzivatelSnapshot.child("email").getValue(String::class.java)
+                        val vsechnyEmaily =
+                            uzivatelSnapshot.child("email").getValue(String::class.java)
                         vsechnyEmaily?.let { emails.add(it) }
                     }
 
-                    if(emails.contains(emailText)) {
+                    if (emails.contains(emailText)) {
 
                         email.error = "Tento email je již zaregistrovaný"
 
@@ -169,8 +170,6 @@ class Registrace : AppCompatActivity() {
                 override fun onCancelled(error: DatabaseError) {
                 }
             })
-
-            Log.d("VYSLEDEk", vysledek.toString())
 
             return vysledek
         }
@@ -239,40 +238,49 @@ class Registrace : AppCompatActivity() {
 
         for (key in mapa.keys) {
 
-            if (key == registraceJmenoPrijmeni) {
+            when (key) {
 
-                addDrawableTextWatcher(
-                    key,
-                    { checkPocetSlov(key) },
-                    checkmark,
-                    mapa[key]
-                )
+                registraceJmenoPrijmeni -> {
 
-            } else if (key == registraceEmail) {
+                    addDrawableTextWatcher(
+                        key,
+                        { checkPocetSlov(key) },
+                        checkmark,
+                        mapa[key]
+                    )
 
-                addDrawableTextWatcher(
-                    key,
-                    { checkEmail(key) },
-                    checkmark,
-                    mapa[key]
-                )
+                }
 
-            } else if (key == registraceUzivatelskeJmeno) {
+                registraceEmail -> {
 
-                addDrawableTextWatcher(
-                    key,
-                    { checkUzivatel(key) },
-                    checkmark,
-                    mapa[key]
-                )
-            } else {
+                    addDrawableTextWatcher(
+                        key,
+                        { checkEmail(key) },
+                        checkmark,
+                        mapa[key]
+                    )
 
-                addDrawableTextWatcher(
-                    key,
-                    { checkHeslo(key) },
-                    null,
-                    mapa[key]
-                )
+                }
+
+                registraceUzivatelskeJmeno -> {
+
+                    addDrawableTextWatcher(
+                        key,
+                        { checkUzivatel(key) },
+                        checkmark,
+                        mapa[key]
+                    )
+                }
+
+                else -> {
+
+                    addDrawableTextWatcher(
+                        key,
+                        { checkHeslo(key) },
+                        null,
+                        mapa[key]
+                    )
+                }
             }
         }
 
@@ -394,7 +402,6 @@ class Registrace : AppCompatActivity() {
                 val email = registraceEmail.text.toString()
                 val uzivatelskeJmeno = registraceUzivatelskeJmeno.text.toString()
                 val heslo = registraceHeslo.text.toString()
-                val googleUcet = false.toString()
 
                 // Vytvoření uživatele v databázi Firebase - Auth, s emailem a heslem
                 FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, heslo)
@@ -415,18 +422,33 @@ class Registrace : AppCompatActivity() {
                                 .setDisplayName(jmenoPrijmeni)
                                 .build()
 
-                            uzivatelFirebaseAuth.updateProfile(profileUpdates).addOnCompleteListener(
-                                OnCompleteListener<Void?> { task ->
+                            uzivatelFirebaseAuth.updateProfile(profileUpdates)
+                                .addOnCompleteListener(
+                                    OnCompleteListener<Void?> { task ->
 
-                                    Log.d("JMENO", uzivatelFirebaseAuth.displayName.toString())
-                                })
+                                        Log.d("JMENO", uzivatelFirebaseAuth.displayName.toString())
+                                    })
 
 
                             // Firebase Realtime database
                             val udajeUzivatele =
-                                UdajeUzivatele(jmenoPrijmeni, email, uzivatelskeJmeno, false)
 
-                            referenceFirebase.child(uzivatelskeJmeno).setValue(udajeUzivatele)
+                                UdajeUzivatele(
+                                    jmenoPrijmeni,
+                                    email,
+                                    uzivatelskeJmeno,
+                                    false,
+                                    true,
+                                    true,
+                                    "",
+                                    "",
+                                    0.0,
+                                    0,
+                                    0,
+                                    0.0
+                                )
+
+                            referenceFirebase.child(jmenoPrijmeni).setValue(udajeUzivatele)
 
                             Toast.makeText(
                                 this@Registrace,

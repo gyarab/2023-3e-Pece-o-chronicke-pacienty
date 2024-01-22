@@ -102,6 +102,8 @@ class Ucet : AppCompatActivity() {
         val jmeno = uzivatel?.displayName
         jmenoUzivatele.text = jmeno
 
+        println(jmeno)
+
         // Email uživatele
         val email = uzivatel?.email
         ucet_email.text = email
