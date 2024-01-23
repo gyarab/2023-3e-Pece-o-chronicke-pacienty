@@ -29,11 +29,6 @@ class Nastaveni : AppCompatActivity() {
     private lateinit var nastaveni_switch_mode: SwitchCompat
     var darkModeZapnut: Boolean = true
 
-    // Tmavý motiv
-    private var nightMode: Boolean = false
-    private lateinit var preferences: SharedPreferences
-    private lateinit var editPreferences: SharedPreferences.Editor
-
     // Switch oznámení
     private lateinit var nastaveni_switch_oznameni: SwitchCompat
     var oznameniZapnuta: Boolean = true
@@ -115,57 +110,30 @@ class Nastaveni : AppCompatActivity() {
             nastaveni_switch_oznameni.isChecked = oznameniZapnuta
         }
 
+
         // Kontrola zda je dark mode zapnut či vypnut
-        nastaveni_switch_mode.setOnCheckedChangeListener { buttonView, isChecked ->
+        nastaveni_switch_mode.setOnClickListener {
 
-
-            if (isChecked) {
+             if (darkModeZapnut) {
 
                 println("Dark mode je zapnut!")
 
-                darkModeZapnut = true
+                darkModeZapnut = false
+
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
             } else {
 
                 println("Dark mode je vypnut!")
 
-                darkModeZapnut = false
+                darkModeZapnut = true
+
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             }
 
             // Mód uživatele
             darkModeDB(uzivatel)
             nastaveni_switch_mode.isChecked = darkModeZapnut
-
-            preferences = getSharedPreferences("MODE", Context.MODE_PRIVATE)
-
-            nightMode = preferences.getBoolean("nightMode",false)
-
-            if (nightMode) {
-
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            }
-
-            nastaveni_switch_mode.setOnClickListener {
-
-                if (nightMode) {
-
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
-                    editPreferences = preferences.edit()
-
-                    editPreferences.putBoolean("nightMode",false)
-
-                } else {
-
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-
-                    editPreferences = preferences.edit()
-
-                    editPreferences.putBoolean("nightMode",true)
-                }
-
-                editPreferences.apply()
-            }
         }
     }
 
@@ -202,6 +170,11 @@ class Nastaveni : AppCompatActivity() {
                 if (switchUzivatel != null) {
 
                     switchCompat.isChecked = switchUzivatel
+
+                    if (switchNazev == "darkMode") {
+
+                        darkModeZapnut = switchUzivatel
+                    }
                 }
             }
 

@@ -73,6 +73,9 @@ class Prihlaseni : AppCompatActivity() {
         prihlaseniZaregistrujteSe = findViewById(R.id.prihlaseni_nemateUcetZaregistrujteSe)
         zapomenutiHesla = findViewById(R.id.zapomenuti_hesla)
 
+        // Dark mode
+        getDarkMode("darkMode")
+
         prihlaseniUzivatele()
 
         // Viditelnost při psaní hesla
@@ -273,6 +276,34 @@ class Prihlaseni : AppCompatActivity() {
                     }
                 }
         }
+    }
+
+    private fun getDarkMode(switchNazev:String) {
+
+        val databazeFirebase: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val referenceFirebaseUzivatel: DatabaseReference = databazeFirebase.getReference("users")
+
+        val uzivatel = FirebaseAuth.getInstance().currentUser!!
+
+        referenceFirebaseUzivatel.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val darkMode = uzivatel.displayName?.let { snapshot.child(it).child(switchNazev).getValue(Boolean::class.java) }
+
+                if (darkMode == true) {
+
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+
+                } else {
+
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
     }
 
     /** Přidání uživatele do Firebase - Realtime database  **/
