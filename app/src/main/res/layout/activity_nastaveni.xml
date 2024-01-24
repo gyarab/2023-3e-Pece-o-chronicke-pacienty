@@ -195,7 +195,8 @@
                 android:autofillHints="Kroky"
                 android:background="@null"
                 android:hint="12,000"
-                android:inputType="text"
+                android:maxLength="5"
+                android:inputType="number"
                 android:padding="8dp"
                 android:textSize="16sp"
                 style="@style/NastaveniDescriptionColor"/>
@@ -247,7 +248,8 @@
                 android:autofillHints="Kroky"
                 android:background="@null"
                 android:hint="120"
-                android:inputType="text"
+                android:inputType="number"
+                android:maxLength="3"
                 android:textSize="16sp"
                 android:padding="2dp"
                 android:layout_marginEnd="4dp"
@@ -259,7 +261,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:text="@string/kg"
-                style="@style/NastaveniDescriptionColor" />
+                style="@style/NastaveniJednotky" />
 
             </LinearLayout>
 
@@ -324,19 +326,18 @@
                 style="@style/NastaveniTextColor"
                 app:drawableStartCompat="@drawable/ic_birthday_cake" />
 
-            <EditText
-                android:id="@+id/nastaveni_datum_narozeni_editext"
+            <TextView
+                android:id="@+id/nastaveni_datum_narozeni_udaje_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@+id/nastaveni_udaje_datum_narozeni"
                 android:layout_marginEnd="15dp"
-                android:autofillHints="Kroky"
-                android:background="@null"
-                android:hint="DD.MM.YY"
-                android:inputType="text"
+                android:background="@android:color/transparent"
+                android:text="DD.MM.YY"
                 android:padding="8dp"
                 android:textSize="15sp"
-                style="@style/NastaveniDescriptionColor"/>
+                style="@style/NastaveniJednotky"
+                />
 
             <View
                 android:layout_width="match_parent"
@@ -378,13 +379,14 @@
                 tools:ignore="RelativeOverlap">
 
                 <EditText
-                    android:id="@+id/nastaveni_vyska_editext"
+                    android:id="@+id/nastaveni_vyska_udaje_editext"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:autofillHints="Kroky"
                     android:background="@null"
                     android:hint="180"
-                    android:inputType="text"
+                    android:inputType="number"
+                    android:maxLength="3"
                     android:textSize="15sp"
                     android:padding="2dp"
                     android:layout_marginEnd="4dp"
@@ -396,7 +398,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
                     android:text="@string/cm"
-                    style="@style/NastaveniDescriptionColor" />
+                    style="@style/NastaveniJednotky" />
 
             </LinearLayout>
 
@@ -444,11 +446,11 @@
                     android:id="@+id/nastaveni_vaha_udaje_editext"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignEnd="@+id/nastaveni_udaje_vaha"
                     android:autofillHints="Kroky"
                     android:background="@null"
                     android:hint="125"
-                    android:inputType="text"
+                    android:inputType="number"
+                    android:maxLength="3"
                     android:textSize="15sp"
                     android:padding="2dp"
                     android:layout_marginEnd="4dp"
@@ -460,7 +462,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
                     android:text="@string/kg"
-                    style="@style/NastaveniDescriptionColor" />
+                    style="@style/NastaveniJednotky" />
 
             </LinearLayout>
 
@@ -480,7 +482,7 @@
             android:layout_height="wrap_content">
 
             <Button
-                android:id="@+id/ucet_odhlasit_button"
+                android:id="@+id/nastaveni_ulozit_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ULOŽIT ZMĚNY"

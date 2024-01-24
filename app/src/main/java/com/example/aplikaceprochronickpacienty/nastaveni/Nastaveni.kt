@@ -1,11 +1,14 @@
 package com.example.aplikaceprochronickpacienty.nastaveni
 
-import android.content.Context
+import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -19,6 +22,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.util.Calendar
 
 class Nastaveni : AppCompatActivity() {
 
@@ -36,8 +40,8 @@ class Nastaveni : AppCompatActivity() {
     // Switch oznámení
     private lateinit var nastaveni_kroky_editext: EditText
     private lateinit var nastaveni_vaha_editext: EditText
-    private lateinit var nastaveni_datum_narozeni_editext: EditText
-    private lateinit var nastaveni_vyska_editext: EditText
+    private lateinit var nastaveni_datum_narozeni_udaje_textview: TextView
+    private lateinit var nastaveni_vyska_udaje_editext: EditText
     private lateinit var nastaveni_vaha_udaje_editext: EditText
 
     // Firebase Realtime database
@@ -46,6 +50,9 @@ class Nastaveni : AppCompatActivity() {
 
     // Uživatel Firebase Auth
     private lateinit var uzivatel: FirebaseUser
+
+    // Uložit údaje
+    private lateinit var button_ulozit: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -73,22 +80,20 @@ class Nastaveni : AppCompatActivity() {
         // Dark/White mode
         nastaveni_switch_mode = findViewById(R.id.nastaveni_switch_mode)
 
-        // Aktivace tmavého motivu
-        /*if (nightMode) {
-
-            nastaveni_switch_mode.isChecked = true
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }*/
-
-        // Nastavení Dark/White motivu
-
-        nastaveni_switch_mode = findViewById(R.id.nastaveni_switch_mode)
-
         // Oznámení
         nastaveni_switch_oznameni = findViewById(R.id.nastaveni_switch_oznameni)
 
+        // Získání aktuální pooložky z databáze
         getSwitchDB("oznameni", nastaveni_switch_oznameni)
         getSwitchDB("darkMode", nastaveni_switch_mode)
+
+        // Data uživatele
+        getUserDataDB("krokyCil")
+        getUserDataDB("vahaCil")
+        getUserDataDB("datumNarozeni")
+        getUserDataDB("vyska")
+        getUserDataDB("vaha")
+
 
         // Kontrola zda jsou oznámení zapnuta či vypnuta
         nastaveni_switch_oznameni.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -114,7 +119,7 @@ class Nastaveni : AppCompatActivity() {
         // Kontrola zda je dark mode zapnut či vypnut
         nastaveni_switch_mode.setOnClickListener {
 
-             if (darkModeZapnut) {
+            if (darkModeZapnut) {
 
                 println("Dark mode je zapnut!")
 
@@ -131,10 +136,30 @@ class Nastaveni : AppCompatActivity() {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             }
 
-            // Mód uživatele
+            // Zvolený motiv (mode) uživatele
             darkModeDB(uzivatel)
             nastaveni_switch_mode.isChecked = darkModeZapnut
         }
+
+        // Nastavení číselných paramterů u elementu EditText
+        nastaveni_kroky_editext = findViewById(R.id.nastaveni_kroky_editext)
+        nastaveni_vaha_editext = findViewById(R.id.nastaveni_vaha_editext)
+        nastaveni_vyska_udaje_editext = findViewById(R.id.nastaveni_vyska_udaje_editext)
+        nastaveni_vaha_udaje_editext = findViewById(R.id.nastaveni_vaha_udaje_editext)
+
+        // Uložení dat
+        button_ulozit = findViewById(R.id.nastaveni_ulozit_button)
+
+        // Vybrání data narození z kalendáře Button
+        nastaveni_datum_narozeni_udaje_textview =
+            findViewById(R.id.nastaveni_datum_narozeni_udaje_textview)
+
+        // Vybrání data narození uživatele
+        setBithdayUser(nastaveni_datum_narozeni_udaje_textview)
+
+        // Přidání dat uživatele
+        addDataToDB()
+
     }
 
     private fun oznameniDB(uzivatel: FirebaseUser?) {
@@ -165,7 +190,9 @@ class Nastaveni : AppCompatActivity() {
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val switchUzivatel = uzivatel.displayName?.let { snapshot.child(it).child(switchNazev).getValue(Boolean::class.java) }
+                val switchUzivatel = uzivatel.displayName?.let {
+                    snapshot.child(it).child(switchNazev).getValue(Boolean::class.java)
+                }
 
                 if (switchUzivatel != null) {
 
@@ -182,4 +209,128 @@ class Nastaveni : AppCompatActivity() {
             }
         })
     }
+
+    private fun getUserDataDB(nazevInfo: String) {
+
+        referenceFirebaseUzivatel.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val uzivatelUdaje = uzivatel.displayName?.let {
+                    snapshot.child(it).child(nazevInfo).getValue(Any::class.java).toString()
+                }
+
+                if (uzivatelUdaje != null) {
+
+                    if (uzivatelUdaje.toString().isNotEmpty() && uzivatelUdaje.toString() != "0") {
+
+                        when (nazevInfo) {
+
+                            "krokyCil" -> {
+
+                                nastaveni_kroky_editext.hint = uzivatelUdaje
+
+                            }
+
+                            "vahaCil" -> {
+
+                                nastaveni_vaha_editext.hint = uzivatelUdaje
+
+                            }
+
+                            "datumNarozeni" -> {
+
+                                nastaveni_datum_narozeni_udaje_textview.text = uzivatelUdaje
+
+                            }
+
+                            "vyska" -> {
+
+                                nastaveni_vyska_udaje_editext.hint = uzivatelUdaje
+
+                            }
+
+                            "vaha" -> {
+
+                                nastaveni_vaha_udaje_editext.hint = uzivatelUdaje
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun setBithdayUser(textView: TextView) {
+
+        textView.setOnClickListener {
+
+            val kalendar = Calendar.getInstance()
+
+            val rok = kalendar.get(Calendar.YEAR)
+            val mesic = kalendar.get(Calendar.MONTH)
+            val den = kalendar.get(Calendar.DAY_OF_MONTH)
+
+            // Výběr data z kalendáře
+            val datePickerDialog = DatePickerDialog(
+
+                this,
+                { view, celkovyRok, mesicRoku, denMesice ->
+
+                    val vybranyDen = (denMesice.toString() + "." + (mesicRoku + 1) + "." + celkovyRok)
+
+                    textView.text = vybranyDen
+
+                },
+
+                rok,
+                mesic,
+                den
+            )
+
+            datePickerDialog.show()
+        }
+    }
+
+    /** Při stisknutí tlačítka se uloží veškerá uživatelská data **/
+    private fun addDataToDB() {
+
+        button_ulozit.setOnClickListener {
+
+            val krokyCil = nastaveni_kroky_editext.text.toString()
+            val vahaCil = nastaveni_vaha_editext.text.toString()
+            val datumNarozeni = nastaveni_datum_narozeni_udaje_textview.text.toString()
+            val vyska = nastaveni_vyska_udaje_editext.text.toString()
+            val vaha = nastaveni_vaha_udaje_editext.text.toString()
+
+            uzivatel.displayName?.let {
+
+                addUserInfo(it, "krokyCil",krokyCil)
+                addUserInfo(it, "vahaCil",vahaCil)
+                addUserInfo(it, "datumNarozeni",datumNarozeni)
+                addUserInfo(it, "vyska",vyska)
+                addUserInfo(it, "vaha",vaha)
+
+                Toast.makeText(
+                    this@Nastaveni,
+                    "Úspěšně uloženo!",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+
+            }
+        }
+    }
+
+    /** Metoda pro přidání dat uživatele **/
+    private fun addUserInfo(it: String, nazev: String, info: String) {
+
+        referenceFirebaseUzivatel.child(it).child(nazev).setValue(info)
+    }
+
 }

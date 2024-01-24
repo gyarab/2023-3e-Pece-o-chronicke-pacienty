@@ -6,7 +6,7 @@
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondary">@color/modro_fialova</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
@@ -64,6 +64,12 @@
         <item name="android:textColorHint">@color/tmave_seda</item>
 
         <item name="android:textColor">@color/black</item>
+
+    </style>
+
+    <style name="NastaveniJednotky">
+
+        <item name="android:textColor">@color/tmave_seda</item>
 
     </style>
 
