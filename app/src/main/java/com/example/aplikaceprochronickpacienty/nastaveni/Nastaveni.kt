@@ -54,6 +54,9 @@ class Nastaveni : AppCompatActivity() {
     // Uložit údaje
     private lateinit var button_ulozit: Button
 
+    // Údaje uživatele
+    private val udaje = listOf("krokyCil", "vahaCil", "datumNarozeni", "vyska", "vaha")
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         supportActionBar?.hide()
@@ -87,13 +90,11 @@ class Nastaveni : AppCompatActivity() {
         getSwitchDB("oznameni", nastaveni_switch_oznameni)
         getSwitchDB("darkMode", nastaveni_switch_mode)
 
-        // Data uživatele
-        getUserDataDB("krokyCil")
-        getUserDataDB("vahaCil")
-        getUserDataDB("datumNarozeni")
-        getUserDataDB("vyska")
-        getUserDataDB("vaha")
+        // Získání dat uživatele z databáze
+        for (i in udaje) {
 
+            getUserDataDB(i)
+        }
 
         // Kontrola zda jsou oznámení zapnuta či vypnuta
         nastaveni_switch_oznameni.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -257,7 +258,6 @@ class Nastaveni : AppCompatActivity() {
                         }
                     }
                 }
-
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -282,7 +282,32 @@ class Nastaveni : AppCompatActivity() {
                 this,
                 { view, celkovyRok, mesicRoku, denMesice ->
 
-                    val vybranyDen = (denMesice.toString() + "." + (mesicRoku + 1) + "." + celkovyRok)
+                    val vybranyDen:String
+
+                    if (denMesice < 10 && mesicRoku < 10) {
+
+                        vybranyDen =
+                            ("0" + denMesice.toString() + "." + "0" + (mesicRoku + 1) + "." + celkovyRok)
+
+                    }
+
+                    else if (denMesice < 10) {
+
+                        vybranyDen =
+                            ("0" + denMesice.toString() + "." + (mesicRoku + 1) + "." + celkovyRok)
+                    }
+
+                    else if (mesicRoku < 10) {
+
+                        vybranyDen =
+                            (denMesice.toString() + "." + "0" + (mesicRoku + 1) + "." + celkovyRok)
+                    }
+
+                    else {
+
+                        vybranyDen =
+                            (denMesice.toString() + "." + (mesicRoku + 1) + "." + celkovyRok)
+                    }
 
                     textView.text = vybranyDen
 
@@ -308,13 +333,23 @@ class Nastaveni : AppCompatActivity() {
             val vyska = nastaveni_vyska_udaje_editext.text.toString()
             val vaha = nastaveni_vaha_udaje_editext.text.toString()
 
+            val mapa = hashMapOf<String, String>()
+            mapa["krokyCil"] = krokyCil
+            mapa["vahaCil"] = vahaCil
+            mapa["datumNarozeni"] = datumNarozeni
+            mapa["vyska"] = vyska
+            mapa["vaha"] = vaha
+
+            // Přidání nových dat uživatele
             uzivatel.displayName?.let {
 
-                addUserInfo(it, "krokyCil",krokyCil)
-                addUserInfo(it, "vahaCil",vahaCil)
-                addUserInfo(it, "datumNarozeni",datumNarozeni)
-                addUserInfo(it, "vyska",vyska)
-                addUserInfo(it, "vaha",vaha)
+                mapa.forEach { (key, value) ->
+
+                    if (value.isNotEmpty()) {
+
+                        addUserInfo(it, key, value)
+                    }
+                }
 
                 Toast.makeText(
                     this@Nastaveni,

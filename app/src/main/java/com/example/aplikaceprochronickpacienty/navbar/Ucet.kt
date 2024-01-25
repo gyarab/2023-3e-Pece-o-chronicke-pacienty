@@ -16,27 +16,44 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 
 class Ucet : AppCompatActivity() {
-
-    private lateinit var jmenoUzivatele: TextView
-    private lateinit var odhlasitButton: Button
-    private lateinit var ikonaUzivatele: ImageView
 
     // Nastavení
     private lateinit var ucet_nastaveni: TextView
 
     // Údaje uživatele
+    private lateinit var ucet_jmenoPrijmeni: TextView
     private lateinit var ucet_email: TextView
     private lateinit var ucet_datum_narozeni: TextView
     private lateinit var ucet_vyska: TextView
     private lateinit var ucet_vaha: TextView
     private lateinit var ucet_vek: TextView
+    private lateinit var ucet_ikonaUzivatele: ImageView
+    private lateinit var ucet_odhlasitButton: Button
 
+    // Odhlášení uživatele
     private lateinit var odhlaseni_google_client: GoogleSignInClient
     private lateinit var googleSignOutOptions: GoogleSignInOptions
 
+    // Aktuální uživatel
+    private var uzivatel: FirebaseUser? = null
+
+    // Firebase Realtime database
+    private lateinit var databazeFirebase: FirebaseDatabase
+    private lateinit var referenceFirebaseUzivatel: DatabaseReference
+
+    private lateinit var datumNarozeni: String
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,14 +92,18 @@ class Ucet : AppCompatActivity() {
             }
         }
 
+        // Firebase Reference
+        databazeFirebase = FirebaseDatabase.getInstance()
+        referenceFirebaseUzivatel = databazeFirebase.getReference("users")
+
         // Celé jméno uživatele
-        jmenoUzivatele = findViewById(R.id.ucet_jmeno_uzivatele)
+        ucet_jmenoPrijmeni = findViewById(R.id.ucet_jmeno_uzivatele)
 
         // Tlačítko pro odhálšení uživatele
-        odhlasitButton = findViewById(R.id.ucet_odhlasit_button)
+        ucet_odhlasitButton = findViewById(R.id.ucet_odhlasit_button)
 
         // Ikona uživatele
-        ikonaUzivatele = findViewById(R.id.ucet_imageview)
+        ucet_ikonaUzivatele = findViewById(R.id.ucet_imageview)
 
         // Nastavení
         ucet_nastaveni = findViewById(R.id.ucet_nastaveni)
@@ -96,11 +117,11 @@ class Ucet : AppCompatActivity() {
 
 
         // Aktuální uživatel
-        val uzivatel = FirebaseAuth.getInstance().currentUser
+        uzivatel = FirebaseAuth.getInstance().currentUser
 
         // Jméno uživatele
         val jmeno = uzivatel?.displayName
-        jmenoUzivatele.text = jmeno
+        ucet_jmenoPrijmeni.text = jmeno
 
         println(jmeno)
 
@@ -108,9 +129,14 @@ class Ucet : AppCompatActivity() {
         val email = uzivatel?.email
         ucet_email.text = email
 
+        // Ostatní údaje uživatele
+        getUserDataDB("datumNarozeni")
+        getUserDataDB("vyska")
+        getUserDataDB("vaha")
+        getUserDataDB("vek")
 
         // Kliknutí na tlačítko - Odhlásit se
-        odhlasitButton.setOnClickListener {
+        ucet_odhlasitButton.setOnClickListener {
 
             // Odhlášení z Firebase - Auth
             googleSignOutOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -132,5 +158,69 @@ class Ucet : AppCompatActivity() {
 
             startActivity(Intent(this,Nastaveni::class.java))
         }
+
+        println(getAge("01.03.2006"))
+
     }
+
+    private fun getUserDataDB(nazevInfo: String) {
+
+        referenceFirebaseUzivatel.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            @SuppressLint("SetTextI18n")
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val uzivatelUdaje = uzivatel?.displayName?.let {
+                    snapshot.child(it).child(nazevInfo).getValue(Any::class.java).toString()
+                }
+
+                if (uzivatelUdaje != null) {
+
+                    if (uzivatelUdaje.toString().isNotEmpty() && uzivatelUdaje.toString() != "0") {
+
+                        when (nazevInfo) {
+
+                            "datumNarozeni" -> {
+
+                                ucet_datum_narozeni.text = uzivatelUdaje
+                                datumNarozeni = uzivatelUdaje
+                            }
+
+                            "vyska" -> {
+
+                                ucet_vyska.text = "$uzivatelUdaje cm"
+
+                            }
+
+                            "vaha" -> {
+
+                                ucet_vaha.text = "$uzivatelUdaje kg"
+
+                            }
+                        }
+
+                        ucet_vek.text = getAge(datumNarozeni).toString() + " let"
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+    }
+
+    /** Získání věku podle data narození uživatele **/
+    fun getAge(dateString: String): Int {
+
+        val format = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+
+        val datumNarozeni = LocalDate.parse(dateString, format)
+
+        val dnesniDatum = LocalDate.now()
+
+        val vek = ChronoUnit.YEARS.between(datumNarozeni, dnesniDatum).toInt()
+
+        return vek
+    }
+
 }
