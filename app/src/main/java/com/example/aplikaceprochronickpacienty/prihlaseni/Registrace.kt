@@ -444,7 +444,6 @@ class Registrace : AppCompatActivity() {
                                     "",
                                     0.0,
                                     0,
-                                    0,
                                     0.0
                                 )
 

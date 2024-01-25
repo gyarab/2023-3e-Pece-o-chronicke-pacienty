@@ -203,7 +203,7 @@
                                 android:layout_marginStart="16dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
-                                android:text="185 cm"
+                                android:text="—  cm"
                                 android:textColor="@color/tmave_seda"
                                 android:textSize="15sp" />
 
@@ -235,7 +235,7 @@
                                 android:layout_marginStart="23dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
-                                android:text="100 kg"
+                                android:text="—  kg"
                                 android:textColor="@color/tmave_seda"
                                 android:textSize="15sp" />
 
@@ -268,7 +268,7 @@
                                 android:layout_marginStart="31dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="12dp"
-                                android:text="20 let"
+                                android:text="—  let"
                                 android:textColor="@color/tmave_seda"
                                 android:textSize="15sp" />
 

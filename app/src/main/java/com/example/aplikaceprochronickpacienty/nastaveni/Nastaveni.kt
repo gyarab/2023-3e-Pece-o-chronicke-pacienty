@@ -272,6 +272,9 @@ class Nastaveni : AppCompatActivity() {
 
             val kalendar = Calendar.getInstance()
 
+            // Výchozí rok
+            kalendar.add(Calendar.YEAR, -10)
+
             val rok = kalendar.get(Calendar.YEAR)
             val mesic = kalendar.get(Calendar.MONTH)
             val den = kalendar.get(Calendar.DAY_OF_MONTH)
@@ -282,28 +285,22 @@ class Nastaveni : AppCompatActivity() {
                 this,
                 { view, celkovyRok, mesicRoku, denMesice ->
 
-                    val vybranyDen:String
+                    val vybranyDen: String
 
                     if (denMesice < 10 && mesicRoku < 10) {
 
                         vybranyDen =
                             ("0" + denMesice.toString() + "." + "0" + (mesicRoku + 1) + "." + celkovyRok)
 
-                    }
-
-                    else if (denMesice < 10) {
+                    } else if (denMesice < 10) {
 
                         vybranyDen =
                             ("0" + denMesice.toString() + "." + (mesicRoku + 1) + "." + celkovyRok)
-                    }
-
-                    else if (mesicRoku < 10) {
+                    } else if (mesicRoku < 10) {
 
                         vybranyDen =
                             (denMesice.toString() + "." + "0" + (mesicRoku + 1) + "." + celkovyRok)
-                    }
-
-                    else {
+                    } else {
 
                         vybranyDen =
                             (denMesice.toString() + "." + (mesicRoku + 1) + "." + celkovyRok)
@@ -318,6 +315,13 @@ class Nastaveni : AppCompatActivity() {
                 den
             )
 
+            // Minimální věk uživatele
+            val maxDen = 1;
+            val maxMesic = 1;
+            val maxRok = 2014;
+            kalendar.set(maxRok, maxMesic - 1, maxDen);
+
+            datePickerDialog.datePicker.maxDate = kalendar.timeInMillis
             datePickerDialog.show()
         }
     }
@@ -333,6 +337,7 @@ class Nastaveni : AppCompatActivity() {
             val vyska = nastaveni_vyska_udaje_editext.text.toString()
             val vaha = nastaveni_vaha_udaje_editext.text.toString()
 
+            // Přidání informací do komponenty HashMap
             val mapa = hashMapOf<String, String>()
             mapa["krokyCil"] = krokyCil
             mapa["vahaCil"] = vahaCil

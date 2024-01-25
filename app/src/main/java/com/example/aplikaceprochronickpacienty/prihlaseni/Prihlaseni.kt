@@ -73,9 +73,6 @@ class Prihlaseni : AppCompatActivity() {
         prihlaseniZaregistrujteSe = findViewById(R.id.prihlaseni_nemateUcetZaregistrujteSe)
         zapomenutiHesla = findViewById(R.id.zapomenuti_hesla)
 
-        // Dark mode
-        getDarkMode("darkMode")
-
         prihlaseniUzivatele()
 
         // Viditelnost při psaní hesla
@@ -136,6 +133,9 @@ class Prihlaseni : AppCompatActivity() {
         val uzivatel = FirebaseAuth.getInstance().currentUser
 
         if (uzivatel != null) {
+
+            // Dark mode
+            getDarkMode("darkMode")
 
             // Uživatel je přihlášen
             val intent = Intent(this@Prihlaseni, Prehled::class.java)
@@ -323,7 +323,6 @@ class Prihlaseni : AppCompatActivity() {
                 "",
                 "",
                 0.0,
-                0,
                 0,
                 0.0
             )

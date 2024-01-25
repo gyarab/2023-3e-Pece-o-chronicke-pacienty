@@ -9,7 +9,6 @@ class UdajeUzivatele(var jmenoPrijmeni: String? = null,
                      var datumNarozeni: String? = null,
                      var vyska: String? = null,
                      var vaha: Double,
-                     var vek: Int,
                      var krokyCil: Int,
                      var vahaCil: Double) {
 
