@@ -11,6 +11,8 @@ import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.adapters.ChatAdapter
 import com.example.aplikaceprochronickpacienty.databinding.ActivityChatBinding
 import com.example.aplikaceprochronickpacienty.models.Message
+import com.example.aplikaceprochronickpacienty.nastaveni.Internet
+import com.example.aplikaceprochronickpacienty.nastaveni.InternetPripojeni
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.api.gax.core.FixedCredentialsProvider
 import com.google.auth.oauth2.GoogleCredentials
@@ -71,62 +73,71 @@ class Chat : AppCompatActivity() {
 
         navView.selectedItemId = R.id.navigation_chat
 
-        navView.setOnNavigationItemSelectedListener { item ->
+        val pripojeni = InternetPripojeni()
 
-            when (item.itemId) {
+        if (pripojeni.checkInternetConnection(this)) {
 
-                R.id.navigation_home -> {
+            navView.setOnNavigationItemSelectedListener { item ->
 
-                    startActivity(Intent(applicationContext, Prehled::class.java))
-                    overridePendingTransition(0, 0)
-                    return@setOnNavigationItemSelectedListener true
+                when (item.itemId) {
+
+                    R.id.navigation_home -> {
+
+                        startActivity(Intent(applicationContext, Prehled::class.java))
+                        overridePendingTransition(0, 0)
+                        return@setOnNavigationItemSelectedListener true
+                    }
+
+                    R.id.navigation_chat -> {
+                        return@setOnNavigationItemSelectedListener true
+                    }
+
+                    R.id.navigation_settings -> {
+                        startActivity(Intent(applicationContext, Ucet::class.java))
+                        overridePendingTransition(0, 0)
+                        return@setOnNavigationItemSelectedListener true
+                    }
+
+                    else -> return@setOnNavigationItemSelectedListener false
                 }
-
-                R.id.navigation_chat -> {
-                    return@setOnNavigationItemSelectedListener true
-                }
-
-                R.id.navigation_settings -> {
-                    startActivity(Intent(applicationContext, Ucet::class.java))
-                    overridePendingTransition(0, 0)
-                    return@setOnNavigationItemSelectedListener true
-                }
-
-                else -> return@setOnNavigationItemSelectedListener false
             }
-        }
 
-        //setting adapter to recyclerview
-        chatAdapter = ChatAdapter(this, messageList)
-        binding.chatView.adapter = chatAdapter
+            //setting adapter to recyclerview
+            chatAdapter = ChatAdapter(this, messageList)
+            binding.chatView.adapter = chatAdapter
 
-        binding.btnSend.setOnClickListener {
+            binding.btnSend.setOnClickListener {
 
-            otazka = binding.editMessage.text.toString()
+                otazka = binding.editMessage.text.toString()
 
-            if (otazka.isNotEmpty()) {
+                if (otazka.isNotEmpty()) {
 
-                addMessageToList(otazka, false)
-                sendMessageToBot(otazka)
+                    addMessageToList(otazka, false)
+                    sendMessageToBot(otazka)
 
-            } else {
-                Toast.makeText(this@Chat, "Please enter text!", Toast.LENGTH_SHORT)
-                    .show()
+                } else {
+                    Toast.makeText(this@Chat, "Please enter text!", Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
+
+            client = OkHttpClient.Builder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(120, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .build()
+
+
+            // nacteni souboru JSON a vytvoření motivační hlášky
+            readJSON()
+
+            //initialize bot config
+            setUpBot()
+
+        } else {
+
+            startActivity(Intent(applicationContext, Internet::class.java))
         }
-
-        client = OkHttpClient.Builder()
-            .connectTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(120, TimeUnit.SECONDS)
-            .readTimeout(60, TimeUnit.SECONDS)
-            .build()
-
-
-        // nacteni souboru JSON a vytvoření motivační hlášky
-        readJSON()
-
-        //initialize bot config
-        setUpBot()
     }
 
     @SuppressLint("NotifyDataSetChanged")

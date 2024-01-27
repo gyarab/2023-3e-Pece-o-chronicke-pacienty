@@ -9,6 +9,8 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.example.aplikaceprochronickpacienty.R
+import com.example.aplikaceprochronickpacienty.nastaveni.Internet
+import com.example.aplikaceprochronickpacienty.nastaveni.InternetPripojeni
 import com.example.aplikaceprochronickpacienty.nastaveni.Nastaveni
 import com.example.aplikaceprochronickpacienty.prihlaseni.Prihlaseni
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -63,104 +65,113 @@ class Ucet : AppCompatActivity() {
         supportActionBar?.hide()
         setContentView(R.layout.activity_ucet)
 
-        val navView: BottomNavigationView = findViewById(R.id.bottom_nav)
+        val pripojeni = InternetPripojeni()
 
-        navView.selectedItemId = R.id.navigation_settings
+        if (pripojeni.checkInternetConnection(this)) {
 
-        navView.setOnNavigationItemSelectedListener { item ->
+            val navView: BottomNavigationView = findViewById(R.id.bottom_nav)
 
-            when (item.itemId) {
+            navView.selectedItemId = R.id.navigation_settings
 
-                R.id.navigation_home -> {
+            navView.setOnNavigationItemSelectedListener { item ->
 
-                    startActivity(Intent(applicationContext, Prehled::class.java))
-                    overridePendingTransition(0, 0)
-                    return@setOnNavigationItemSelectedListener true
+                when (item.itemId) {
+
+                    R.id.navigation_home -> {
+
+                        startActivity(Intent(applicationContext, Prehled::class.java))
+                        overridePendingTransition(0, 0)
+                        return@setOnNavigationItemSelectedListener true
+                    }
+
+                    R.id.navigation_chat -> {
+                        startActivity(Intent(applicationContext, Chat::class.java))
+                        overridePendingTransition(0, 0)
+                        return@setOnNavigationItemSelectedListener true
+                    }
+
+                    R.id.navigation_settings -> {
+                        return@setOnNavigationItemSelectedListener true
+                    }
+
+                    else -> return@setOnNavigationItemSelectedListener false
                 }
-
-                R.id.navigation_chat -> {
-                    startActivity(Intent(applicationContext, Chat::class.java))
-                    overridePendingTransition(0, 0)
-                    return@setOnNavigationItemSelectedListener true
-                }
-
-                R.id.navigation_settings -> {
-                    return@setOnNavigationItemSelectedListener true
-                }
-
-                else -> return@setOnNavigationItemSelectedListener false
             }
+
+            // Firebase Reference
+            databazeFirebase = FirebaseDatabase.getInstance()
+            referenceFirebaseUzivatel = databazeFirebase.getReference("users")
+
+            // Celé jméno uživatele
+            ucet_jmenoPrijmeni = findViewById(R.id.ucet_jmeno_uzivatele)
+
+            // Tlačítko pro odhálšení uživatele
+            ucet_odhlasitButton = findViewById(R.id.ucet_odhlasit_button)
+
+            // Ikona uživatele
+            ucet_ikonaUzivatele = findViewById(R.id.ucet_imageview)
+
+            // Nastavení
+            ucet_nastaveni = findViewById(R.id.ucet_nastaveni)
+
+            // Udáje uživatele
+            ucet_email = findViewById(R.id.ucet_email)
+            ucet_datum_narozeni = findViewById(R.id.ucet_rok_narozeni)
+            ucet_vyska = findViewById(R.id.ucet_vyska)
+            ucet_vaha = findViewById(R.id.ucet_vaha)
+            ucet_vek = findViewById(R.id.ucet_vek)
+
+
+            // Aktuální uživatel
+            uzivatel = FirebaseAuth.getInstance().currentUser
+
+            // Jméno uživatele
+            val jmeno = uzivatel?.displayName
+            ucet_jmenoPrijmeni.text = jmeno
+
+            println(jmeno)
+
+            // Email uživatele
+            val email = uzivatel?.email
+            ucet_email.text = email
+
+            // Ostatní údaje uživatele
+            getUserDataDB("datumNarozeni")
+            getUserDataDB("vyska")
+            getUserDataDB("vaha")
+            getUserDataDB("vek")
+
+            // Kliknutí na tlačítko - Odhlásit se
+            ucet_odhlasitButton.setOnClickListener {
+
+                // Odhlášení z Firebase - Auth
+                googleSignOutOptions =
+                    GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken(getString(R.string.default_web_client_id))
+                        .requestEmail()
+                        .build()
+
+                // Google Client Set up
+                odhlaseni_google_client = GoogleSignIn.getClient(this, googleSignOutOptions)
+                odhlaseni_google_client.signOut()
+                FirebaseAuth.getInstance().signOut()
+
+                // Přesunutí na aktivitu Přihlášení
+                startActivity(Intent(this, Prihlaseni::class.java))
+            }
+
+            // Přesměrování uživatele na aktivitu Nastavení
+            ucet_nastaveni.setOnClickListener {
+
+                startActivity(Intent(this, Nastaveni::class.java))
+            }
+
+            println(getAge("01.03.2006"))
+
+        } else {
+
+            startActivity(Intent(applicationContext, Internet::class.java))
         }
-
-        // Firebase Reference
-        databazeFirebase = FirebaseDatabase.getInstance()
-        referenceFirebaseUzivatel = databazeFirebase.getReference("users")
-
-        // Celé jméno uživatele
-        ucet_jmenoPrijmeni = findViewById(R.id.ucet_jmeno_uzivatele)
-
-        // Tlačítko pro odhálšení uživatele
-        ucet_odhlasitButton = findViewById(R.id.ucet_odhlasit_button)
-
-        // Ikona uživatele
-        ucet_ikonaUzivatele = findViewById(R.id.ucet_imageview)
-
-        // Nastavení
-        ucet_nastaveni = findViewById(R.id.ucet_nastaveni)
-
-        // Udáje uživatele
-        ucet_email = findViewById(R.id.ucet_email)
-        ucet_datum_narozeni = findViewById(R.id.ucet_rok_narozeni)
-        ucet_vyska = findViewById(R.id.ucet_vyska)
-        ucet_vaha = findViewById(R.id.ucet_vaha)
-        ucet_vek = findViewById(R.id.ucet_vek)
-
-
-        // Aktuální uživatel
-        uzivatel = FirebaseAuth.getInstance().currentUser
-
-        // Jméno uživatele
-        val jmeno = uzivatel?.displayName
-        ucet_jmenoPrijmeni.text = jmeno
-
-        println(jmeno)
-
-        // Email uživatele
-        val email = uzivatel?.email
-        ucet_email.text = email
-
-        // Ostatní údaje uživatele
-        getUserDataDB("datumNarozeni")
-        getUserDataDB("vyska")
-        getUserDataDB("vaha")
-        getUserDataDB("vek")
-
-        // Kliknutí na tlačítko - Odhlásit se
-        ucet_odhlasitButton.setOnClickListener {
-
-            // Odhlášení z Firebase - Auth
-            googleSignOutOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build()
-
-            // Google Client Set up
-            odhlaseni_google_client = GoogleSignIn.getClient(this, googleSignOutOptions)
-            odhlaseni_google_client.signOut()
-            FirebaseAuth.getInstance().signOut()
-
-            // Přesunutí na aktivitu Přihlášení
-            startActivity(Intent(this , Prihlaseni::class.java))
-        }
-
-        // Přesměrování uživatele na aktivitu Nastavení
-        ucet_nastaveni.setOnClickListener {
-
-            startActivity(Intent(this,Nastaveni::class.java))
-        }
-
-        println(getAge("01.03.2006"))
-
     }
 
     private fun getUserDataDB(nazevInfo: String) {

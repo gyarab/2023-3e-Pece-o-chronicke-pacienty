@@ -2,7 +2,6 @@ package com.example.aplikaceprochronickpacienty.prihlaseni
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.TextUtils
 import android.text.method.HideReturnsTransformationMethod
@@ -18,6 +17,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.aplikaceprochronickpacienty.R
+import com.example.aplikaceprochronickpacienty.nastaveni.Internet
+import com.example.aplikaceprochronickpacienty.nastaveni.InternetPripojeni
 import com.example.aplikaceprochronickpacienty.navbar.Prehled
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -62,42 +63,54 @@ class Prihlaseni : AppCompatActivity() {
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         supportActionBar?.hide()
-        setContentView(R.layout.activity_prihlaseni)
 
-        prihlaseniEmail = findViewById(R.id.prihlaseni_email)
-        prihlaseniHeslo = findViewById(R.id.prihlaseni_heslo)
-        prihlaseni_button = findViewById(R.id.prihlaseni_button)
-        prihlaseniZaregistrujteSe = findViewById(R.id.prihlaseni_nemateUcetZaregistrujteSe)
-        zapomenutiHesla = findViewById(R.id.zapomenuti_hesla)
+        val pripojeni = InternetPripojeni()
 
-        prihlaseniUzivatele()
+        if (pripojeni.checkInternetConnection(this)) {
 
-        // Viditelnost při psaní hesla
-        prihlaseniEye = findViewById(R.id.registrace_eye_show)
+            setContentView(R.layout.activity_prihlaseni)
 
-        prihlaseniEye.setOnClickListener {
+            prihlaseniEmail = findViewById(R.id.prihlaseni_email)
+            prihlaseniHeslo = findViewById(R.id.prihlaseni_heslo)
+            prihlaseni_button = findViewById(R.id.prihlaseni_button)
+            prihlaseniZaregistrujteSe = findViewById(R.id.prihlaseni_nemateUcetZaregistrujteSe)
+            zapomenutiHesla = findViewById(R.id.zapomenuti_hesla)
 
-            if (prihlaseniHeslo.transformationMethod.equals(HideReturnsTransformationMethod.getInstance())) {
+            prihlaseniUzivatele()
 
-                prihlaseniHeslo.transformationMethod = PasswordTransformationMethod.getInstance()
+            // Viditelnost při psaní hesla
+            prihlaseniEye = findViewById(R.id.registrace_eye_show)
 
-                prihlaseniEye.setImageResource(R.drawable.ic_eye_hide)
+            prihlaseniEye.setOnClickListener {
 
-                // nastavení kurzoru na konec věty
-                prihlaseniHeslo.setSelection(prihlaseniHeslo.length())
+                if (prihlaseniHeslo.transformationMethod.equals(HideReturnsTransformationMethod.getInstance())) {
 
-            } else {
+                    prihlaseniHeslo.transformationMethod = PasswordTransformationMethod.getInstance()
 
-                prihlaseniHeslo.transformationMethod = HideReturnsTransformationMethod.getInstance()
+                    prihlaseniEye.setImageResource(R.drawable.ic_eye_hide)
 
-                prihlaseniEye.setImageResource(R.drawable.ic_eye_show)
+                    // nastavení kurzoru na konec věty
+                    prihlaseniHeslo.setSelection(prihlaseniHeslo.length())
 
-                // nastavení kurzoru na konec věty
-                prihlaseniHeslo.setSelection(prihlaseniHeslo.length())
+                } else {
+
+                    prihlaseniHeslo.transformationMethod = HideReturnsTransformationMethod.getInstance()
+
+                    prihlaseniEye.setImageResource(R.drawable.ic_eye_show)
+
+                    // nastavení kurzoru na konec věty
+                    prihlaseniHeslo.setSelection(prihlaseniHeslo.length())
+                }
             }
+
+
+        } else {
+
+            startActivity(Intent(applicationContext, Internet::class.java))
         }
     }
 

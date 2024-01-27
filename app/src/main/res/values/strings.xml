@@ -39,4 +39,7 @@
     <string name="zpet">Zpět</string>
     <string name="kg">kg</string>
     <string name="cm">cm</string>
+    <string name="wifi_error">Připojení se nezdařilo</string>
+    <string name="pripojeni_selhalo">Připojení selhalo!</string>
+    <string name="popis_internet">Vypadá to, že nejste připojeni k internetu. \n\nProsím, zkontrolujte své připojení a zkuste to znovu nebo opusťte aplikaci a opakujte to později znovu.</string>
 </resources>

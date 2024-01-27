@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".nastaveni.Internet"
+    style="@style/Navbar">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/internet_imageview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:contentDescription="@string/wifi_error"
+            android:src="@drawable/ic_connection_failed" />
+
+        <TextView
+            android:id="@+id/textView"
+            style="@style/InternetText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/montserrat_bold"
+            android:text="Whoops!"
+            android:textSize="35sp" />
+
+        <TextView
+            android:id="@+id/textView2"
+            style="@style/InternetTextDescription"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/open_sans"
+            android:lineSpacingExtra="5dp"
+            android:text="@string/popis_internet"
+            android:textAlignment="center"
+            android:textSize="18sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/internet_button"
+            style="@style/InternetTextButton"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/internet_button"
+            android:fontFamily="@font/montserrat_bold"
+            android:text="Zkusit to znovu"
+            android:textSize="18sp" />
+
+        <ProgressBar
+            android:id="@+id/intenet_loader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/neon_ruzova"
+            android:layout_marginTop="32dp">
+
+        </ProgressBar>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

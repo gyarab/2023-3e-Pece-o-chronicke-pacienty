@@ -64,103 +64,112 @@ class Nastaveni : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_nastaveni)
 
-        // Firebase Reference
-        databazeFirebase = FirebaseDatabase.getInstance()
-        referenceFirebaseUzivatel = databazeFirebase.getReference("users")
+        // Kontrola připojení
+        val pripojeni = InternetPripojeni()
 
-        // Aktulání uživatel Firebase
-        uzivatel = FirebaseAuth.getInstance().currentUser!!
+        if (pripojeni.checkInternetConnection(this)) {
 
-        // Tlačítko Zpět
-        nastaveni_button_zpet = findViewById(R.id.nastaveni_button_zpet)
+            // Firebase Reference
+            databazeFirebase = FirebaseDatabase.getInstance()
+            referenceFirebaseUzivatel = databazeFirebase.getReference("users")
 
-        // Přesměrování uživatele na aktivitu Účet
-        nastaveni_button_zpet.setOnClickListener {
+            // Aktulání uživatel Firebase
+            uzivatel = FirebaseAuth.getInstance().currentUser!!
 
-            startActivity(Intent(this, Ucet::class.java))
-        }
+            // Tlačítko Zpět
+            nastaveni_button_zpet = findViewById(R.id.nastaveni_button_zpet)
 
-        // Dark/White mode
-        nastaveni_switch_mode = findViewById(R.id.nastaveni_switch_mode)
+            // Přesměrování uživatele na aktivitu Účet
+            nastaveni_button_zpet.setOnClickListener {
 
-        // Oznámení
-        nastaveni_switch_oznameni = findViewById(R.id.nastaveni_switch_oznameni)
-
-        // Získání aktuální pooložky z databáze
-        getSwitchDB("oznameni", nastaveni_switch_oznameni)
-        getSwitchDB("darkMode", nastaveni_switch_mode)
-
-        // Získání dat uživatele z databáze
-        for (i in udaje) {
-
-            getUserDataDB(i)
-        }
-
-        // Kontrola zda jsou oznámení zapnuta či vypnuta
-        nastaveni_switch_oznameni.setOnCheckedChangeListener { buttonView, isChecked ->
-
-            if (isChecked) {
-
-                println("Oznámení jsou zapnuta!")
-
-                oznameniZapnuta = true
-
-            } else {
-
-                println("Oznámení jsou vypnuta!")
-
-                oznameniZapnuta = false
+                startActivity(Intent(this, Ucet::class.java))
             }
 
-            oznameniDB(uzivatel)
-            nastaveni_switch_oznameni.isChecked = oznameniZapnuta
-        }
+            // Dark/White mode
+            nastaveni_switch_mode = findViewById(R.id.nastaveni_switch_mode)
 
+            // Oznámení
+            nastaveni_switch_oznameni = findViewById(R.id.nastaveni_switch_oznameni)
 
-        // Kontrola zda je dark mode zapnut či vypnut
-        nastaveni_switch_mode.setOnClickListener {
+            // Získání aktuální pooložky z databáze
+            getSwitchDB("oznameni", nastaveni_switch_oznameni)
+            getSwitchDB("darkMode", nastaveni_switch_mode)
 
-            if (darkModeZapnut) {
+            // Získání dat uživatele z databáze
+            for (i in udaje) {
 
-                println("Dark mode je zapnut!")
-
-                darkModeZapnut = false
-
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
-            } else {
-
-                println("Dark mode je vypnut!")
-
-                darkModeZapnut = true
-
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                getUserDataDB(i)
             }
 
-            // Zvolený motiv (mode) uživatele
-            darkModeDB(uzivatel)
-            nastaveni_switch_mode.isChecked = darkModeZapnut
+            // Kontrola zda jsou oznámení zapnuta či vypnuta
+            nastaveni_switch_oznameni.setOnCheckedChangeListener { buttonView, isChecked ->
+
+                if (isChecked) {
+
+                    println("Oznámení jsou zapnuta!")
+
+                    oznameniZapnuta = true
+
+                } else {
+
+                    println("Oznámení jsou vypnuta!")
+
+                    oznameniZapnuta = false
+                }
+
+                oznameniDB(uzivatel)
+                nastaveni_switch_oznameni.isChecked = oznameniZapnuta
+            }
+
+
+            // Kontrola zda je dark mode zapnut či vypnut
+            nastaveni_switch_mode.setOnClickListener {
+
+                if (darkModeZapnut) {
+
+                    println("Dark mode je zapnut!")
+
+                    darkModeZapnut = false
+
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+                } else {
+
+                    println("Dark mode je vypnut!")
+
+                    darkModeZapnut = true
+
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                }
+
+                // Zvolený motiv (mode) uživatele
+                darkModeDB(uzivatel)
+                nastaveni_switch_mode.isChecked = darkModeZapnut
+            }
+
+            // Nastavení číselných paramterů u elementu EditText
+            nastaveni_kroky_editext = findViewById(R.id.nastaveni_kroky_editext)
+            nastaveni_vaha_editext = findViewById(R.id.nastaveni_vaha_editext)
+            nastaveni_vyska_udaje_editext = findViewById(R.id.nastaveni_vyska_udaje_editext)
+            nastaveni_vaha_udaje_editext = findViewById(R.id.nastaveni_vaha_udaje_editext)
+
+            // Uložení dat
+            button_ulozit = findViewById(R.id.nastaveni_ulozit_button)
+
+            // Vybrání data narození z kalendáře Button
+            nastaveni_datum_narozeni_udaje_textview =
+                findViewById(R.id.nastaveni_datum_narozeni_udaje_textview)
+
+            // Vybrání data narození uživatele
+            setBithdayUser(nastaveni_datum_narozeni_udaje_textview)
+
+            // Přidání dat uživatele
+            addDataToDB()
+
+        } else {
+
+            startActivity(Intent(applicationContext, Internet::class.java))
         }
-
-        // Nastavení číselných paramterů u elementu EditText
-        nastaveni_kroky_editext = findViewById(R.id.nastaveni_kroky_editext)
-        nastaveni_vaha_editext = findViewById(R.id.nastaveni_vaha_editext)
-        nastaveni_vyska_udaje_editext = findViewById(R.id.nastaveni_vyska_udaje_editext)
-        nastaveni_vaha_udaje_editext = findViewById(R.id.nastaveni_vaha_udaje_editext)
-
-        // Uložení dat
-        button_ulozit = findViewById(R.id.nastaveni_ulozit_button)
-
-        // Vybrání data narození z kalendáře Button
-        nastaveni_datum_narozeni_udaje_textview =
-            findViewById(R.id.nastaveni_datum_narozeni_udaje_textview)
-
-        // Vybrání data narození uživatele
-        setBithdayUser(nastaveni_datum_narozeni_udaje_textview)
-
-        // Přidání dat uživatele
-        addDataToDB()
-
     }
 
     private fun oznameniDB(uzivatel: FirebaseUser?) {
