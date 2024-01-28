@@ -187,7 +187,7 @@
 
     <style name="AplikaceGyarabLogo">
 
-        <item name="android:tint">@color/modro_fialova</item>
+        <item name="android:tint">#1d33a6</item>
 
     </style>
 
