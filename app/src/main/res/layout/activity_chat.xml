@@ -26,6 +26,7 @@
             android:layout_marginTop="1dp"
             android:background="@null"
             android:padding="8dp"
+            android:contentDescription="@string/poslat_zpravu"
             android:src="@drawable/ic_send"
             app:tint="@color/fialova"
 

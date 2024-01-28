@@ -17,8 +17,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.aplikaceprochronickpacienty.R
-import com.example.aplikaceprochronickpacienty.nastaveni.Internet
-import com.example.aplikaceprochronickpacienty.nastaveni.InternetPripojeni
+import com.example.aplikaceprochronickpacienty.internetPripojeni.Internet
+import com.example.aplikaceprochronickpacienty.internetPripojeni.InternetPripojeni
 import com.example.aplikaceprochronickpacienty.navbar.Prehled
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount

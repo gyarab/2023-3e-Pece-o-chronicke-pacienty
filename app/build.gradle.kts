@@ -113,4 +113,7 @@ dependencies {
 
     // Charts
     implementation("com.diogobernardino:williamchart:3.10.1")
+
+    // PDF Viewer
+    implementation("com.github.mhiew:android-pdf-viewer:3.2.0-beta.3")
 }

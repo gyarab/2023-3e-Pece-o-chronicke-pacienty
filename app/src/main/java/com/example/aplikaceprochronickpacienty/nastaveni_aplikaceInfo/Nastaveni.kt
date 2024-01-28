@@ -1,4 +1,4 @@
-package com.example.aplikaceprochronickpacienty.nastaveni
+package com.example.aplikaceprochronickpacienty.nastaveni_aplikaceInfo
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SwitchCompat
 import com.example.aplikaceprochronickpacienty.R
+import com.example.aplikaceprochronickpacienty.internetPripojeni.Internet
+import com.example.aplikaceprochronickpacienty.internetPripojeni.InternetPripojeni
 import com.example.aplikaceprochronickpacienty.navbar.Ucet
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser

@@ -1,4 +1,4 @@
-package com.example.aplikaceprochronickpacienty.nastaveni
+package com.example.aplikaceprochronickpacienty.internetPripojeni
 
 import android.content.Context
 import android.net.ConnectivityManager

@@ -9,9 +9,10 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.example.aplikaceprochronickpacienty.R
-import com.example.aplikaceprochronickpacienty.nastaveni.Internet
-import com.example.aplikaceprochronickpacienty.nastaveni.InternetPripojeni
-import com.example.aplikaceprochronickpacienty.nastaveni.Nastaveni
+import com.example.aplikaceprochronickpacienty.internetPripojeni.Internet
+import com.example.aplikaceprochronickpacienty.internetPripojeni.InternetPripojeni
+import com.example.aplikaceprochronickpacienty.nastaveni_aplikaceInfo.AplikaceInfo
+import com.example.aplikaceprochronickpacienty.nastaveni_aplikaceInfo.Nastaveni
 import com.example.aplikaceprochronickpacienty.prihlaseni.Prihlaseni
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -34,6 +35,9 @@ class Ucet : AppCompatActivity() {
     // Nastavení
     private lateinit var ucet_nastaveni: TextView
 
+    // O aplikaci
+    private lateinit var ucet_o_aplikaci: TextView
+
     // Údaje uživatele
     private lateinit var ucet_jmenoPrijmeni: TextView
     private lateinit var ucet_email: TextView
@@ -55,6 +59,7 @@ class Ucet : AppCompatActivity() {
     private lateinit var databazeFirebase: FirebaseDatabase
     private lateinit var referenceFirebaseUzivatel: DatabaseReference
 
+    // Datum narození uživatele
     private lateinit var datumNarozeni: String
 
     @SuppressLint("MissingInflatedId")
@@ -114,6 +119,9 @@ class Ucet : AppCompatActivity() {
             // Nastavení
             ucet_nastaveni = findViewById(R.id.ucet_nastaveni)
 
+            // O aplikaci
+            ucet_o_aplikaci = findViewById(R.id.ucet_o_aplikaci)
+
             // Udáje uživatele
             ucet_email = findViewById(R.id.ucet_email)
             ucet_datum_narozeni = findViewById(R.id.ucet_rok_narozeni)
@@ -166,7 +174,11 @@ class Ucet : AppCompatActivity() {
                 startActivity(Intent(this, Nastaveni::class.java))
             }
 
-            println(getAge("01.03.2006"))
+            // Přesměrování uživatele na aktivitu O aplikaci
+            ucet_o_aplikaci.setOnClickListener {
+
+                startActivity(Intent(this, AplikaceInfo::class.java))
+            }
 
         } else {
 

@@ -53,7 +53,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="30dp"
                     android:fontFamily="@font/montserrat_bold"
-                    android:text="8,530"
+                    android:text="@string/priklad_kroky"
                     android:textAlignment="center"
                     android:textColor="@color/neon_zluta"
                     android:textSize="50sp"
@@ -79,7 +79,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/open_sans"
-                    android:text="Zbývá 1400 kroků"
+                    android:text="@string/priklad_zbyvajicich_kroku"
                     android:textAlignment="center"
                     android:textColor="@color/neon_zluta"
                     android:textSize="18sp" />
@@ -91,7 +91,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_bold"
-                android:text="Kalorie a Kroky"
+                android:text="@string/kalorie_a_kroky"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="25sp"
@@ -130,12 +130,12 @@
                     <com.google.android.material.tabs.TabItem
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="KALORIE" />
+                        android:text="@string/kalorie" />
 
                     <com.google.android.material.tabs.TabItem
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="KROKY" />
+                        android:text="@string/kroky" />
 
                 </com.google.android.material.tabs.TabLayout>
 
@@ -164,7 +164,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/montserrat_bold"
-                android:text="Průběh vaší váhy"
+                android:text="@string/prubeh_vahy"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="25sp"
@@ -204,17 +204,17 @@
                     <com.google.android.material.tabs.TabItem
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="TÝDEN" />
+                        android:text="@string/tyden" />
 
                     <com.google.android.material.tabs.TabItem
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="MĚSÍC" />
+                        android:text="@string/mesic" />
 
                     <com.google.android.material.tabs.TabItem
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="ROK" />
+                        android:text="@string/rok" />
 
                 </com.google.android.material.tabs.TabLayout>
 

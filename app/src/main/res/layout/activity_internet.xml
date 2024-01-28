@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".nastaveni.Internet"
+    tools:context=".internetPripojeni.Internet"
     style="@style/Navbar">
 
     <LinearLayout
@@ -34,7 +34,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/montserrat_bold"
-            android:text="Whoops!"
+            android:text="@string/whoops"
             android:textSize="35sp" />
 
         <TextView
@@ -59,7 +59,7 @@
             android:layout_marginTop="32dp"
             android:background="@drawable/internet_button"
             android:fontFamily="@font/montserrat_bold"
-            android:text="Zkusit to znovu"
+            android:text="@string/zkusit_to_znovu"
             android:textSize="18sp" />
 
         <ProgressBar

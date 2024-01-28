@@ -91,6 +91,7 @@
                     android:background="@null"
                     android:paddingTop="30dp"
                     android:paddingEnd="15dp"
+                    android:contentDescription="@string/zobrazit_heslo"
                     android:src="@drawable/ic_eye_hide"
                     tools:ignore="RtlSymmetry">
 
@@ -108,7 +109,7 @@
                 android:paddingEnd="10dp"
                 android:text="@string/zapomenuti_hesla"
                 android:textColor="@color/modro_fialova"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 tools:ignore="RtlHardcoded,RtlSymmetry">
 
 
@@ -173,7 +174,7 @@
                 android:drawableLeft="@drawable/ic_google"
                 android:textAlignment="center"
                 app:backgroundTint="@null"
-                >
+                tools:ignore="RtlSymmetry">
 
             </Button>
 

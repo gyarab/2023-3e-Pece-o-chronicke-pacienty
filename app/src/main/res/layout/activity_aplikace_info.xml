@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    style="@style/NastaveniBackground">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="vertical"
+        style="@style/NastaveniCardBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/aplikace_button_zpet"
+                android:layout_width="50dp"
+                android:layout_height="75dp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="15dp"
+                android:background="@null"
+                android:contentDescription="@string/zpet"
+                android:paddingBottom="6dp"
+                android:src="@drawable/nastaveni_ic_arrow_left"
+                style="@style/NastaveniTitle"/>
+
+            <TextView
+                style="@style/NastaveniTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat_bold"
+                android:padding="15dp"
+                android:text="@string/o_aplikaci"
+                android:textAlignment="center"
+                android:textSize="25sp" />
+
+            <ImageView
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:src="@drawable/ic_gyarab"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="@string/gyarab_logo"
+                style="@style/AplikaceGyarabLogo"/>
+
+
+        </RelativeLayout>
+
+        <ListView
+            android:id="@+id/aplikace_listview"
+            android:layout_width="wrap_content"
+            android:layout_height="350dp"
+            />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/aplikace_pdfviewer_button"
+                style="@style/InternetTextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:padding="10dp"
+                android:drawableLeft="@drawable/ic_pdf"
+                android:fontFamily="@font/montserrat_bold"
+                android:text="@string/dokumentace"
+                android:textSize="14sp"
+                app:backgroundTint="#e92857"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

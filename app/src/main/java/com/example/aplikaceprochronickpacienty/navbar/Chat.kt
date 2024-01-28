@@ -11,8 +11,8 @@ import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.adapters.ChatAdapter
 import com.example.aplikaceprochronickpacienty.databinding.ActivityChatBinding
 import com.example.aplikaceprochronickpacienty.models.Message
-import com.example.aplikaceprochronickpacienty.nastaveni.Internet
-import com.example.aplikaceprochronickpacienty.nastaveni.InternetPripojeni
+import com.example.aplikaceprochronickpacienty.internetPripojeni.Internet
+import com.example.aplikaceprochronickpacienty.internetPripojeni.InternetPripojeni
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.api.gax.core.FixedCredentialsProvider
 import com.google.auth.oauth2.GoogleCredentials
