@@ -246,9 +246,10 @@
                 android:id="@+id/prehled_souradnice_linearChart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""
+                android:text="@string/informace_o_grafu"
+                android:layout_marginTop="16dp"
                 android:textSize="20sp"
-                android:textColor="@color/white"
+                android:textColor="@color/neon_zluta"
                 app:layout_constraintEnd_toEndOf="@+id/prehled_lineChart"
                 app:layout_constraintStart_toStartOf="@+id/prehled_lineChart"
                 app:layout_constraintTop_toBottomOf="@+id/prehled_lineChart" />
@@ -261,9 +262,9 @@
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="25sp"
-                app:layout_constraintEnd_toEndOf="@+id/prehled_lineChart"
-                app:layout_constraintStart_toStartOf="@+id/prehled_lineChart"
-                app:layout_constraintTop_toBottomOf="@+id/prehled_lineChart" />
+                app:layout_constraintEnd_toEndOf="@+id/prehled_souradnice_linearChart"
+                app:layout_constraintStart_toStartOf="@+id/prehled_souradnice_linearChart"
+                app:layout_constraintTop_toBottomOf="@+id/prehled_souradnice_linearChart" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

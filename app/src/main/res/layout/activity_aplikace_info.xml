@@ -64,7 +64,7 @@
         <ListView
             android:id="@+id/aplikace_listview"
             android:layout_width="wrap_content"
-            android:layout_height="350dp"
+            android:layout_height="450dp"
             />
 
         <androidx.constraintlayout.widget.ConstraintLayout

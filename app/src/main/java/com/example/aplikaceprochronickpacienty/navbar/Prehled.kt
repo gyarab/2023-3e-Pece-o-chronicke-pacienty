@@ -11,7 +11,6 @@ import android.util.Log
 import android.view.animation.AlphaAnimation
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import app.futured.donut.DonutProgressView
 import app.futured.donut.DonutSection
 import com.db.williamchart.ExperimentalFeature
@@ -28,12 +27,6 @@ import com.example.aplikaceprochronickpacienty.roomDB.UzivatelDatabase
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.tabs.TabLayout
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -508,7 +501,7 @@ class Prehled : AppCompatActivity() {
         set: MutableList<Pair<String, Float>>,
         vaha: ArrayList<Double>
     ) {
-        for (i in (datum.size - 1) downTo maxOf((datum.size - 1) - size, 0) step 2) {
+        for (i in (datum.size) - size until maxOf((datum.size), 0) step 2) {
 
             set.add(datum[i] to vaha[i].toFloat())
         }
@@ -698,15 +691,20 @@ class Prehled : AppCompatActivity() {
             // Vypsání souřadnice grafu při dotyku uživatele
             lineChart.onDataPointTouchListener = { index, _, _ ->
 
+                // Souřadnice grafu
                 val x = set[index].first
                 val y = set[index].second
 
-                val barvaX = "<font color='#ffc412'>X: </font>"
-                val barvaY = "<font color='#ffc412'> Y: </font>"
-                prehled_souradnice_linearChart.text =
-                    Html.fromHtml(barvaX + x + barvaY + "$y")
+                // Bílá barva
+                val barvaX = "<font color='#FFFFFF'>$x </font>"
+                val barvaY = "<font color='#FFFFFF'>$y </font>"
 
-                println("[X: $x, Y: $y]")
+                // Žlutá barva
+                val barvaDatum = "<font color='#ffc412'>Datum: </font>"
+                val barvaVaha = "<font color='#ffc412'> Váha: </font>"
+
+                prehled_souradnice_linearChart.text =
+                    Html.fromHtml("$barvaDatum $barvaX $barvaVaha $barvaY kg")
             }
 
             lineChart.animate(set)
