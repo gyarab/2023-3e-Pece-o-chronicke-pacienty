@@ -61,6 +61,9 @@ class Prihlaseni : AppCompatActivity() {
     // Kontrola účtu - výchozí či Google
     private var mapa: HashMap<String, Boolean> = HashMap()
 
+    // Notifikace
+    private var oznameni: Boolean = false
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -291,6 +294,7 @@ class Prihlaseni : AppCompatActivity() {
         }
     }
 
+    /** Aktuální motiv aplikace **/
     private fun getDarkMode(switchNazev:String) {
 
         val databazeFirebase: FirebaseDatabase = FirebaseDatabase.getInstance()
@@ -318,6 +322,7 @@ class Prihlaseni : AppCompatActivity() {
             }
         })
     }
+
 
     /** Přidání uživatele do Firebase - Realtime database  **/
     private fun pridatUzivatele_Realtime(account: GoogleSignInAccount) {

@@ -1,6 +1,11 @@
 package com.example.aplikaceprochronickpacienty.navbar
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.LinearGradient
@@ -20,6 +25,11 @@ import com.db.williamchart.data.Scale
 import com.db.williamchart.data.configuration.ChartConfiguration
 import com.db.williamchart.view.BarChartView
 import com.db.williamchart.view.LineChartView
+import com.example.aplikaceprochronickpacienty.Notifikace.Notifikace
+import com.example.aplikaceprochronickpacienty.Notifikace.kanalID
+import com.example.aplikaceprochronickpacienty.Notifikace.nadpisExtra
+import com.example.aplikaceprochronickpacienty.Notifikace.notifikaceID
+import com.example.aplikaceprochronickpacienty.Notifikace.zpravaExtra
 import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.databinding.ActivityPrehledBinding
 import com.example.aplikaceprochronickpacienty.roomDB.Uzivatel
@@ -27,6 +37,12 @@ import com.example.aplikaceprochronickpacienty.roomDB.UzivatelDatabase
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.tabs.TabLayout
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -34,6 +50,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -75,7 +92,6 @@ class Prehled : AppCompatActivity() {
     private var tabItemLine: String = "TYDEN"
 
     val listDnu = ArrayList<String>()
-
 
     // BarChart
     private var kalorieClick: Int = 0
@@ -142,6 +158,10 @@ class Prehled : AppCompatActivity() {
                     else -> return@setOnNavigationItemSelectedListener false
                 }
             }
+
+            // Vytvoření a poslání notifikace
+            createNotification()
+            getNotifcation()
 
             // Databáze ROOM
             roomDatabase = UzivatelDatabase.getDatabase(this)
@@ -709,5 +729,93 @@ class Prehled : AppCompatActivity() {
 
             lineChart.animate(set)
         }
+    }
+
+    /** Vytvoření notifikace pro uživatele **/
+    private fun createNotification() {
+
+        val nazev = "Titul"
+        val popis = "Popis"
+        val dulezitost = NotificationManager.IMPORTANCE_DEFAULT
+        val kanal = NotificationChannel(kanalID, nazev, dulezitost)
+        kanal.description = popis
+
+        val notifikaceManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notifikaceManager.createNotificationChannel(kanal)
+    }
+
+    /** Poslání notifikace pro uživatele **/
+    @SuppressLint("ScheduleExactAlarm")
+    private fun sendNotification() {
+
+        val intent = Intent(applicationContext, Notifikace::class.java)
+        val nadpis = "Motivační hláška"
+        val zprava = "Koukněte co je nového!"
+        intent.putExtra(nadpisExtra, nadpis)
+        intent.putExtra(zpravaExtra, zprava)
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            notifikaceID,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        // Okamžitá notifikace
+        /*alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            System.currentTimeMillis(),
+            pendingIntent
+        )*/
+
+        // Načasovaná notifikace
+        val calendar = Calendar.getInstance()
+        calendar.setTimeInMillis(System.currentTimeMillis())
+        calendar[Calendar.HOUR_OF_DAY] = 7
+        calendar[Calendar.MINUTE] = 0
+        calendar[Calendar.SECOND] = 0
+
+        alarmManager.setRepeating(
+            AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+            AlarmManager.INTERVAL_DAY, pendingIntent
+        )
+
+        // Opakování každý den
+        alarmManager.setRepeating(
+            AlarmManager.RTC, calendar.getTimeInMillis() / 1000,
+            AlarmManager.INTERVAL_DAY, pendingIntent
+        )
+    }
+
+    /** Kontrola zda jsou zapnuta oznámení, pokud ano, je vzápětí posláno oznámení **/
+    private fun getNotifcation() {
+
+        val databazeFirebase: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val referenceFirebaseUzivatel: DatabaseReference = databazeFirebase.getReference("users")
+
+        val uzivatel = FirebaseAuth.getInstance().currentUser!!
+
+        referenceFirebaseUzivatel.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val oznameniDB = uzivatel.displayName?.let {
+                    snapshot.child(it).child("oznameni").getValue(Boolean::class.java)
+                }
+
+                // Oznámení zapnuta
+                if (oznameniDB == true) {
+
+                    // Poslání notifikace
+                    sendNotification()
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
     }
 }
