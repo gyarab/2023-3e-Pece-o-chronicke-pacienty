@@ -22,6 +22,17 @@
         android:theme="@style/Theme.AplikaceProChronickéPacienty"
         tools:targetApi="31">
 
+        <receiver android:name="com.example.aplikaceprochronickpacienty.Notifikace.NotifikaceBoot" android:enabled="true"
+            android:exported="true">
+
+            <intent-filter>
+
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+
+            </intent-filter>
+
+        </receiver>
+
         <receiver
             android:name=".Notifikace.Notifikace"
             android:enabled="true"

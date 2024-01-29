@@ -51,6 +51,7 @@ import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.GregorianCalendar
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -763,29 +764,35 @@ class Prehled : AppCompatActivity() {
 
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
+        setTimeToPushNotifications(alarmManager,pendingIntent,7)
+
         // Okamžitá notifikace
         /*alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             System.currentTimeMillis(),
             pendingIntent
         )*/
+    }
 
-        // Načasovaná notifikace
-        val calendar = Calendar.getInstance()
-        calendar.setTimeInMillis(System.currentTimeMillis())
-        calendar[Calendar.HOUR_OF_DAY] = 7
-        calendar[Calendar.MINUTE] = 0
-        calendar[Calendar.SECOND] = 0
+    /** Notifikace se zobrazí ve stejný čas v průběhu dne **/
+    private fun setTimeToPushNotifications(alarmManager: AlarmManager, intent: PendingIntent, denniNotifikace: Int) {
+
+        val kalendar = GregorianCalendar.getInstance().apply {
+            if (get(Calendar.HOUR_OF_DAY) >= denniNotifikace) {
+                add(Calendar.DAY_OF_MONTH, 1)
+            }
+
+            set(Calendar.HOUR_OF_DAY, denniNotifikace)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
 
         alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-            AlarmManager.INTERVAL_DAY, pendingIntent
-        )
-
-        // Opakování každý den
-        alarmManager.setRepeating(
-            AlarmManager.RTC, calendar.getTimeInMillis() / 1000,
-            AlarmManager.INTERVAL_DAY, pendingIntent
+            AlarmManager.RTC_WAKEUP,
+            kalendar.timeInMillis,
+            AlarmManager.INTERVAL_DAY,
+            intent
         )
     }
 
