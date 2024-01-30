@@ -330,23 +330,31 @@ class Prihlaseni : AppCompatActivity() {
         val databazeFirebase = FirebaseDatabase.getInstance()
         val referenceFirebase = databazeFirebase.getReference("users")
 
-        val udajeUzivatele =
-            UdajeUzivatele(
-                account.displayName,
-                account.email,
-                account.givenName,
-                true,
-                true,
-                true,
-                "",
-                "",
-                0.0,
-                0,
-                0.0
-            )
+        // Pokud email již existuje
+        if (mapa.keys.contains(account.email)) {
 
-        // V databazi Firebase Realtime se vytvoří nový uživatel se údaji
-        account.displayName?.let { referenceFirebase.child(it).setValue(udajeUzivatele) }
+            return
+
+        } else {
+
+            val udajeUzivatele =
+                UdajeUzivatele(
+                    account.displayName,
+                    account.email,
+                    account.givenName,
+                    true,
+                    true,
+                    true,
+                    "",
+                    "",
+                    0.0,
+                    0,
+                    0.0
+                )
+
+            // V databazi Firebase Realtime se vytvoří nový uživatel se údaji
+            account.displayName?.let { referenceFirebase.child(it).setValue(udajeUzivatele) }
+        }
     }
 
     /** Kontrola emailu - zda je validní **/
@@ -376,7 +384,6 @@ class Prihlaseni : AppCompatActivity() {
             )
                 .show()
 
-            prihlaseni_google_client.signOut()
         }
 
         return false

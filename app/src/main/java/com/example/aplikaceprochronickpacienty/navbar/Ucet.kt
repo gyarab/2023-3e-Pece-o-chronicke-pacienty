@@ -222,7 +222,14 @@ class Ucet : AppCompatActivity() {
                             }
                         }
 
-                        ucet_vek.text = getAge(datumNarozeni).toString() + " let"
+                        try {
+                            ucet_vek.text = getAge(datumNarozeni).toString() + " let"
+
+                        } catch (e:UninitializedPropertyAccessException) {
+
+                            println("Tento účet nemá datum narození")
+                        }
+
                     }
                 }
             }

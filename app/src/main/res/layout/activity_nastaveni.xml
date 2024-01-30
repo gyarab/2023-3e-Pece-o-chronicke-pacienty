@@ -179,7 +179,7 @@
                 android:drawablePadding="10dp"
                 android:padding="8dp"
                 android:paddingStart="50dp"
-                android:text="@string/kroky"
+                android:text="@string/Kroky"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 style="@style/NastaveniTextColor"

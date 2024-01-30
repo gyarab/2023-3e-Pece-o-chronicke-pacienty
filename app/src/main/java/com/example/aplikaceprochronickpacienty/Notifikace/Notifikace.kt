@@ -33,7 +33,10 @@ class Notifikace : BroadcastReceiver() {
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(intent.getStringExtra(nadpisExtra))
                 .setContentText(intent.getStringExtra(zpravaExtra))
+                .setAutoCancel(true)
                 .setContentIntent(aktivita)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .build()
 
             val manager =

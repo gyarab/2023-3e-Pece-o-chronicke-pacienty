@@ -2,6 +2,7 @@ package com.example.aplikaceprochronickpacienty.navbar
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -739,6 +740,9 @@ class Prehled : AppCompatActivity() {
         val popis = "Popis"
         val dulezitost = NotificationManager.IMPORTANCE_DEFAULT
         val kanal = NotificationChannel(kanalID, nazev, dulezitost)
+
+        // Posílání zpráv na uzamčenou obrazovku
+        kanal.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         kanal.description = popis
 
         val notifikaceManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
@@ -778,6 +782,7 @@ class Prehled : AppCompatActivity() {
     private fun setTimeToPushNotifications(alarmManager: AlarmManager, intent: PendingIntent, denniNotifikace: Int) {
 
         val kalendar = GregorianCalendar.getInstance().apply {
+
             if (get(Calendar.HOUR_OF_DAY) >= denniNotifikace) {
                 add(Calendar.DAY_OF_MONTH, 1)
             }
