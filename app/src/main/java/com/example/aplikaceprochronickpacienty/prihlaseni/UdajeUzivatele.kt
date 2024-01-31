@@ -10,7 +10,8 @@ class UdajeUzivatele(var jmenoPrijmeni: String? = null,
                      var vyska: String? = null,
                      var vaha: Double,
                      var krokyCil: Int,
-                     var vahaCil: Double) {
+                     var vahaCil: Double,
+                     var profilovyObrazek: String) {
 
 
 }

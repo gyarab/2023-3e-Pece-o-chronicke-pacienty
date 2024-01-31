@@ -349,7 +349,8 @@ class Prihlaseni : AppCompatActivity() {
                     "",
                     0.0,
                     0,
-                    0.0
+                    0.0,
+                    ""
                 )
 
             // V databazi Firebase Realtime se vytvoří nový uživatel se údaji

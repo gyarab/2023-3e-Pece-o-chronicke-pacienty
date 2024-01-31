@@ -116,4 +116,7 @@ dependencies {
 
     // PDF Viewer
     implementation("com.github.mhiew:android-pdf-viewer:3.2.0-beta.3")
+
+    // Rounded ImageView
+    implementation("com.makeramen:roundedimageview:2.3.0")
 }

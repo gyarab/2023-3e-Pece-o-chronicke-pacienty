@@ -444,7 +444,8 @@ class Registrace : AppCompatActivity() {
                                     "",
                                     0.0,
                                     0,
-                                    0.0
+                                    0.0,
+                                    ""
                                 )
 
                             referenceFirebase.child(jmenoPrijmeni).setValue(udajeUzivatele)

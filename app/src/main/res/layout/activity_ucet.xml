@@ -54,7 +54,7 @@
                 </View>
 
                 <ImageView
-                    android:id="@+id/edit_profile_picture_button"
+                    android:id="@+id/ucet_select_icon_button"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_marginEnd="10dp"
@@ -64,23 +64,23 @@
                     android:elevation="10dp"
                     android:padding="8dp"
                     android:src="@drawable/ic_photo"
-                    app:layout_constraintBottom_toBottomOf="@id/ucet_imageview"
-                    app:layout_constraintEnd_toEndOf="@id/ucet_imageview"
+                    app:layout_constraintBottom_toBottomOf="@id/ucet_icon"
+                    app:layout_constraintEnd_toEndOf="@id/ucet_icon"
                     app:tint="@color/white" />
 
-                <ImageView
-                    android:id="@+id/ucet_imageview"
+                <com.makeramen.roundedimageview.RoundedImageView
+                    android:id="@+id/ucet_icon"
                     android:layout_width="125sp"
                     android:layout_height="125sp"
-                    android:background="@drawable/ucet_ikona_account"
+                    android:src="@drawable/ucet_ikona_account"
                     android:contentDescription="@string/profilov_obrazek_uzivatele"
                     app:backgroundTint="@null"
                     app:layout_constraintBottom_toBottomOf="@+id/view"
                     app:layout_constraintEnd_toEndOf="@+id/view"
                     app:layout_constraintStart_toStartOf="@+id/view"
-                    app:layout_constraintTop_toTopOf="@+id/view">
-
-                </ImageView>
+                    app:layout_constraintTop_toTopOf="@+id/view"
+                    app:riv_corner_radius="1000dp"
+                    />
 
                 <TextView
                     android:id="@+id/ucet_jmeno_uzivatele"

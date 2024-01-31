@@ -159,7 +159,7 @@ class AplikaceInfo : AppCompatActivity() {
         )
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
         //emailIntent.putExtra(Intent.EXTRA_TEXT, "Body")
-        startActivity(Intent.createChooser(emailIntent, "Send email..."))
+        startActivity(Intent.createChooser(emailIntent, "Píšu email ohledně..."))
     }
 
     /** Vypsání aktuálního motivu aplikace **/

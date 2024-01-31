@@ -1,13 +1,19 @@
 package com.example.aplikaceprochronickpacienty.navbar
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.internetPripojeni.Internet
 import com.example.aplikaceprochronickpacienty.internetPripojeni.InternetPripojeni
@@ -25,6 +31,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.makeramen.roundedimageview.RoundedImageView
+import java.io.ByteArrayOutputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -45,7 +53,6 @@ class Ucet : AppCompatActivity() {
     private lateinit var ucet_vyska: TextView
     private lateinit var ucet_vaha: TextView
     private lateinit var ucet_vek: TextView
-    private lateinit var ucet_ikonaUzivatele: ImageView
     private lateinit var ucet_odhlasitButton: Button
 
     // Odhlášení uživatele
@@ -62,7 +69,13 @@ class Ucet : AppCompatActivity() {
     // Datum narození uživatele
     private lateinit var datumNarozeni: String
 
-    @SuppressLint("MissingInflatedId")
+    // Výběr ikony uživatele
+    private lateinit var ucet_select_icon_button: ImageView
+
+    // Ikona uživatele
+    private lateinit var ucet_icon: RoundedImageView
+
+    @SuppressLint("MissingInflatedId", "QueryPermissionsNeeded")
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -103,6 +116,12 @@ class Ucet : AppCompatActivity() {
                 }
             }
 
+            // Výběr ikony uživatele
+            ucet_select_icon_button = findViewById(R.id.ucet_select_icon_button)
+
+            // Ikona uživatele
+            ucet_icon = findViewById(R.id.ucet_icon)
+
             // Firebase Reference
             databazeFirebase = FirebaseDatabase.getInstance()
             referenceFirebaseUzivatel = databazeFirebase.getReference("users")
@@ -112,9 +131,6 @@ class Ucet : AppCompatActivity() {
 
             // Tlačítko pro odhálšení uživatele
             ucet_odhlasitButton = findViewById(R.id.ucet_odhlasit_button)
-
-            // Ikona uživatele
-            ucet_ikonaUzivatele = findViewById(R.id.ucet_imageview)
 
             // Nastavení
             ucet_nastaveni = findViewById(R.id.ucet_nastaveni)
@@ -128,7 +144,6 @@ class Ucet : AppCompatActivity() {
             ucet_vyska = findViewById(R.id.ucet_vyska)
             ucet_vaha = findViewById(R.id.ucet_vaha)
             ucet_vek = findViewById(R.id.ucet_vek)
-
 
             // Aktuální uživatel
             uzivatel = FirebaseAuth.getInstance().currentUser
@@ -148,6 +163,16 @@ class Ucet : AppCompatActivity() {
             getUserDataDB("vyska")
             getUserDataDB("vaha")
             getUserDataDB("vek")
+            getUserDataDB("profilovyObrazek")
+
+            // Kliknutí na výběr profilového obrázku
+            ucet_select_icon_button.setOnClickListener {
+
+                val vyber = Intent(Intent.ACTION_PICK)
+                vyber.type = "image/*"
+
+                startActivityForResult(vyber, 1000)
+            }
 
             // Kliknutí na tlačítko - Odhlásit se
             ucet_odhlasitButton.setOnClickListener {
@@ -186,11 +211,44 @@ class Ucet : AppCompatActivity() {
         }
     }
 
+    /** Metoda pro zobrazení obrázku z galerie uživatele **/
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK && requestCode == 1000) {
+
+            // Kvůli chybě SecurityException je nutné použít formát Bitmap, který již není soukromý
+            val bitmap: Bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data?.data)
+
+            // Přeformátování na formát Uri
+            val tempUri: Uri = getImageUriFromBitmap(applicationContext, bitmap)
+
+            // Stanovení obrázku
+            ucet_icon.setImageURI(tempUri)
+            ucet_icon.setScaleType(ImageView.ScaleType.FIT_XY)
+
+            // přidání URI obrázku to databáze
+            referenceFirebaseUzivatel.child(uzivatel?.displayName.toString()).child("profilovyObrazek").setValue(tempUri.toString())
+        }
+    }
+
+    /** Získání formátu Uri z Bitmap
+     * citace kódu: https://medium.com/bobble-engineering/java-lang-securityexception-permission-denial-opening-provider-4dca9425b448 **/
+    private fun getImageUriFromBitmap(context: Context?, bitmap: Bitmap): Uri {
+        val bytes = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,bytes)
+        val path = MediaStore.Images.Media.insertImage(context!!.contentResolver,bitmap,"File",null)
+        return Uri.parse(path.toString())
+
+    }
+
     private fun getUserDataDB(nazevInfo: String) {
 
         referenceFirebaseUzivatel.addListenerForSingleValueEvent(object : ValueEventListener {
 
-            @SuppressLint("SetTextI18n")
+            @SuppressLint("SetTextI18n", "DiscouragedApi", "UseCompatLoadingForDrawables")
             override fun onDataChange(snapshot: DataSnapshot) {
 
                 val uzivatelUdaje = uzivatel?.displayName?.let {
@@ -220,12 +278,34 @@ class Ucet : AppCompatActivity() {
                                 ucet_vaha.text = "$uzivatelUdaje kg"
 
                             }
+
+                            "profilovyObrazek" -> {
+
+                                if (ucet_icon.getDrawable() != null) {
+
+                                    ucet_icon.setImageURI(uzivatelUdaje.toUri())
+                                    ucet_icon.setScaleType(ImageView.ScaleType.FIT_XY)
+
+                                } else {
+
+                                    val drawable = "@drawable/ucet_ikona_account"
+
+                                    val obrazek = getResources().getIdentifier(drawable, null,
+                                        packageName
+                                    )
+
+                                    val res = getResources().getDrawable(obrazek)
+
+                                    ucet_icon.setImageDrawable(res)
+                                }
+
+                            }
                         }
 
                         try {
                             ucet_vek.text = getAge(datumNarozeni).toString() + " let"
 
-                        } catch (e:UninitializedPropertyAccessException) {
+                        } catch (e:Exception) {
 
                             println("Tento účet nemá datum narození")
                         }
