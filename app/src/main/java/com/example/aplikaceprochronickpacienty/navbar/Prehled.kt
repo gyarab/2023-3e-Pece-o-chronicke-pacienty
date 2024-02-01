@@ -106,28 +106,12 @@ class Prehled : AppCompatActivity() {
 
     private var click: String = "BAR LINE"
 
-    val formatter: (Float) -> String = { value -> value.toString() }
-
-    private lateinit var chartConfiguration: ChartConfiguration
-
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
 
-        // Nastavení výchozího grafu
-        chartConfiguration = ChartConfiguration(
-            0,
-            0,
-            Paddings(0F, 0F, 0F, 0F),
-            AxisType.NONE,
-            0F,
-            Scale(0F, 0F),
-            formatter
-        )
-
-        if (::chartConfiguration.isInitialized) {
-
+        try {
 
             supportActionBar?.hide()
             val binding: ActivityPrehledBinding = ActivityPrehledBinding.inflate(layoutInflater)
@@ -192,9 +176,9 @@ class Prehled : AppCompatActivity() {
             getItemFromTableBarChart()
             getItemFromTableLineChart()
 
-        } else {
+        } catch (e:Exception) {
 
-            println("ERROR")
+            println("Chyba načítání grafů")
         }
     }
 
@@ -263,7 +247,7 @@ class Prehled : AppCompatActivity() {
 
             val aktualniDatum = datum[i]
 
-            println("DATUM: " + aktualniDatum)
+            //println("DATUM: " + aktualniDatum)
 
             val datumFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
 
@@ -272,7 +256,7 @@ class Prehled : AppCompatActivity() {
             var denVtydnu =
                 getDatum?.let { SimpleDateFormat("EEEE", Locale.getDefault()).format(it) }
 
-            println(denVtydnu)
+            //println(denVtydnu)
 
             when (denVtydnu) {
 
@@ -321,7 +305,7 @@ class Prehled : AppCompatActivity() {
             listDnu.add(denVtydnu)
         }
 
-        println(listDnu)
+       // println(listDnu)
     }
 
     /** Nastavení posluchače události při kliknutí na TabLayout **/
@@ -445,7 +429,7 @@ class Prehled : AppCompatActivity() {
             datumy.add(uzivatel.Date)
         }
 
-        println("DATUMY: " + datumy)
+        //println("DATUMY: " + datumy)
 
         currentDayInWeek(datumy)
 

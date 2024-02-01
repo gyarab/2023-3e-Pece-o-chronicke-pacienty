@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Aplikace pro chronické pacienty</string>
+    <string name="app_name">MoveMed</string>
     <string name="title_home">Home</string>
     <string name="chat">Chat</string>
     <string name="settings">Settings</string>
