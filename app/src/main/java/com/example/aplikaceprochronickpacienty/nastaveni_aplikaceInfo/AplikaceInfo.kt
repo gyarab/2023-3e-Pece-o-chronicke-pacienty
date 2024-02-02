@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.ListView
 import android.widget.SimpleAdapter
 import android.widget.TextView
@@ -44,12 +45,23 @@ class AplikaceInfo : AppCompatActivity() {
     // Kontrola Dark/White mode
     var darkMode = false
 
+    // Odkaz na weové stránky Gyarab
+    private lateinit var aplikace_gyarab_imageview: ImageView
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         supportActionBar?.hide()
         setContentView(R.layout.activity_aplikace_info)
+
+        // Logo Gyarab
+        aplikace_gyarab_imageview = findViewById(R.id.aplikace_gyarab_imageview)
+
+        aplikace_gyarab_imageview.setOnClickListener {
+
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.gyarab.cz/")))
+        }
 
         // Tlačítko zpět do scény Účet
         aplikace_button_zpet = findViewById(R.id.aplikace_button_zpet)
@@ -83,13 +95,13 @@ class AplikaceInfo : AppCompatActivity() {
 
             mapOf(
                 "nadpis" to " — Téma: ",
-                "text" to "\n Mobilní aplikace pro chronicky nemocné pacienty \n"
+                "text" to "\n MoveMed \n Mobilní aplikace pro chronicky nemocné pacienty \n"
             ),
-            mapOf("nadpis" to " — Autoři: ", "text" to "\n Vladimír Samojlov (Student) \n"),
-            mapOf("nadpis" to " — Organizace: ", "text" to "\n Gymnázium Arabská \n"),
+            mapOf("nadpis" to " — Autoři: ", "text" to "\n - Vladimír Samojlov (Student) \n - Felix Navrátil (Student) \n - Kryštof Breburda (Student) \n"),
+            mapOf("nadpis" to " — Organizace: ", "text" to "\n Gymnázium, Praha 6, Arabská 14 \n"),
             mapOf(
                 "nadpis" to " — Zdrojový kód: ",
-                "text" to "\n https://github.com/gyarab/2023-3e-Pece-o-chronicke-pacienty \n"
+                "text" to "\n Link na Github \n"
             ),
             mapOf("nadpis" to " — Kontakt: ", "text" to "\n vladimir.samojlov@student.gyarab.cz \n")
 

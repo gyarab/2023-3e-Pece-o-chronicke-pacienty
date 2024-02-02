@@ -12,6 +12,7 @@ import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.os.Bundle
+import android.os.Handler
 import android.text.Html
 import android.util.Log
 import android.view.animation.AlphaAnimation
@@ -20,10 +21,6 @@ import androidx.appcompat.app.AppCompatActivity
 import app.futured.donut.DonutProgressView
 import app.futured.donut.DonutSection
 import com.db.williamchart.ExperimentalFeature
-import com.db.williamchart.data.AxisType
-import com.db.williamchart.data.Paddings
-import com.db.williamchart.data.Scale
-import com.db.williamchart.data.configuration.ChartConfiguration
 import com.db.williamchart.view.BarChartView
 import com.db.williamchart.view.LineChartView
 import com.example.aplikaceprochronickpacienty.Notifikace.Notifikace
@@ -310,6 +307,7 @@ class Prehled : AppCompatActivity() {
 
     /** Nastavení posluchače události při kliknutí na TabLayout **/
     private fun tabClickListener(tabLayout: TabLayout, onClickAction: (Int) -> Unit) {
+
         for (i in 0 until tabLayout.tabCount) {
             val tab: TabLayout.Tab? = tabLayout.getTabAt(i)
 
@@ -339,6 +337,7 @@ class Prehled : AppCompatActivity() {
             }
 
             click = "BAR"
+            readData()
             readData()
         }
     }
@@ -370,6 +369,7 @@ class Prehled : AppCompatActivity() {
 
             }
             click = "LINE"
+            readData()
             readData()
         }
     }

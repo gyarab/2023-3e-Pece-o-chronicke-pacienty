@@ -50,37 +50,44 @@
 
         <activity
             android:name=".nastaveni_aplikaceInfo.ZobrazeniPDF"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
 
 
         <activity
             android:name=".nastaveni_aplikaceInfo.AplikaceInfo"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
 
 
         <activity
             android:name=".internetPripojeni.Internet"
-            android:exported="false" />
+            android:exported="false"
+            />
 
 
         <activity
             android:name=".nastaveni_aplikaceInfo.Nastaveni"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
 
 
         <activity
             android:name=".prihlaseni.ObnoveniHesla"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
 
 
         <activity
             android:name=".prihlaseni.Registrace"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait"/>
 
 
         <activity
             android:name=".prihlaseni.Prihlaseni"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
 
             <intent-filter>
 
@@ -94,16 +101,19 @@
 
         <activity
             android:name=".navbar.Ucet"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".navbar.Chat"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".navbar.Prehled"
             android:exported="true"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"/>
 
         <meta-data
             android:name="preloaded_fonts"

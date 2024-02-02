@@ -2,6 +2,7 @@ package com.example.aplikaceprochronickpacienty.navbar
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -24,6 +25,7 @@ import com.google.cloud.dialogflow.v2.SessionName
 import com.google.cloud.dialogflow.v2.SessionsClient
 import com.google.cloud.dialogflow.v2.SessionsSettings
 import com.google.cloud.dialogflow.v2.TextInput
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -140,6 +142,7 @@ class Chat : AppCompatActivity() {
         }
     }
 
+    /** Přidání zprávy **/
     @SuppressLint("NotifyDataSetChanged")
     private fun addMessageToList(message: String, isReceived: Boolean) {
 
@@ -149,6 +152,8 @@ class Chat : AppCompatActivity() {
         binding.chatView.layoutManager?.scrollToPosition(messageList.size - 1)
     }
 
+
+    /** Propojení Dialogwflow s aplikací **/
     private fun setUpBot() {
 
         try {
@@ -169,6 +174,8 @@ class Chat : AppCompatActivity() {
         }
     }
 
+    /** Poslání zprávy do Dialogflow, získání odpovědi **/
+    @OptIn(DelicateCoroutinesApi::class)
     private fun sendMessageToBot(message: String) {
         val input = QueryInput.newBuilder()
             .setText(TextInput.newBuilder().setText(message).setLanguageCode("en-US")).build()
@@ -177,6 +184,7 @@ class Chat : AppCompatActivity() {
         }
     }
 
+    /** Poslání zprávy do pozadí **/
     private suspend fun sendMessageInBg(
         queryInput: QueryInput
     ) {
@@ -194,6 +202,7 @@ class Chat : AppCompatActivity() {
                         updateUI(result)
                     }
                 }
+
             } catch (e: java.lang.Exception) {
                 Log.d(TAG, "doInBackground: " + e.message)
                 e.printStackTrace()
@@ -269,7 +278,7 @@ class Chat : AppCompatActivity() {
         })
     }
 
-
+    /** Odpověď Dialogflow nebo ChatGPT **/
     private fun updateUI(response: DetectIntentResponse) {
 
         val botReply: String = response.queryResult.fulfillmentText
@@ -295,6 +304,7 @@ class Chat : AppCompatActivity() {
         }
     }
 
+    /** Přečtení souboru JSON **/
     private fun readJSON(): String? {
 
         var json: String? = null

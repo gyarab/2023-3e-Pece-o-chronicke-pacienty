@@ -2,6 +2,7 @@ package com.example.aplikaceprochronickpacienty.prihlaseni
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.text.TextUtils
 import android.text.method.HideReturnsTransformationMethod
@@ -60,9 +61,6 @@ class Prihlaseni : AppCompatActivity() {
 
     // Kontrola účtu - výchozí či Google
     private var mapa: HashMap<String, Boolean> = HashMap()
-
-    // Notifikace
-    private var oznameni: Boolean = false
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
