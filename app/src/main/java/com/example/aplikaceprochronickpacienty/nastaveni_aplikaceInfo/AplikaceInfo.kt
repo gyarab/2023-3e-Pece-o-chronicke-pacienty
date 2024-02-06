@@ -95,7 +95,7 @@ class AplikaceInfo : AppCompatActivity() {
 
             mapOf(
                 "nadpis" to " — Téma: ",
-                "text" to "\n MoveMed \n Mobilní aplikace pro chronicky nemocné pacienty \n"
+                "text" to "\n Mobilní aplikace pro chronicky nemocné pacienty \n"
             ),
             mapOf("nadpis" to " — Autoři: ", "text" to "\n - Vladimír Samojlov (Student) \n - Felix Navrátil (Student) \n - Kryštof Breburda (Student) \n"),
             mapOf("nadpis" to " — Organizace: ", "text" to "\n Gymnázium, Praha 6, Arabská 14 \n"),
