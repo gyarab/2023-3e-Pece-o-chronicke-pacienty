@@ -2,18 +2,21 @@ package com.example.aplikaceprochronickpacienty.navbar
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.ActivityInfo
+import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.os.Bundle
 import android.util.Log
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.aplikaceprochronickpacienty.BuildConfig
 import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.adapters.ChatAdapter
 import com.example.aplikaceprochronickpacienty.databinding.ActivityChatBinding
-import com.example.aplikaceprochronickpacienty.models.Message
 import com.example.aplikaceprochronickpacienty.internetPripojeni.Internet
 import com.example.aplikaceprochronickpacienty.internetPripojeni.InternetPripojeni
+import com.example.aplikaceprochronickpacienty.models.Message
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.api.gax.core.FixedCredentialsProvider
 import com.google.auth.oauth2.GoogleCredentials
@@ -45,6 +48,7 @@ import java.io.InputStream
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
+
 class Chat : AppCompatActivity() {
 
     private var messageList: ArrayList<Message> = ArrayList()
@@ -62,6 +66,8 @@ class Chat : AppCompatActivity() {
     private var client = OkHttpClient()
 
     private var otazka: String = ""
+
+    private lateinit var textView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -104,7 +110,22 @@ class Chat : AppCompatActivity() {
                 }
             }
 
-            //setting adapter to recyclerview
+            // Nadpis AI ChatBota
+            textView = findViewById(R.id.textView)
+
+            // Barvy textu
+            val barva = textView.paint
+            val sirkaTextu = barva.measureText("AI ChatBot")
+
+            val gradient: Shader = LinearGradient(
+                0f, 0f, sirkaTextu, textView.textSize, intArrayOf(
+                    Color.parseColor("#BC13FE"),
+                    Color.parseColor("#09dbd0"),
+                ), null, Shader.TileMode.CLAMP
+            )
+            textView.paint.setShader(gradient)
+
+            //Nastavení adapteru pro RecycleView
             chatAdapter = ChatAdapter(this, messageList)
             binding.chatView.adapter = chatAdapter
 
@@ -330,18 +351,29 @@ class Chat : AppCompatActivity() {
 
             val motivacniHlaska = "Vytvoř jednovětnou motivační hlášku pro člověka, který vykonal tyto aktivity za jeden den: $kroky $spanek $aktivniPohyb"
 
-            addMessageToList("Typing...",true)
+            //addMessageToList("Typing...",true)
+
+            // Uvítání uživatele
+
+            getResponse("") { vysledek ->
+
+                runOnUiThread {
+
+                    addMessageToList("Dobrý den, \n jak vám mohu pomoci? ", true)
+
+                }
+            }
 
             /** Motivační hláška **/
 
-            getResponse(motivacniHlaska) { result ->
+            /*getResponse(motivacniHlaska) { result ->
 
                 runOnUiThread {
 
                     messageList.remove(Message("Typing...", true))
                     addMessageToList(result, true)
                 }
-            }
+            }*/
 
 
         } catch (e:Exception){

@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    style="@style/ChatBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    style="@style/ChatBackground"
     tools:context=".navbar.Chat">
 
     <FrameLayout
@@ -14,7 +14,6 @@
         android:layout_height="40dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="75dp"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -25,46 +24,81 @@
             android:layout_marginStart="4dp"
             android:layout_marginTop="1dp"
             android:background="@null"
-            android:padding="8dp"
             android:contentDescription="@string/poslat_zpravu"
+            android:padding="8dp"
             android:src="@drawable/ic_send"
             app:tint="@color/fialova"
 
-        />
+            />
 
     </FrameLayout>
 
     <EditText
-
         android:id="@+id/editMessage"
+        style="@style/ChatDesignInput"
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_marginStart="16sp"
         android:layout_marginEnd="8sp"
         android:layout_marginBottom="75dp"
-        style="@style/ChatDesignInput"
+        android:autofillHints="Napište zprávu"
         android:ems="10"
         android:hint="@string/napis_svoji_zpravu"
         android:inputType="text"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:autofillHints="Napište zprávu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/constraintLayout"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <RelativeLayout
+        android:id="@+id/text_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/Navbar">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="30dp"
+            android:fontFamily="@font/montserrat_bold"
+            android:text="@string/ai_chatbot"
+            android:textColor="@color/modro_fialova"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/obrazek_ai"
+            android:src="@drawable/ic_chat" />
+
+
+    </RelativeLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatView"
+        style="@style/ChatBackground"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        style="@style/ChatBackground"
-        android:orientation="vertical"
         android:layout_marginBottom="15dp"
+        android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@id/constraintLayout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_layout"
         app:layout_constraintVertical_bias="1.0"
         app:stackFromEnd="false"
         tools:itemCount="2"
@@ -72,11 +106,11 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"
+        style="@style/Navbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="0dp"
         android:layout_marginEnd="0dp"
-        style="@style/Navbar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

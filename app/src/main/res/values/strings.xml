@@ -79,4 +79,6 @@
     <string name="gyarab_logo">Gyarab Logo</string>
     <string name="informace_o_grafu">Pro přesné info klikněte na graf</string>
     <string name="Kroky">Kroky</string>
+    <string name="obrazek_ai">Obrázek AI</string>
+    <string name="ai_chatbot">AI ChatBot</string>
 </resources>
