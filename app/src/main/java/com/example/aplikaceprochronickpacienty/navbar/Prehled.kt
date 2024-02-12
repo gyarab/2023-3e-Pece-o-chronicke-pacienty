@@ -1,5 +1,6 @@
 package com.example.aplikaceprochronickpacienty.navbar
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.Notification
@@ -8,16 +9,25 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Shader
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.text.Html
 import android.util.Log
 import android.view.animation.AlphaAnimation
 import android.widget.TextView
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import app.futured.donut.DonutProgressView
 import app.futured.donut.DonutSection
 import com.db.williamchart.ExperimentalFeature
@@ -45,6 +55,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.text.SimpleDateFormat
@@ -54,8 +65,19 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 
-class Prehled : AppCompatActivity() {
+class Prehled : AppCompatActivity(), SensorEventListener {
 
+    // Senzor na kroky
+    private var senzorManager: SensorManager? = null
+
+    // Počet kroků
+    private var pocetKroku = 0f
+
+    // Předchozí kroky
+    private var predchoziKroky = 0f
+
+    // Uživatel je v pohybu
+    private var pohyb = false
 
     // Donut
     private var prehled_donut_bar: DonutProgressView? = null
@@ -103,6 +125,7 @@ class Prehled : AppCompatActivity() {
 
     private var click: String = "BAR LINE"
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -142,12 +165,26 @@ class Prehled : AppCompatActivity() {
                 }
             }
 
+            // Žádost o povolení senzoru
+            if (pristupKrokyPovolen()) {
+                zadostPristupKroky()
+            }
+
+            // Zaznamenání pohybu uživatele
+            senzorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+
             // Vytvoření a poslání notifikace
             createNotification()
             getNotifcation()
 
             // Databáze ROOM
             roomDatabase = UzivatelDatabase.getDatabase(this)
+
+            runBlocking {
+                val cislo = roomDatabase.uzivatelDao().getLastUserColumnValue()
+
+                println("CISLICE: " + cislo)
+            }
 
             // Vkládání dat do databáze
             saveData()
@@ -168,15 +205,36 @@ class Prehled : AppCompatActivity() {
 
             prehled_souradnice_linearChart = findViewById(R.id.prehled_souradnice_linearChart)
 
-
             // Získání konkrétní položky z tabulky
             getItemFromTableBarChart()
             getItemFromTableLineChart()
 
-        } catch (e:Exception) {
+        } catch (e: Exception) {
 
             println("Chyba načítání grafů")
         }
+    }
+
+    private fun zadostPristupKroky() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
+                1000
+            )
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun pristupKrokyPovolen(): Boolean {
+
+        return ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACTIVITY_RECOGNITION
+        ) != PackageManager.PERMISSION_GRANTED
     }
 
     /** Přenos dat uživatele z csv souboru do databáze **/
@@ -236,6 +294,8 @@ class Prehled : AppCompatActivity() {
         }
 
     }
+
+    /** **/
 
     /** Získání podle datumu aktuálního dnu v týdnu **/
     private fun currentDayInWeek(datum: List<String>) {
@@ -302,7 +362,7 @@ class Prehled : AppCompatActivity() {
             listDnu.add(denVtydnu)
         }
 
-       // println(listDnu)
+        // println(listDnu)
     }
 
     /** Nastavení posluchače události při kliknutí na TabLayout **/
@@ -593,45 +653,7 @@ class Prehled : AppCompatActivity() {
             donutView.cap = 12000f
             donutView.submitData(listOf(donut))
 
-            if (dnesniKroky.toString().length == 4) {
-
-                val pridaniCarky =
-                    dnesniKroky.toString().substring(0, 1) + "," + dnesniKroky.toString()
-                        .substring(1)
-
-                prehled_pocet_kroku.text = pridaniCarky
-
-            } else if (dnesniKroky.toString().length == 5) {
-
-                val pridaniCarky =
-                    dnesniKroky.toString().substring(0, 2) + "," + dnesniKroky.toString()
-                        .substring(2)
-
-                prehled_pocet_kroku.text = pridaniCarky
-                prehled_pocet_kroku.textSize = 45F
-            }
-
-            if (dnesniKroky >= donutView.cap) {
-
-                prehled_zbyvajici_kroky.text = "SPLNĚNO! \uD83C\uDF89"
-
-                // první zobrazení grafu
-                if (click == "BAR LINE") {
-
-                    // Animace textu
-                    prehled_zbyvajici_kroky.animate().scaleX(0F).scaleY(0F).setDuration(500)
-
-                        .withEndAction(Runnable {
-                            prehled_zbyvajici_kroky.animate().scaleX(1F).scaleY(1F)
-                                .setDuration(1500)
-                        })
-                }
-
-            } else {
-
-                prehled_zbyvajici_kroky.text =
-                    "Zbývá " + (donutView.cap - dnesniKroky).roundToInt().toString() + " kroků"
-            }
+            donutKroky(dnesniKroky, donutView)
 
             // první zobrazení grafu
             if (click == "BAR LINE") {
@@ -642,20 +664,70 @@ class Prehled : AppCompatActivity() {
                 fadeIn.setDuration(4000)
                 fadeIn.fillAfter = true
 
-                val myShader: Shader = LinearGradient(
-                    0F, 0F, 0F, 150F,
-                    Color.parseColor("#ff30a2"),
-                    Color.parseColor("#FFDC72"),
-                    Shader.TileMode.CLAMP
-                )
+                prechodBarevKroky()
+            }
+        }
+    }
 
-                prehled_pocet_kroku.paint.shader = myShader
+    /** Použití přechodu Linear Gradient u počtu kroků **/
+    private fun prechodBarevKroky() {
+
+        val myShader: Shader = LinearGradient(
+            0F, 0F, 0F, 150F,
+            Color.parseColor("#ff30a2"),
+            Color.parseColor("#FFDC72"),
+            Shader.TileMode.CLAMP
+        )
+
+        prehled_pocet_kroku.paint.shader = myShader
+    }
+
+    /** Metoda pro kontrolu kroků uživatele **/
+    @SuppressLint("SetTextI18n")
+    private fun donutKroky(dnesniKroky: Int, donutView: DonutProgressView) {
+
+        if (dnesniKroky.toString().length < 4) {
+
+            prehled_pocet_kroku.text = dnesniKroky.toString()
+
+        } else if (dnesniKroky.toString().length == 4) {
+
+            val pridaniCarky =
+                dnesniKroky.toString().substring(0, 1) + "," + dnesniKroky.toString()
+                    .substring(1)
+
+            prehled_pocet_kroku.text = pridaniCarky
+
+        } else if (dnesniKroky.toString().length == 5) {
+
+            val pridaniCarky =
+                dnesniKroky.toString().substring(0, 2) + "," + dnesniKroky.toString()
+                    .substring(2)
+
+            prehled_pocet_kroku.text = pridaniCarky
+            prehled_pocet_kroku.textSize = 45F
+        }
+
+        if (dnesniKroky >= donutView.cap) {
+
+            prehled_zbyvajici_kroky.text = "SPLNĚNO! \uD83C\uDF89"
+
+            // první zobrazení grafu
+            if (click == "BAR LINE") {
+
+                // Animace textu
+                prehled_zbyvajici_kroky.animate().scaleX(0F).scaleY(0F).setDuration(500)
+
+                    .withEndAction(Runnable {
+                        prehled_zbyvajici_kroky.animate().scaleX(1F).scaleY(1F)
+                            .setDuration(1500)
+                    })
             }
 
-            /*donutView.addAmount(
-                sectionName = "drink_amount_water",
-                amount = 0.5f,
-                color = Color.parseColor("#03BFFA"))*/
+        } else {
+
+            prehled_zbyvajici_kroky.text =
+                "Zbývá " + (donutView.cap - dnesniKroky).roundToInt().toString() + " kroků"
         }
     }
 
@@ -752,7 +824,7 @@ class Prehled : AppCompatActivity() {
 
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        setTimeToPushNotifications(alarmManager,pendingIntent,7)
+        setTimeToPushNotifications(alarmManager, pendingIntent, 7)
 
         // Okamžitá notifikace
         /*alarmManager.setExactAndAllowWhileIdle(
@@ -763,7 +835,11 @@ class Prehled : AppCompatActivity() {
     }
 
     /** Notifikace se zobrazí ve stejný čas v průběhu dne **/
-    private fun setTimeToPushNotifications(alarmManager: AlarmManager, intent: PendingIntent, denniNotifikace: Int) {
+    private fun setTimeToPushNotifications(
+        alarmManager: AlarmManager,
+        intent: PendingIntent,
+        denniNotifikace: Int
+    ) {
 
         val kalendar = GregorianCalendar.getInstance().apply {
 
@@ -813,5 +889,73 @@ class Prehled : AppCompatActivity() {
             override fun onCancelled(error: DatabaseError) {
             }
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        pohyb = true
+
+        // Nastavení senzoru na kroky
+        val krokySenzor = senzorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+
+        if (krokySenzor != null) {
+
+            senzorManager?.registerListener(this, krokySenzor, SensorManager.SENSOR_DELAY_UI)
+        }
+    }
+
+    /** Metoda pro zaznamenávání kroků uživatele **/
+    @OptIn(DelicateCoroutinesApi::class)
+    override fun onSensorChanged(event: SensorEvent?) {
+
+        if (pohyb) {
+
+            pocetKroku = event!!.values[0] - pocetKroku
+
+            if (pocetKroku < 100000) {
+
+                println(pocetKroku)
+
+                prehled_donut_bar?.let { donutView ->
+
+                    val donut = DonutSection(
+                        name = "kroky",
+                        color = Color.parseColor("#ffc412"),
+                        amount = pocetKroku
+                    )
+
+                    donutView.animationDurationMs = 3000
+                    donutView.cap = 12000f
+                    donutView.submitData(listOf(donut))
+
+                    donutKroky(pocetKroku.toInt(),donutView)
+
+                    prechodBarevKroky()
+                }
+
+                // Vytvoreni objektu Uzivatele
+                /*val uzivatel =
+
+                    Uzivatel(
+                        (lastNumberDB() + 1),
+                        id_uzivatel,
+                        datum_uzivatel,
+                        vaha_uzivatel,
+                        kalorie_uzivatel,
+                        kroky_uzivatel
+                    )
+
+                GlobalScope.launch(Dispatchers.IO) {
+
+                    roomDatabase.uzivatelDao().pridatUzivatele(uzivatel)
+                }*/
+
+            }
+
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        println("onAccuracyChanged: Sensor: $sensor; accuracy: $accuracy")
     }
 }
