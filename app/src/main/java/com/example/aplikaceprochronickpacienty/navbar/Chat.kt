@@ -17,6 +17,7 @@ import com.example.aplikaceprochronickpacienty.databinding.ActivityChatBinding
 import com.example.aplikaceprochronickpacienty.internetPripojeni.Internet
 import com.example.aplikaceprochronickpacienty.internetPripojeni.InternetPripojeni
 import com.example.aplikaceprochronickpacienty.models.Message
+import com.example.aplikaceprochronickpacienty.roomDB.UzivatelDatabase
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.api.gax.core.FixedCredentialsProvider
 import com.google.auth.oauth2.GoogleCredentials
@@ -32,6 +33,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.Callback
@@ -59,15 +61,25 @@ class Chat : AppCompatActivity() {
     private val uuid = UUID.randomUUID().toString()
     private val TAG = "chat"
 
+    // Chat Adapter
     private lateinit var chatAdapter: ChatAdapter
 
     private lateinit var binding: ActivityChatBinding
 
+    // Zavolání klienta pro prpojení s dialogFlow
     private var client = OkHttpClient()
 
+    // Otázka uživatele
     private var otazka: String = ""
 
+    // Vstupní text uživatele
     private lateinit var textView: TextView
+
+    // ROOM Database
+    private lateinit var roomDatabase: UzivatelDatabase
+
+    // Aktivní uživatel
+    private val aktivniUzivatel = 2285
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -110,6 +122,9 @@ class Chat : AppCompatActivity() {
                 }
             }
 
+            // Databáze ROOM
+            roomDatabase = UzivatelDatabase.getDatabase(this)
+
             // Nadpis AI ChatBota
             textView = findViewById(R.id.textView)
 
@@ -139,7 +154,7 @@ class Chat : AppCompatActivity() {
                     sendMessageToBot(otazka)
 
                 } else {
-                    Toast.makeText(this@Chat, "Please enter text!", Toast.LENGTH_SHORT)
+                    Toast.makeText(this@Chat, "Zpráva nemůže být prázdná!", Toast.LENGTH_SHORT)
                         .show()
                 }
             }
@@ -151,7 +166,7 @@ class Chat : AppCompatActivity() {
                 .build()
 
 
-            // nacteni souboru JSON a vytvoření motivační hlášky
+            // Načtení dat uživatele
             readJSON()
 
             //initialize bot config
@@ -198,14 +213,16 @@ class Chat : AppCompatActivity() {
     /** Poslání zprávy do Dialogflow, získání odpovědi **/
     @OptIn(DelicateCoroutinesApi::class)
     private fun sendMessageToBot(message: String) {
+
         val input = QueryInput.newBuilder()
             .setText(TextInput.newBuilder().setText(message).setLanguageCode("en-US")).build()
+
         GlobalScope.launch {
             sendMessageInBg(input)
         }
     }
 
-    /** Poslání zprávy do pozadí **/
+    /** Poslání zprávy uživatele do ChatBota **/
     private suspend fun sendMessageInBg(
         queryInput: QueryInput
     ) {
@@ -310,7 +327,7 @@ class Chat : AppCompatActivity() {
 
         } else {
 
-            addMessageToList("Typing...",true)
+            addMessageToList("...",true)
 
             Log.d("OTAZKA", otazka)
 
@@ -318,7 +335,7 @@ class Chat : AppCompatActivity() {
 
                 runOnUiThread {
 
-                    messageList.remove(Message("Typing...", true))
+                    messageList.remove(Message("...", true))
                     addMessageToList(result, true)
                 }
             }
@@ -326,13 +343,13 @@ class Chat : AppCompatActivity() {
     }
 
     /** Přečtení souboru JSON **/
-    private fun readJSON(): String? {
+    private fun readJSON() {
 
-        var json: String? = null
+        //var json: String? = null
 
         try {
 
-            val vstup: InputStream = assets.open("data-uzivatele.json")
+            /*val vstup: InputStream = assets.open("data-uzivatele.json")
             json = vstup.bufferedReader().use{it.readText()}
 
             val arr = JSONArray(json)
@@ -349,11 +366,11 @@ class Chat : AppCompatActivity() {
             val spanek = "Spánek: " + objektJSON.getString("hours_of_sleep_per_day") + " hodin"
             val aktivniPohyb = "Aktivní pohyb: " + objektJSON.getString("active_minutes") + " minut"
 
-            val motivacniHlaska = "Vytvoř jednovětnou motivační hlášku pro člověka, který vykonal tyto aktivity za jeden den: $kroky $spanek $aktivniPohyb"
+            val motivacniHlaska = "Vytvoř jednovětnou motivační hlášku pro člověka, který vykonal tyto aktivity za jeden den: $kroky $spanek $aktivniPohyb"*/
 
             //addMessageToList("Typing...",true)
 
-            // Uvítání uživatele
+             /** Uvítání uživatele **/
 
             getResponse("") { vysledek ->
 
@@ -364,23 +381,29 @@ class Chat : AppCompatActivity() {
                 }
             }
 
-            /** Motivační hláška **/
 
-            /*getResponse(motivacniHlaska) { result ->
+            /** Zpracování dat uživatele **/
 
-                runOnUiThread {
+            runBlocking {
 
-                    messageList.remove(Message("Typing...", true))
-                    addMessageToList(result, true)
-                }
-            }*/
+                // Data za poslední měsíc
+                val data = roomDatabase.uzivatelDao().getLastMonthData(aktivniUzivatel)
+                println("fhčuhtihjwth" + data)
+
+                /*getResponse("Analyzuj data tohoto uživatele: $data") { result ->
+
+                    runOnUiThread {
+
+                        messageList.remove(Message("...", true))
+                        addMessageToList(result, true)
+                    }
+                }*/
+            }
 
 
         } catch (e:Exception){
 
             Log.e("ERROR VSTUP", e.toString())
         }
-
-        return json
     }
 }

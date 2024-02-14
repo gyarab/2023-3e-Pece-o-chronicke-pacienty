@@ -54,7 +54,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.text.SimpleDateFormat
@@ -139,6 +138,7 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
     private var click: String = "BAR LINE"
 
+    @OptIn(DelicateCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.Q)
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,43 +187,15 @@ class Prehled : AppCompatActivity(), SensorEventListener {
             // Databáze ROOM
             roomDatabase = UzivatelDatabase.getDatabase(this)
 
-            GlobalScope.launch {
-
-                val aktualniUzivatel =
-
-                    Uzivatel(
-                        (posledniCislo + 1),
-                        aktivniUzivatel,
-                        dnesniDatum(),
-                        85.0,
-                        0.0,
-                        0
-                    )
-
-                // List se všemi datumy uživatele
-                val list = roomDatabase.uzivatelDao().getDatesForSubject(aktivniUzivatel)
-
-                // Pokud list již neobsahuje dnešní datum, tak následně přidá uživatele
-                if (!list.equals(dnesniDatum())) {
-
-                    // Přidání uživatele do databáze
-                    roomDatabase.uzivatelDao().addUser(aktualniUzivatel)
-
-                    println("U6U6U6U")
-
-                } else {
-
-                    // Aktualizace dat
-                    roomDatabase.uzivatelDao().updateUser(aktivniUzivatel,dnesniDatum(),pocetKroku.toInt(),caloriesBurned(vaha.toDouble(),pocetKroku.toInt()),vaha)
-                }
-            }
-
             // Zaznamenání pohybu uživatele
             senzorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
             // Vytvoření a poslání notifikace
             createNotification()
             getNotifcation()
+
+            // Resetování při začátku nového dne
+            newDayStart()
 
             // Vkládání dat do databáze
             saveData()
@@ -252,6 +224,72 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
             println("Chyba načítání grafů")
         }
+    }
+
+    /** Metoda, která resetuje na začátku nového dne kroky, kalorie uživatele **/
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun newDayStart() {
+
+        // Firebase Reference
+        val databazeFirebase = FirebaseDatabase.getInstance()
+        val referenceFirebaseUzivatel = databazeFirebase.getReference("users")
+
+        // Aktulání uživatel Firebase
+        val uzivatel = FirebaseAuth.getInstance().currentUser!!
+
+        referenceFirebaseUzivatel.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val aktualniVaha = uzivatel.displayName?.let {
+                    snapshot.child(it).child("vaha").getValue(Any::class.java).toString()
+                        .toDouble()
+                }
+
+                if (aktualniVaha != null) {
+
+                    GlobalScope.launch(Dispatchers.IO) {
+
+                        // Poslední pořadové číslo v databázi ROOM
+                        posledniCislo = roomDatabase.uzivatelDao().getLastUserColumnValue()!!
+
+                        val aktualniUzivatel =
+
+                            Uzivatel(
+                                (posledniCislo + 1),
+                                aktivniUzivatel,
+                                dnesniDatum(),
+                                aktualniVaha,
+                                0.0,
+                                0
+                            )
+
+                        // List se všemi datumy uživatele
+                        val list =
+                            roomDatabase.uzivatelDao().getDatesForSubject(aktivniUzivatel)
+
+                        // Pokud list již neobsahuje dnešní datum, tak následně přidá uživatele
+                        if (!list.contains(dnesniDatum())) {
+
+                            // Přidání uživatele do databáze
+                            roomDatabase.uzivatelDao().addUser(aktualniUzivatel)
+
+                            println(aktualniUzivatel)
+
+                        } else {
+
+                            val kroky = roomDatabase.uzivatelDao().getSteps(aktivniUzivatel,dnesniDatum())
+
+                            // Přidání uživatele do databáze
+                            roomDatabase.uzivatelDao().updateUser(aktivniUzivatel,dnesniDatum(),kroky,caloriesBurned(aktualniVaha,kroky),aktualniVaha)
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
     }
 
     private fun zadostPristupKroky() {
@@ -322,6 +360,16 @@ class Prehled : AppCompatActivity(), SensorEventListener {
                         GlobalScope.launch(Dispatchers.IO) {
 
                             roomDatabase.uzivatelDao().addUser(uzivatel)
+
+                            // List se všemi datumy uživatele
+                            val list =
+                                roomDatabase.uzivatelDao().getDatesForSubject(aktivniUzivatel)
+
+                            // Pokud list již neobsahuje dnešní datum, tak následně přidá uživatele
+                            if (!list.contains(dnesniDatum())) {
+
+                                newDayStart()
+                            }
                         }
                     }
                 }
@@ -660,7 +708,8 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
         GlobalScope.launch {
 
-            val uzivatelList: List<Uzivatel> = roomDatabase.uzivatelDao().findIdBySubjectId(aktivniUzivatel)
+            val uzivatelList: List<Uzivatel> =
+                roomDatabase.uzivatelDao().findIdBySubjectId(aktivniUzivatel)
             displayData(uzivatelList)
         }
     }
@@ -943,7 +992,7 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
         if (krokySenzor != null) {
 
-            senzorManager?.registerListener(this, krokySenzor, SensorManager.SENSOR_DELAY_UI)
+            senzorManager?.registerListener(this, krokySenzor, SensorManager.SENSOR_DELAY_NORMAL)
         }
     }
 
@@ -971,7 +1020,7 @@ class Prehled : AppCompatActivity(), SensorEventListener {
                     donutView.cap = 12000f
                     donutView.submitData(listOf(donut))
 
-                    donutKroky(pocetKroku.toInt(),donutView)
+                    donutKroky(pocetKroku.toInt(), donutView)
 
                     prechodBarevKroky()
 
@@ -1008,35 +1057,18 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
                     val spaleneKalorie = caloriesBurned(aktualniVaha, pocetKroku.toInt())
 
-                    // Aktuální informace o uživateli do databáze ROOM
-                    val aktualniUzivatel =
-
-                        Uzivatel(
-                            (posledniCislo + 1),
-                            aktivniUzivatel,
-                            datum,
-                            aktualniVaha,
-                            spaleneKalorie,
-                            0
-                        )
-
                     GlobalScope.launch(Dispatchers.IO) {
 
-                        // List se všemi datumy uživatele
-                        val list = roomDatabase.uzivatelDao().getDatesForSubject(aktivniUzivatel)
+                        // Aktualizace dat uživatele
+                        roomDatabase.uzivatelDao().updateUser(
+                            aktivniUzivatel,
+                            datum,
+                            pocetKroku.toInt(),
+                            spaleneKalorie,
+                            aktualniVaha
+                        )
 
-
-                        // Pokud list již neobsahuje dnešní datum, tak následně přidá uživatele
-                        if (!list.equals(datum)) {
-
-                            // Přidání uživatele do databáze
-                            roomDatabase.uzivatelDao().addUser(aktualniUzivatel)
-
-                        } else {
-
-                            // Aktualizace dat
-                            roomDatabase.uzivatelDao().updateUser(aktivniUzivatel,datum,pocetKroku.toInt(),spaleneKalorie,vaha)
-                        }
+                        println("ROOM je v listu: $aktivniUzivatel,$datum,$pocetKroku,$spaleneKalorie,$vaha")
                     }
                 }
             }
@@ -1064,7 +1096,7 @@ class Prehled : AppCompatActivity(), SensorEventListener {
         return vyslednyPocetkalorii
     }
 
-    fun dnesniDatum() : String {
+    fun dnesniDatum(): String {
 
         // Dnešní datum
         val dnesniDatum = LocalDate.now()
