@@ -378,9 +378,14 @@ class Chat : AppCompatActivity() {
 
                     addMessageToList("Dobrý den, \n jak vám mohu pomoci? ", true)
 
+                    addMessageToList("Prosím, vyberte jednu z následujících nemocí: " +
+                            "\n — Obezita (Nadváha)" +
+                            "\n — Kašel" +
+                            "\n — Horečka" +
+                            "\n — Bolest hlavy", true)
                 }
             }
-
+//Horečka a zvýšená teplota
 
             /** Zpracování dat uživatele **/
 

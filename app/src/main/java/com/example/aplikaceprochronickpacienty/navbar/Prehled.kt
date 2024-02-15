@@ -1055,20 +1055,23 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
                 if (aktualniVaha != null && aktualniVyska != null) {
 
-                    val spaleneKalorie = caloriesBurned(aktualniVaha, pocetKroku.toInt())
-
                     GlobalScope.launch(Dispatchers.IO) {
 
-                        // Aktualizace dat uživatele
-                        roomDatabase.uzivatelDao().updateUser(
-                            aktivniUzivatel,
-                            datum,
-                            pocetKroku.toInt(),
-                            spaleneKalorie,
-                            aktualniVaha
-                        )
+                        if (pocetKroku < 100000) {
 
-                        println("ROOM je v listu: $aktivniUzivatel,$datum,$pocetKroku,$spaleneKalorie,$vaha")
+                            val spaleneKalorie = caloriesBurned(aktualniVaha, pocetKroku.toInt())
+
+                            // Aktualizace dat uživatele
+                            roomDatabase.uzivatelDao().updateUser(
+                                aktivniUzivatel,
+                                datum,
+                                pocetKroku.toInt(),
+                                spaleneKalorie,
+                                aktualniVaha
+                            )
+
+                            println("ROOM je v listu: $aktivniUzivatel,$datum,$pocetKroku,$spaleneKalorie,$aktualniVaha")
+                        }
                     }
                 }
             }
