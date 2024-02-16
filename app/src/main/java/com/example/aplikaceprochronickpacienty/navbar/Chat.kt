@@ -521,6 +521,7 @@ class Chat : AppCompatActivity() {
         })
     }
 
+    /** Všechny verze slova **/
     private fun getAllFormsWord(slovo: String, arr: ArrayList<String>): ArrayList<String> {
 
         arr.add(slovo)
