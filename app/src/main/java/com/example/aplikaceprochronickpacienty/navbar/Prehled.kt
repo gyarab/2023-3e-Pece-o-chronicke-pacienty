@@ -67,8 +67,8 @@ import kotlin.math.roundToInt
 
 class Prehled : AppCompatActivity(), SensorEventListener {
 
-    // AKtuální váha uživatele
-    private var vaha = 0
+    // Kroky
+    private var kroky = 0
 
     // Aktivní uživatel
     private val aktivniUzivatel = 2285
@@ -274,14 +274,8 @@ class Prehled : AppCompatActivity(), SensorEventListener {
                             // Přidání uživatele do databáze
                             roomDatabase.uzivatelDao().addUser(aktualniUzivatel)
 
-                            println(aktualniUzivatel)
+                            println("OD ZAČÁTKU: $aktualniUzivatel")
 
-                        } else {
-
-                            val kroky = roomDatabase.uzivatelDao().getSteps(aktivniUzivatel,dnesniDatum())
-
-                            // Přidání uživatele do databáze
-                            roomDatabase.uzivatelDao().updateUser(aktivniUzivatel,dnesniDatum(),kroky,caloriesBurned(aktualniVaha,kroky),aktualniVaha)
                         }
                     }
                 }
@@ -718,42 +712,68 @@ class Prehled : AppCompatActivity(), SensorEventListener {
     @SuppressLint("SetTextI18n", "ResourceAsColor")
     private fun donutProgressView(uzivatelList: List<Uzivatel>) {
 
-        // Donut bar setup
-        prehled_donut_bar?.let { donutView ->
+        // Firebase Reference
+        val databazeFirebase = FirebaseDatabase.getInstance()
+        val referenceFirebaseUzivatel = databazeFirebase.getReference("users")
 
-            val kroky = ArrayList<Float>()
+        // Aktulání uživatel Firebase
+        val uzivatel = FirebaseAuth.getInstance().currentUser!!
 
-            for (uzivatel in uzivatelList) {
+        // Načtení dat z firebase
+        referenceFirebaseUzivatel.addListenerForSingleValueEvent(object :
+            ValueEventListener {
 
-                kroky.add(uzivatel.StepsCountDay.toFloat())
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val krokyCil = uzivatel.displayName?.let {
+                    snapshot.child(it).child("krokyCil").getValue(Any::class.java).toString()
+                        .toInt()
+                }
+
+                if (krokyCil != null) {
+
+                    // Donut bar setup
+                    prehled_donut_bar?.let { donutView ->
+
+                        val kroky = ArrayList<Float>()
+
+                        for (uzivatel in uzivatelList) {
+
+                            kroky.add(uzivatel.StepsCountDay.toFloat())
+                        }
+
+                        dnesniKroky = kroky.last().roundToInt()
+
+                        val donut = DonutSection(
+                            name = "kroky",
+                            color = Color.parseColor("#ffc412"),
+                            amount = dnesniKroky.toFloat()
+                        )
+
+                        donutView.animationDurationMs = 3000
+                        donutView.cap = krokyCil.toFloat()
+                        donutView.submitData(listOf(donut))
+
+                        donutKroky(dnesniKroky, donutView)
+
+                        // první zobrazení grafu
+                        if (click == "BAR LINE") {
+
+                            // Fade in - efekt pro zobrazení kroků
+                            val fadeIn = AlphaAnimation(0.0f, 1.0f)
+                            prehled_pocet_kroku.startAnimation(fadeIn)
+                            fadeIn.setDuration(4000)
+                            fadeIn.fillAfter = true
+
+                            prechodBarevKroky()
+                        }
+                    }
+                }
             }
 
-            dnesniKroky = kroky.last().roundToInt()
-
-            val donut = DonutSection(
-                name = "kroky",
-                color = Color.parseColor("#ffc412"),
-                amount = dnesniKroky.toFloat()
-            )
-
-            donutView.animationDurationMs = 3000
-            donutView.cap = 12000f
-            donutView.submitData(listOf(donut))
-
-            donutKroky(dnesniKroky, donutView)
-
-            // první zobrazení grafu
-            if (click == "BAR LINE") {
-
-                // Fade in - efekt pro zobrazení kroků
-                val fadeIn = AlphaAnimation(0.0f, 1.0f)
-                prehled_pocet_kroku.startAnimation(fadeIn)
-                fadeIn.setDuration(4000)
-                fadeIn.fillAfter = true
-
-                prechodBarevKroky()
+            override fun onCancelled(error: DatabaseError) {
             }
-        }
+        })
     }
 
     /** Použití přechodu Linear Gradient u počtu kroků **/
@@ -997,40 +1017,65 @@ class Prehled : AppCompatActivity(), SensorEventListener {
     }
 
     /** Metoda pro zaznamenávání kroků uživatele **/
-    @OptIn(DelicateCoroutinesApi::class)
     override fun onSensorChanged(event: SensorEvent?) {
 
         if (pohyb) {
 
-            pocetKroku = (event!!.values[0] - pocetKroku) + dnesniKroky
+            kroky++
 
-            if (pocetKroku < 100000) {
+            pocetKroku = dnesniKroky.toFloat() + kroky
 
-                println(pocetKroku)
+            println(pocetKroku)
 
-                prehled_donut_bar?.let { donutView ->
+            // Firebase Reference
+            val databazeFirebase = FirebaseDatabase.getInstance()
+            val referenceFirebaseUzivatel = databazeFirebase.getReference("users")
 
-                    val donut = DonutSection(
-                        name = "kroky",
-                        color = Color.parseColor("#ffc412"),
-                        amount = pocetKroku
-                    )
+            // Aktulání uživatel Firebase
+            val uzivatel = FirebaseAuth.getInstance().currentUser!!
 
-                    donutView.animationDurationMs = 3000
-                    donutView.cap = 12000f
-                    donutView.submitData(listOf(donut))
+            // Načtení dat z firebase
+            referenceFirebaseUzivatel.addListenerForSingleValueEvent(object :
+                ValueEventListener {
 
-                    donutKroky(pocetKroku.toInt(), donutView)
+                override fun onDataChange(snapshot: DataSnapshot) {
 
-                    prechodBarevKroky()
+                    val krokyCil = uzivatel.displayName?.let {
+                        snapshot.child(it).child("krokyCil").getValue(Any::class.java).toString()
+                            .toInt()
+                    }
 
+                    if (krokyCil != null) {
+
+                        prehled_donut_bar?.let { donutView ->
+
+                            val donut = DonutSection(
+                                name = "kroky",
+                                color = Color.parseColor("#ffc412"),
+                                amount = pocetKroku
+                            )
+
+                            donutView.animationDurationMs = 3000
+                            donutView.cap = krokyCil.toFloat()
+                            donutView.submitData(listOf(donut))
+
+                            donutKroky(pocetKroku.toInt(), donutView)
+
+                            prechodBarevKroky()
+
+                            addUserDataROOM(dnesniDatum())
+                        }
+                    }
                 }
-                addUserDataROOM(dnesniDatum())
-            }
+
+                override fun onCancelled(error: DatabaseError) {
+                }
+            })
 
         }
     }
 
+    /** Přidání aktuálních dat uživatele **/
     @OptIn(DelicateCoroutinesApi::class)
     private fun addUserDataROOM(datum: String) {
 
@@ -1057,21 +1102,18 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
                     GlobalScope.launch(Dispatchers.IO) {
 
-                        if (pocetKroku < 100000) {
+                        val spaleneKalorie = caloriesBurned(aktualniVaha, pocetKroku.toInt())
 
-                            val spaleneKalorie = caloriesBurned(aktualniVaha, pocetKroku.toInt())
+                        // Aktualizace dat uživatele
+                        roomDatabase.uzivatelDao().updateUser(
+                            aktivniUzivatel,
+                            datum,
+                            pocetKroku.toInt(),
+                            spaleneKalorie,
+                            aktualniVaha
+                        )
 
-                            // Aktualizace dat uživatele
-                            roomDatabase.uzivatelDao().updateUser(
-                                aktivniUzivatel,
-                                datum,
-                                pocetKroku.toInt(),
-                                spaleneKalorie,
-                                aktualniVaha
-                            )
-
-                            println("ROOM je v listu: $aktivniUzivatel,$datum,$pocetKroku,$spaleneKalorie,$aktualniVaha")
-                        }
+                        println("ROOM je v listu: $aktivniUzivatel,$datum,$pocetKroku,$spaleneKalorie,$aktualniVaha")
                     }
                 }
             }

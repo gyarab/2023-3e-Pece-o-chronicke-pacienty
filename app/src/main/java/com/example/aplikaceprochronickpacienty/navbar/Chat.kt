@@ -29,6 +29,12 @@ import com.google.cloud.dialogflow.v2.SessionName
 import com.google.cloud.dialogflow.v2.SessionsClient
 import com.google.cloud.dialogflow.v2.SessionsSettings
 import com.google.cloud.dialogflow.v2.TextInput
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.GlobalScope
@@ -46,7 +52,6 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
-import java.io.InputStream
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -144,6 +149,7 @@ class Chat : AppCompatActivity() {
             chatAdapter = ChatAdapter(this, messageList)
             binding.chatView.adapter = chatAdapter
 
+            // Kliknutí na tlačítko odeslání zprávy
             binding.btnSend.setOnClickListener {
 
                 otazka = binding.editMessage.text.toString()
@@ -321,22 +327,41 @@ class Chat : AppCompatActivity() {
 
         val botReply: String = response.queryResult.fulfillmentText
 
-        if (botReply.isNotEmpty()) {
+        var bmi = false
 
-            addMessageToList(botReply, true)
+        val arr = ArrayList<String>()
 
-        } else {
+        getAllFormsWord("bmi",arr)
 
-            addMessageToList("...",true)
+        for (i in arr) {
 
-            Log.d("OTAZKA", otazka)
+            if (otazka.contains(i)) {
 
-            getResponse(otazka) { result ->
+                getBMI()
+                bmi = true
+            }
+        }
 
-                runOnUiThread {
+        if (!bmi) {
 
-                    messageList.remove(Message("...", true))
-                    addMessageToList(result, true)
+            if (botReply.isNotEmpty()) {
+
+                // Odpověď dialogFlow
+                addMessageToList(botReply, true)
+
+            } else {
+
+                addMessageToList("...", true)
+
+                Log.d("OTAZKA", otazka)
+
+                getResponse(otazka) { result ->
+
+                    runOnUiThread {
+
+                        messageList.remove(Message("...", true))
+                        addMessageToList(result, true)
+                    }
                 }
             }
         }
@@ -370,7 +395,7 @@ class Chat : AppCompatActivity() {
 
             //addMessageToList("Typing...",true)
 
-             /** Uvítání uživatele **/
+            /** Uvítání uživatele **/
 
             getResponse("") { vysledek ->
 
@@ -378,14 +403,15 @@ class Chat : AppCompatActivity() {
 
                     addMessageToList("Dobrý den, \n jak vám mohu pomoci? ", true)
 
-                    addMessageToList("Prosím, vyberte jednu z následujících nemocí: " +
-                            "\n — Obezita (Nadváha)" +
-                            "\n — Kašel" +
-                            "\n — Horečka" +
-                            "\n — Bolest hlavy", true)
+                    addMessageToList(
+                        "Prosím, vyberte jednu z následujících nemocí: " +
+                                "\n — Obezita (Nadváha)" +
+                                "\n — Kašel" +
+                                "\n — Horečka" +
+                                "\n — Bolest hlavy", true
+                    )
                 }
             }
-//Horečka a zvýšená teplota
 
             /** Zpracování dat uživatele **/
 
@@ -406,9 +432,146 @@ class Chat : AppCompatActivity() {
             }
 
 
-        } catch (e:Exception){
+        } catch (e: Exception) {
 
             Log.e("ERROR VSTUP", e.toString())
         }
+    }
+
+    /** Metoda pro výpočet BMI **/
+    private fun getBMI() {
+
+        val databazeFirebase: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val referenceFirebaseUzivatel: DatabaseReference = databazeFirebase.getReference("users")
+
+        val uzivatel = FirebaseAuth.getInstance().currentUser!!
+
+        referenceFirebaseUzivatel.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val vaha = uzivatel.displayName?.let {
+                    snapshot.child(it).child("vaha").getValue(Any::class.java).toString().toDouble()
+                }
+
+                val vyska = uzivatel.displayName?.let {
+                    snapshot.child(it).child("vyska").getValue(Any::class.java).toString().toInt()
+                }
+
+                if (vaha != null && vyska != null) {
+
+                    val vyskaM = vyska / 100.00
+
+                    // BMI = tělesná váha (kg) / tělesná výška^2 (m)
+                    val BMI = (vaha / (vyskaM * vyskaM))
+
+                    val vysledek = String.format("%.1f", BMI).toDouble()
+
+                    if (vysledek < 18.5) {
+
+                        addMessageToList(
+                            "\n" +
+                                    "Vaše BMI ($vysledek) je nižší než 18,5, spadáte tedy do kategorie podváha, což znamená, že vaše hmotnost je příliš nízká ve srovnání s vaší výškou.\n" +
+                                    "\n" +
+                                    "Podváha představuje zvýšené riziko zdravotních komplikací kvůli nedostatečnému příjmu živin a energie, což může negativně ovlivnit fungování těla",
+                            true
+                        )
+
+                    } else if (vysledek >= 18.5 && vysledek < 25) {
+
+                        addMessageToList(
+                            "Vaše BMI ($vysledek) pohybuje v intervalu od 18,5 do 25, což odpovídá tabulkově ideální tělesné hmotnosti a naznačuje zdravější stav těla a nižší riziko zdravotních komplikací spojených s hmotností",
+                            true
+                        )
+
+                    } else if (vysledek >= 25 && vysledek < 30) {
+
+                        addMessageToList(
+                            "Vaše BMI ($vysledek) pohybuje v rozmezí od 25 do 30, spadáte do kategorie nadváhy, což naznačuje, že vaše hmotnost je vyšší než je obvyklé pro vaši výšku, a zvýšené riziko výskytu různých zdravotních problémů, včetně srdečních onemocnění a diabetu typu 2",
+                            true
+                        )
+
+                    } else if (vysledek >= 30 && vysledek < 35) {
+
+                        addMessageToList(
+                            "Vaše BMI ($vysledek) je vyšší než 30, jste klasifikován jako obézní prvního stupně. Nejste sám, protože v České republice má v současnosti obezitu 18 % žen a 20 % mužů",
+                            true
+                        )
+
+                    } else if (vysledek >= 35 && vysledek < 40) {
+
+                        addMessageToList(
+                            "Vaše BMI vyšší než 35, jste klasifikován jako obézní druhého stupně, což často vyžaduje závažnější léčebné a životní úpravy, aby se zabránilo možným zdravotním komplikacím",
+                            true
+                        )
+
+                    } else {
+
+                        addMessageToList(
+                            "Vaše BMI vyšší než 40, jste zařazen jako obézní třetího stupně. Je důležité okamžitě vyhledat lékařskou pomoc. Tento stupeň obezity je extrémně vážný a spojen s vysokým rizikem zdravotních komplikací, včetně srdečních onemocnění, diabetu, problémů s klouby a dalších",
+                            true
+                        )
+                    }
+                }
+
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+    }
+
+    private fun getAllFormsWord(slovo: String, arr: ArrayList<String>): ArrayList<String> {
+
+        arr.add(slovo)
+
+        for (i in 0 .. slovo.length - 1) {
+
+            val pismeno: Char = slovo[i]
+
+            val velkePismeno = pismeno.uppercase()
+
+            val vysledek = slovo.replace(pismeno.toString(), velkePismeno)
+
+            println(vysledek)
+
+            arr.add(vysledek)
+
+            if (slovo.length >= 2 && i < slovo.length - 1) {
+
+                val pismena = slovo[i].toString() + slovo[i + 1].toString()
+
+                val velkaPismena = pismena.uppercase()
+
+                val x = slovo.replace(pismena, velkaPismena)
+
+                arr.add(x)
+            }
+
+            if (slovo.length >= 3 && i < slovo.length - 2) {
+
+                val pismena = slovo[i].toString() + slovo[i + 1].toString() + slovo[i + 2].toString()
+
+                val velkaPismena = pismena.uppercase()
+
+                val x = slovo.replace(pismena, velkaPismena)
+
+                arr.add(x)
+            }
+
+            if (slovo.length >= 4 && i < slovo.length - 3) {
+
+                val pismena = slovo[i].toString() + slovo[i + 1].toString() + slovo[i + 2].toString() + slovo[i + 3].toString()
+
+                val velkaPismena = pismena.uppercase()
+
+                val x = slovo.replace(pismena, velkaPismena)
+
+                arr.add(x)
+            }
+        }
+
+        println(arr)
+        return arr
     }
 }
