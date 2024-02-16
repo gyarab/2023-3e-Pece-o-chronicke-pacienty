@@ -52,6 +52,8 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -173,7 +175,7 @@ class Chat : AppCompatActivity() {
 
 
             // Načtení dat uživatele
-            readJSON()
+            uvitaciText()
 
             //initialize bot config
             setUpBot()
@@ -331,7 +333,8 @@ class Chat : AppCompatActivity() {
 
         val arr = ArrayList<String>()
 
-        getAllFormsWord("bmi",arr)
+        // Všechny tvary slova BMI
+        getAllFormsWord("bmi", arr)
 
         for (i in arr) {
 
@@ -353,47 +356,98 @@ class Chat : AppCompatActivity() {
 
                 addMessageToList("...", true)
 
-                Log.d("OTAZKA", otazka)
+                val databazeFirebase: FirebaseDatabase = FirebaseDatabase.getInstance()
+                val referenceFirebaseUzivatel: DatabaseReference =
+                    databazeFirebase.getReference("users")
 
-                getResponse(otazka) { result ->
+                val uzivatel = FirebaseAuth.getInstance().currentUser!!
 
-                    runOnUiThread {
+                referenceFirebaseUzivatel.addListenerForSingleValueEvent(object :
+                    ValueEventListener {
 
-                        messageList.remove(Message("...", true))
-                        addMessageToList(result, true)
+                    override fun onDataChange(snapshot: DataSnapshot) {
+
+                        val vaha = uzivatel.displayName?.let {
+                            snapshot.child(it).child("vaha").getValue(Any::class.java).toString()
+                        }
+
+                        val vyska = uzivatel.displayName?.let {
+                            snapshot.child(it).child("vyska").getValue(Any::class.java).toString()
+                        }
+
+                        val krokyCil = uzivatel.displayName?.let {
+                            snapshot.child(it).child("krokyCil").getValue(Any::class.java).toString()
+                                .toString()
+                        }
+
+                        val vahaCil = uzivatel.displayName?.let {
+                            snapshot.child(it).child("vahaCil").getValue(Any::class.java).toString()
+                        }
+
+                        runBlocking {
+
+                            // Data za poslední měsíc
+                            val data = roomDatabase.uzivatelDao().getLastMonthData(aktivniUzivatel)
+
+                            // Dnešní kroky
+                            val kroky = roomDatabase.uzivatelDao().getSteps(aktivniUzivatel,dnesniDatum())
+
+                            // Dnešní spálené kalorie
+                            val kalorie = roomDatabase.uzivatelDao().getCalories(aktivniUzivatel,dnesniDatum())
+
+                            val dataUzivatele =
+
+                                "Zde jsou dnešní aktuální data uživatele: " +
+                                        " Dnešní kroky: $kroky" +
+                                        " Spálené kalorie: $kalorie kJ" +
+                                        " Váha: $vaha kg" +
+                                        " Výška: $vyska cm" +
+                                        " Cíl kroků za den: $krokyCil " +
+                                        " Cílová váha: $vahaCil kg" +
+                                        " Data za poslední měsíc jsou: $data" +
+                                        " Tyto data použij pouze v případě jako odpověď na otázku. Odpověď musí být stručná."
+
+                            getResponseAI(dataUzivatele)
+                        }
                     }
-                }
+
+                    override fun onCancelled(error: DatabaseError) {
+                    }
+                })
             }
         }
     }
 
-    /** Přečtení souboru JSON **/
-    private fun readJSON() {
+    /** Dnešní datum **/
+    fun dnesniDatum(): String {
 
-        //var json: String? = null
+        // Dnešní datum
+        val dnesniDatum = LocalDate.now()
+
+        val format = DateTimeFormatter.ofPattern("M/dd/yyyy")
+
+        val datum = dnesniDatum.format(format)
+
+        return datum
+    }
+
+    /** Odpověď na otázku od AI **/
+    private fun getResponseAI(veta: String) {
+
+        getResponse(veta + otazka) { result ->
+
+            runOnUiThread {
+
+                messageList.remove(Message("...", true))
+                addMessageToList(result, true)
+            }
+        }
+    }
+
+    /** Uvítací text **/
+    private fun uvitaciText() {
 
         try {
-
-            /*val vstup: InputStream = assets.open("data-uzivatele.json")
-            json = vstup.bufferedReader().use{it.readText()}
-
-            val arr = JSONArray(json)
-
-            /*for (i in 0 until arr.length()){
-
-                var objektJSON = arr.getJSONObject(i)
-                arrayList.add(objektJSON.getString("steps_per_day"))
-            }*/
-
-            var objektJSON = arr.getJSONObject(2)
-
-            val kroky = "Kroky: " + objektJSON.getString("steps_per_day") + " kroků"
-            val spanek = "Spánek: " + objektJSON.getString("hours_of_sleep_per_day") + " hodin"
-            val aktivniPohyb = "Aktivní pohyb: " + objektJSON.getString("active_minutes") + " minut"
-
-            val motivacniHlaska = "Vytvoř jednovětnou motivační hlášku pro člověka, který vykonal tyto aktivity za jeden den: $kroky $spanek $aktivniPohyb"*/
-
-            //addMessageToList("Typing...",true)
 
             /** Uvítání uživatele **/
 
@@ -404,31 +458,14 @@ class Chat : AppCompatActivity() {
                     addMessageToList("Dobrý den, \n jak vám mohu pomoci? ", true)
 
                     addMessageToList(
-                        "Prosím, vyberte jednu z následujících nemocí: " +
+                        "Jsem vytrénovaný \uD83D\uDE0A \n " +
+                                "\n Mohu vám poskytnout odbornou pomoc s následujícími nemocemi: \n" +
                                 "\n — Obezita (Nadváha)" +
                                 "\n — Kašel" +
                                 "\n — Horečka" +
                                 "\n — Bolest hlavy", true
                     )
                 }
-            }
-
-            /** Zpracování dat uživatele **/
-
-            runBlocking {
-
-                // Data za poslední měsíc
-                val data = roomDatabase.uzivatelDao().getLastMonthData(aktivniUzivatel)
-                println("fhčuhtihjwth" + data)
-
-                /*getResponse("Analyzuj data tohoto uživatele: $data") { result ->
-
-                    runOnUiThread {
-
-                        messageList.remove(Message("...", true))
-                        addMessageToList(result, true)
-                    }
-                }*/
             }
 
 
@@ -526,7 +563,7 @@ class Chat : AppCompatActivity() {
 
         arr.add(slovo)
 
-        for (i in 0 .. slovo.length - 1) {
+        for (i in 0..slovo.length - 1) {
 
             val pismeno: Char = slovo[i]
 
@@ -551,7 +588,8 @@ class Chat : AppCompatActivity() {
 
             if (slovo.length >= 3 && i < slovo.length - 2) {
 
-                val pismena = slovo[i].toString() + slovo[i + 1].toString() + slovo[i + 2].toString()
+                val pismena =
+                    slovo[i].toString() + slovo[i + 1].toString() + slovo[i + 2].toString()
 
                 val velkaPismena = pismena.uppercase()
 
@@ -562,7 +600,8 @@ class Chat : AppCompatActivity() {
 
             if (slovo.length >= 4 && i < slovo.length - 3) {
 
-                val pismena = slovo[i].toString() + slovo[i + 1].toString() + slovo[i + 2].toString() + slovo[i + 3].toString()
+                val pismena =
+                    slovo[i].toString() + slovo[i + 1].toString() + slovo[i + 2].toString() + slovo[i + 3].toString()
 
                 val velkaPismena = pismena.uppercase()
 

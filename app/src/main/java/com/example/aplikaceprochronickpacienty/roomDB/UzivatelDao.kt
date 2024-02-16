@@ -30,6 +30,9 @@ interface UzivatelDao {
     @Query("SELECT StepsCountDay FROM uzivatel_table WHERE SubjectId = :subjectId AND Date = :date")
     suspend fun getSteps(subjectId : Int, date : String): Int
 
+    @Query("SELECT EnergyIntakeDayKJ FROM uzivatel_table WHERE SubjectId = :subjectId AND Date = :date")
+    suspend fun getCalories(subjectId : Int, date : String): Double
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun addUser(uzivatel: Uzivatel)
 
