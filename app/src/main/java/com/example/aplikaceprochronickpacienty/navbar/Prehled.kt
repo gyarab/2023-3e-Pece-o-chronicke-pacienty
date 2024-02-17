@@ -68,8 +68,8 @@ import kotlin.math.roundToInt
 
 class Prehled : AppCompatActivity(), SensorEventListener {
 
-    // Kroky
-    private var kroky = 0
+    // Arraylist pro odstranění odchylky
+    val arr: ArrayList<Int> = ArrayList()
 
     // Aktivní uživatel
     private val aktivniUzivatel = 2285
@@ -82,6 +82,9 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
     // Počet kroků
     private var pocetKroku = 0f
+
+    // Původní kroky
+    private var puvodniKroky = 0f
 
     // Uživatel je v pohybu
     private var pohyb = false
@@ -188,6 +191,13 @@ class Prehled : AppCompatActivity(), SensorEventListener {
             // Vytvoření a poslání notifikace
             createNotification()
             getNotifcation()
+
+            // Počet původních kroků
+            runBlocking {
+
+                puvodniKroky =
+                    roomDatabase.uzivatelDao().getSteps(aktivniUzivatel, dnesniDatum()).toFloat()
+            }
 
             // Začátek nového dne
             newDayStart()
@@ -366,7 +376,6 @@ class Prehled : AppCompatActivity(), SensorEventListener {
                             // List se všemi datumy uživatele
                             val list =
                                 roomDatabase.uzivatelDao().getDatesForSubject(aktivniUzivatel)
-
 
                             // Pokud list již neobsahuje dnešní datum, tak následně přidá uživatele
                             if (!list.contains(dnesniDatum())) {
@@ -746,20 +755,28 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
                         runBlocking {
 
-                            val dnesniKroky =
-                                roomDatabase.uzivatelDao().getSteps(aktivniUzivatel, dnesniDatum())
+                            try {
 
-                            val donut = DonutSection(
-                                name = "kroky",
-                                color = Color.parseColor("#ffc412"),
-                                amount = dnesniKroky.toFloat()
-                            )
+                                val dnesniKroky =
+                                    roomDatabase.uzivatelDao()
+                                        .getSteps(aktivniUzivatel, dnesniDatum())
 
-                            donutView.animationDurationMs = 3000
-                            donutView.cap = krokyCil.toFloat()
-                            donutView.submitData(listOf(donut))
+                                val donut = DonutSection(
+                                    name = "kroky",
+                                    color = Color.parseColor("#ffc412"),
+                                    amount = dnesniKroky.toFloat()
+                                )
 
-                            donutKroky(dnesniKroky, donutView)
+                                donutView.animationDurationMs = 3000
+                                donutView.cap = krokyCil.toFloat()
+                                donutView.submitData(listOf(donut))
+
+                                donutKroky(dnesniKroky, donutView)
+
+                            } catch (e: NullPointerException) {
+
+                                newDayStart()
+                            }
 
                             // první zobrazení grafu
                             if (click == "BAR LINE") {
@@ -1018,7 +1035,7 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
         if (krokySenzor != null) {
 
-            senzorManager?.registerListener(this, krokySenzor, SensorManager.SENSOR_DELAY_NORMAL)
+            senzorManager?.registerListener(this, krokySenzor, SensorManager.SENSOR_DELAY_UI)
         }
     }
 
@@ -1029,14 +1046,22 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
             runBlocking {
 
-                kroky++
+                try {
 
-                val dnesniKroky =
-                    roomDatabase.uzivatelDao().getSteps(aktivniUzivatel, dnesniDatum())
+                    // Pokud je arraylist prázdný
+                    if (arr.isEmpty()) {
 
-                pocetKroku = dnesniKroky.toFloat() + kroky
+                        arr.add(event!!.values[0].toInt())
+                    }
 
-                println("CELKOVÉ KROKY: $pocetKroku")
+                    pocetKroku = (event!!.values[0] - arr[0]) + puvodniKroky
+
+                    println("CELKOVÉ KROKY: $pocetKroku")
+
+                } catch (e: Exception) {
+
+                    newDayStart()
+                }
 
                 // Firebase Reference
                 val databazeFirebase = FirebaseDatabase.getInstance()
@@ -1074,10 +1099,10 @@ class Prehled : AppCompatActivity(), SensorEventListener {
                                 donutKroky(pocetKroku.toInt(), donutView)
 
                                 prechodBarevKroky()
-
-                                addUserDataROOM(dnesniDatum())
                             }
                         }
+
+                        addUserDataROOM(dnesniDatum())
                     }
 
                     override fun onCancelled(error: DatabaseError) {
