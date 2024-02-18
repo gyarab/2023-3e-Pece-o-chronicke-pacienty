@@ -340,7 +340,7 @@ class Chat : AppCompatActivity() {
 
             if (otazka.contains(i)) {
 
-                getBMI()
+                getBMIUzivatel()
                 bmi = true
             }
         }
@@ -368,11 +368,11 @@ class Chat : AppCompatActivity() {
                     override fun onDataChange(snapshot: DataSnapshot) {
 
                         val vaha = uzivatel.displayName?.let {
-                            snapshot.child(it).child("vaha").getValue(Any::class.java).toString()
+                            snapshot.child(it).child("vaha").getValue(Any::class.java).toString().toDouble()
                         }
 
                         val vyska = uzivatel.displayName?.let {
-                            snapshot.child(it).child("vyska").getValue(Any::class.java).toString()
+                            snapshot.child(it).child("vyska").getValue(Any::class.java).toString().toInt()
                         }
 
                         val krokyCil = uzivatel.displayName?.let {
@@ -390,24 +390,35 @@ class Chat : AppCompatActivity() {
                             val data = roomDatabase.uzivatelDao().getLastMonthData(aktivniUzivatel)
 
                             // Dnešní kroky
-                            val kroky = roomDatabase.uzivatelDao().getSteps(aktivniUzivatel,dnesniDatum())
+                            val kroky =
+                                roomDatabase.uzivatelDao().getSteps(aktivniUzivatel, dnesniDatum())
 
                             // Dnešní spálené kalorie
-                            val kalorie = roomDatabase.uzivatelDao().getCalories(aktivniUzivatel,dnesniDatum())
+                            val kalorie = roomDatabase.uzivatelDao()
+                                .getCalories(aktivniUzivatel, dnesniDatum())
 
-                            val dataUzivatele =
+                            if (vyska != null && vaha != null) {
 
-                                "Zde jsou dnešní aktuální data uživatele: " +
-                                        " Dnešní kroky: $kroky" +
-                                        " Spálené kalorie: $kalorie kJ" +
-                                        " Váha: $vaha kg" +
-                                        " Výška: $vyska cm" +
-                                        " Cíl kroků za den: $krokyCil " +
-                                        " Cílová váha: $vahaCil kg" +
-                                        " Data za poslední měsíc jsou: $data" +
-                                        " Tyto data použij pouze v případě jako odpověď na otázku. Odpověď musí být stručná."
+                                val BMI = vypocetBMI(vyska, vaha)
 
-                            getResponseAI(dataUzivatele)
+                                val dataUzivatele =
+
+                                    "Zde jsou dnešní aktuální data uživatele: " +
+
+                                            " Dnešní kroky: $kroky" +
+                                            " Spálené kalorie: $kalorie kJ" +
+                                            " Váha: $vaha kg" +
+                                            " Výška: $vyska cm" +
+                                            " Cíl kroků za den: $krokyCil " +
+                                            " Cílová váha: $vahaCil kg" +
+                                            " BMI: $BMI"
+                                            " Data za poslední měsíc jsou: $data" +
+
+                                        " Pokud uživatel má podle daného BMI nadváhu či obezitu, nesmí jíst jídla s velkou kalorickou hodnotou" +
+                                        " Na otázku odpovídej pouze s použitím těchto dat. Odpověď musí být stručná."
+
+                                getResponseAI(dataUzivatele)
+                            }
                         }
                     }
 
@@ -476,7 +487,20 @@ class Chat : AppCompatActivity() {
     }
 
     /** Metoda pro výpočet BMI **/
-    private fun getBMI() {
+    private fun vypocetBMI(vyskaCM: Int, vahaKG: Double): Double {
+
+        val vyskaM = vyskaCM / 100.00
+
+        // BMI = tělesná váha (kg) / tělesná výška^2 (m)
+        val BMI = (vahaKG / (vyskaM * vyskaM))
+
+        val vysledek = String.format("%.1f", BMI).toDouble()
+
+        return vysledek
+    }
+
+    /** Metoda pro zjištění akutálního BMI pacienta **/
+    private fun getBMIUzivatel() {
 
         val databazeFirebase: FirebaseDatabase = FirebaseDatabase.getInstance()
         val referenceFirebaseUzivatel: DatabaseReference = databazeFirebase.getReference("users")
@@ -497,12 +521,7 @@ class Chat : AppCompatActivity() {
 
                 if (vaha != null && vyska != null) {
 
-                    val vyskaM = vyska / 100.00
-
-                    // BMI = tělesná váha (kg) / tělesná výška^2 (m)
-                    val BMI = (vaha / (vyskaM * vyskaM))
-
-                    val vysledek = String.format("%.1f", BMI).toDouble()
+                    val vysledek = vypocetBMI(vyska,vaha)
 
                     if (vysledek < 18.5) {
 

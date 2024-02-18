@@ -192,13 +192,6 @@ class Prehled : AppCompatActivity(), SensorEventListener {
             createNotification()
             getNotifcation()
 
-            // Počet původních kroků
-            runBlocking {
-
-                puvodniKroky =
-                    roomDatabase.uzivatelDao().getSteps(aktivniUzivatel, dnesniDatum()).toFloat()
-            }
-
             // Začátek nového dne
             newDayStart()
 
@@ -278,8 +271,6 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
                             // Přidání uživatele do databáze
                             roomDatabase.uzivatelDao().addUser(aktualniUzivatel)
-
-                            println("OD ZAČÁTKU: $aktualniUzivatel")
 
                         } else {
 
@@ -382,6 +373,12 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
                                 newDayStart()
                             }
+
+                            // Počet původních kroků
+                            puvodniKroky =
+                                roomDatabase.uzivatelDao().getSteps(aktivniUzivatel, dnesniDatum())
+                                    .toFloat()
+
                         }
                     }
                 }
@@ -776,6 +773,7 @@ class Prehled : AppCompatActivity(), SensorEventListener {
                             } catch (e: NullPointerException) {
 
                                 newDayStart()
+                                println("CATCHED 1")
                             }
 
                             // první zobrazení grafu
@@ -1061,6 +1059,7 @@ class Prehled : AppCompatActivity(), SensorEventListener {
                 } catch (e: Exception) {
 
                     newDayStart()
+                    println("CATCHED")
                 }
 
                 // Firebase Reference
