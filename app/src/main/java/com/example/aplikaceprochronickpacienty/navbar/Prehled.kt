@@ -218,6 +218,14 @@ class Prehled : AppCompatActivity(), SensorEventListener {
             getItemFromTableBarChart()
             getItemFromTableLineChart()
 
+            runBlocking {
+
+                // Počet původních kroků
+                puvodniKroky =
+                    roomDatabase.uzivatelDao().getSteps(aktivniUzivatel, dnesniDatum())
+                        .toFloat()
+            }
+
         } catch (e: Exception) {
 
             println("Chyba načítání grafů")
@@ -373,11 +381,6 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
                                 newDayStart()
                             }
-
-                            // Počet původních kroků
-                            puvodniKroky =
-                                roomDatabase.uzivatelDao().getSteps(aktivniUzivatel, dnesniDatum())
-                                    .toFloat()
 
                         }
                     }

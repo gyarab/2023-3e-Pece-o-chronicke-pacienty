@@ -411,11 +411,11 @@ class Chat : AppCompatActivity() {
                                             " Výška: $vyska cm" +
                                             " Cíl kroků za den: $krokyCil " +
                                             " Cílová váha: $vahaCil kg" +
-                                            " BMI: $BMI"
+                                            " BMI: $BMI" +
                                             " Data za poslední měsíc jsou: $data" +
 
                                         " Pokud uživatel má podle daného BMI nadváhu či obezitu, nesmí jíst jídla s velkou kalorickou hodnotou" +
-                                        " Na otázku odpovídej pouze s použitím těchto dat. Odpověď musí být stručná."
+                                        " Na otázku odpovídej s použitím těchto dat. Odpověď musí být stručná."
 
                                 getResponseAI(dataUzivatele)
                             }
