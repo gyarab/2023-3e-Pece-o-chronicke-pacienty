@@ -259,20 +259,36 @@ class Chat : AppCompatActivity() {
     /** ChatGPT Response **/
     private fun getResponse(question: String, callback: (String) -> Unit) {
 
+        // Získaný OpenAI API klíč
         val apiKey = BuildConfig.OPENAI_API_KEY
+
+        // URL webové stránky, na kterou je poslána žádost o dokončení chatových promptů
         val url = "https://api.openai.com/v1/chat/completions"
 
+        /** Podrobné specifikace požadavku
+         *
+         * Výběr modelu
+         * Zadání otázky
+         * Maximální počet znaků v odpověďi
+         * Teplota – ovlivnění výstupu, může být více náhodný nebo naopak více konkrétní
+         * Top_p – podobná alternativa k vzorkování s teplotou
+         * Frequency_penalty – zaměření na opakování již řečených slov
+         * Presence_penalty – snaha o vyjádření nezmíněných informací
+         *
+         * **/
         val requestBody = """
         {
             "model": "gpt-3.5-turbo",
-            "messages": [{"role": "system", "content": "You are a helpful assistant."},{"role": "user", "content": "$question"}],
-            "max_tokens": 500,
-            "temperature": 0.7
+            "messages": [{"role": "user", "content": "$question"}],
+            "max_tokens": 150,
+            "temperature": 0.75,
+            "top_p": 1,
+            "frequency_penalty": 1.25,
+            "presence_penalty": 0.5
         }
     """.trimIndent()
 
-        Log.d("OTAZKA", question)
-
+        // Záslání specifikace žádosti na OpenAI server s pomocí Open API klíče
         val request = Request.Builder()
             .url(url)
             .addHeader("Content-Type", "application/json")
@@ -471,7 +487,7 @@ class Chat : AppCompatActivity() {
                     addMessageToList(
                         "Jsem vytrénovaný \uD83D\uDE0A \n " +
                                 "\n Mohu vám poskytnout odbornou pomoc s následujícími nemocemi: \n" +
-                                "\n — Obezita (Nadváha)" +
+                                "\n — Obezita \n nebo Nadváha" +
                                 "\n — Kašel" +
                                 "\n — Horečka" +
                                 "\n — Bolest hlavy", true

@@ -36,4 +36,6 @@ interface UzivatelDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun addUser(uzivatel: Uzivatel)
 
+    @Query("DELETE FROM uzivatel_table WHERE uzivatel_id = (SELECT uzivatel_id FROM uzivatel_table ORDER BY uzivatel_id DESC LIMIT 1)")
+    suspend fun deleteLastRow(): Int
 }

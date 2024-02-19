@@ -103,7 +103,11 @@ class AplikaceInfo : AppCompatActivity() {
                 "nadpis" to " — Zdrojový kód: ",
                 "text" to "\n Link na Github \n"
             ),
-            mapOf("nadpis" to " — Kontakt: ", "text" to "\n vladimir.samojlov@student.gyarab.cz \n")
+            mapOf("nadpis" to " — Kontakt: ", "text" to "\n " +
+
+                "vladimir.samojlov@student.gyarab.cz \n" +
+                "\n felix.navratil@student.gyarab.cz \n" +
+                "\n krystof.breburda@student.gyarab.cz \n")
 
         )
 
