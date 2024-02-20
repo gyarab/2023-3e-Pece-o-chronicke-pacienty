@@ -267,11 +267,10 @@ class Chat : AppCompatActivity() {
 
         /** Podrobné specifikace požadavku
          *
-         * Výběr modelu
-         * Zadání otázky
+         * Výběr modelu OpenAI
+         * Zadání otázky modelu
          * Maximální počet znaků v odpověďi
          * Teplota – ovlivnění výstupu, může být více náhodný nebo naopak více konkrétní
-         * Top_p – podobná alternativa k vzorkování s teplotou
          * Frequency_penalty – zaměření na opakování již řečených slov
          * Presence_penalty – snaha o vyjádření nezmíněných informací
          *
@@ -282,7 +281,6 @@ class Chat : AppCompatActivity() {
             "messages": [{"role": "user", "content": "$question"}],
             "max_tokens": 150,
             "temperature": 0.75,
-            "top_p": 1,
             "frequency_penalty": 1.25,
             "presence_penalty": 0.5
         }
