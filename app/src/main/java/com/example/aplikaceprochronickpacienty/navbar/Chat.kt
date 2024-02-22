@@ -485,7 +485,7 @@ class Chat : AppCompatActivity() {
                     addMessageToList(
                         "Jsem vytrénovaný \uD83D\uDE0A \n " +
                                 "\n Mohu vám poskytnout odbornou pomoc s následujícími nemocemi: \n" +
-                                "\n — Obezita \n nebo Nadváha" +
+                                "\n — Obezita" +
                                 "\n — Kašel" +
                                 "\n — Horečka" +
                                 "\n — Bolest hlavy", true
