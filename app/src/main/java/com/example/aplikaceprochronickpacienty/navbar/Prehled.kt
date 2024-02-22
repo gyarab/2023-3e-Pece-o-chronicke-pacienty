@@ -772,8 +772,16 @@ class Prehled : AppCompatActivity(), SensorEventListener {
                                     amount = dnesniKroky.toFloat()
                                 )
 
+                                if (krokyCil == 0) {
+
+                                    donutView.cap = 12000f
+
+                                } else {
+
+                                    donutView.cap = krokyCil.toFloat()
+                                }
+
                                 donutView.animationDurationMs = 3000
-                                donutView.cap = krokyCil.toFloat()
                                 donutView.submitData(listOf(donut))
 
                                 donutKroky(dnesniKroky, donutView)
@@ -1099,10 +1107,17 @@ class Prehled : AppCompatActivity(), SensorEventListener {
                                     amount = pocetKroku
                                 )
 
-                                donutView.animationDurationMs = 3000
-                                donutView.cap = krokyCil.toFloat()
-                                donutView.submitData(listOf(donut))
+                                if (krokyCil == 0) {
 
+                                    donutView.cap = 12000f
+
+                                } else {
+
+                                    donutView.cap = krokyCil.toFloat()
+                                }
+
+                                donutView.animationDurationMs = 3000
+                                donutView.submitData(listOf(donut))
                                 donutKroky(pocetKroku.toInt(), donutView)
 
                                 prechodBarevKroky()
@@ -1135,31 +1150,45 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val aktualniVaha = uzivatel.displayName?.let {
-                    snapshot.child(it).child("vaha").getValue(Any::class.java).toString().toDouble()
-                }
+                var aktualniVaha = 0.0
+                var aktualniVyska = 0
 
-                val aktualniVyska = uzivatel.displayName?.let {
-                    snapshot.child(it).child("vyska").getValue(Any::class.java).toString().toInt()
-                }
+                try {
 
-                if (aktualniVaha != null && aktualniVyska != null) {
+                    aktualniVaha = uzivatel.displayName?.let {
+                        snapshot.child(it).child("vaha").getValue(Any::class.java).toString()
+                            .toDouble()
+                    }!!
 
-                    GlobalScope.launch(Dispatchers.IO) {
+                    aktualniVyska = uzivatel.displayName?.let {
+                        snapshot.child(it).child("vyska").getValue(Any::class.java).toString()
+                            .toInt()
+                    }!!
 
-                        val spaleneKalorie = caloriesBurned(aktualniVaha, pocetKroku.toInt())
+                    if (aktualniVaha != null && aktualniVyska != null) {
 
-                        // Aktualizace dat uživatele
-                        roomDatabase.uzivatelDao().updateUser(
-                            aktivniUzivatel,
-                            datum,
-                            pocetKroku.toInt(),
-                            spaleneKalorie,
-                            aktualniVaha
-                        )
+                        GlobalScope.launch(Dispatchers.IO) {
 
-                        println("ROOM je v listu: $aktivniUzivatel,$datum,$pocetKroku,$spaleneKalorie,$aktualniVaha")
+                            val spaleneKalorie = caloriesBurned(aktualniVaha, pocetKroku.toInt())
+
+                            // Aktualizace dat uživatele
+                            roomDatabase.uzivatelDao().updateUser(
+                                aktivniUzivatel,
+                                datum,
+                                pocetKroku.toInt(),
+                                spaleneKalorie,
+                                aktualniVaha
+                            )
+
+                            println("ROOM je v listu: $aktivniUzivatel,$datum,$pocetKroku,$spaleneKalorie,$aktualniVaha")
+                        }
                     }
+
+                } catch (e: Exception) {
+
+                    aktualniVyska = 0
+
+                    aktualniVaha = 0.0
                 }
             }
 
