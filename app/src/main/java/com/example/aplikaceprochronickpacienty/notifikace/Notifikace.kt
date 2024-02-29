@@ -1,4 +1,4 @@
-package com.example.aplikaceprochronickpacienty.Notifikace
+package com.example.aplikaceprochronickpacienty.notifikace
 
 
 import android.app.NotificationManager

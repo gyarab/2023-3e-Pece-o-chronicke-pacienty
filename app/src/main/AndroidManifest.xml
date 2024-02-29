@@ -33,7 +33,7 @@
 
         <service android:name=".kroky.KrokyService" />
 
-        <receiver android:name="com.example.aplikaceprochronickpacienty.Notifikace.NotifikaceBoot" android:enabled="true"
+        <receiver android:name="com.example.aplikaceprochronickpacienty.notifikace.NotifikaceBoot" android:enabled="true"
             android:exported="true">
 
             <intent-filter>
@@ -46,7 +46,7 @@
 
 
         <receiver
-            android:name=".Notifikace.Notifikace"
+            android:name=".notifikace.Notifikace"
             android:enabled="true"
         />
 

@@ -32,11 +32,11 @@ import app.futured.donut.DonutSection
 import com.db.williamchart.ExperimentalFeature
 import com.db.williamchart.view.BarChartView
 import com.db.williamchart.view.LineChartView
-import com.example.aplikaceprochronickpacienty.Notifikace.Notifikace
-import com.example.aplikaceprochronickpacienty.Notifikace.kanalID
-import com.example.aplikaceprochronickpacienty.Notifikace.nadpisExtra
-import com.example.aplikaceprochronickpacienty.Notifikace.notifikaceID
-import com.example.aplikaceprochronickpacienty.Notifikace.zpravaExtra
+import com.example.aplikaceprochronickpacienty.notifikace.Notifikace
+import com.example.aplikaceprochronickpacienty.notifikace.kanalID
+import com.example.aplikaceprochronickpacienty.notifikace.nadpisExtra
+import com.example.aplikaceprochronickpacienty.notifikace.notifikaceID
+import com.example.aplikaceprochronickpacienty.notifikace.zpravaExtra
 import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.databinding.ActivityPrehledBinding
 import com.example.aplikaceprochronickpacienty.roomDB.Uzivatel

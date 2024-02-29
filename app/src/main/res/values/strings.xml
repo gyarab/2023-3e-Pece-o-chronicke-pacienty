@@ -81,4 +81,12 @@
     <string name="Kroky">Kroky</string>
     <string name="obrazek_ai">Obrázek AI</string>
     <string name="ai_chatbot">AI ChatBot</string>
+
+    <string-array name="nastaveni_vyber_nemoci">
+
+        <item>Obezita</item>
+        <item>Anorexie</item>
+        <item>Bulimie</item>
+
+    </string-array>
 </resources>

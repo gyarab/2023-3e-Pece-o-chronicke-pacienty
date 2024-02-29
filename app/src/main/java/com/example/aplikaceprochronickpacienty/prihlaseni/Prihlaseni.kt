@@ -371,7 +371,7 @@ class Prihlaseni : AppCompatActivity() {
         if (!mapa.containsKey(email) && ucetGoogle == false) {
 
             if (editText != null) {
-                editText.error = "Tento email není zaregistrovaný"
+                editText.error = "Nemáte zatím účet, zaregistrujte se"
             }
 
         } else if (mapa.containsKey(email) && ucetGoogle == true) {
@@ -462,7 +462,7 @@ class Prihlaseni : AppCompatActivity() {
 
                     Toast.makeText(
                         this@Prihlaseni,
-                        "Nesprávné heslo",
+                        "Nesprávný email nebo heslo",
                         Toast.LENGTH_SHORT,
                     ).show()
                 }

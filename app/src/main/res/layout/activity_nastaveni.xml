@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="@style/NastaveniBackground"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    style="@style/NastaveniBackground">
+    android:layout_height="match_parent">
 
 
     <LinearLayout
+        style="@style/NastaveniCardBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:orientation="vertical"
-        style="@style/NastaveniCardBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,6 +27,7 @@
 
             <ImageButton
                 android:id="@+id/nastaveni_button_zpet"
+                style="@style/NastaveniTitle"
                 android:layout_width="50dp"
                 android:layout_height="75dp"
                 android:layout_centerVertical="true"
@@ -35,8 +35,7 @@
                 android:background="@null"
                 android:contentDescription="@string/zpet"
                 android:paddingBottom="6dp"
-                android:src="@drawable/nastaveni_ic_arrow_left"
-                style="@style/NastaveniTitle"/>
+                android:src="@drawable/nastaveni_ic_arrow_left" />
 
             <TextView
                 style="@style/NastaveniTitle"
@@ -58,6 +57,7 @@
 
             <TextView
                 android:id="@+id/nastaveni_oznameni"
+                style="@style/NastaveniNadpisColor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawablePadding="16dp"
@@ -65,7 +65,6 @@
                 android:text="@string/oznameni"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                style="@style/NastaveniNadpisColor"
                 app:drawableStartCompat="@drawable/ic_notifications" />
 
             <androidx.appcompat.widget.SwitchCompat
@@ -80,21 +79,21 @@
                 tools:ignore="RtlSymmetry,UseSwitchCompatOrMaterialXml" />
 
             <View
+                style="@style/NastaveniLineColor"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_below="@id/nastaveni_switch_oznameni"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
-                android:layout_marginEnd="15dp"
-                style="@style/NastaveniLineColor" />
+                android:layout_marginEnd="15dp" />
 
             <View
+                style="@style/NastaveniLineColor"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_alignParentTop="@id/nastaveni_switch_oznameni"
                 android:layout_marginStart="50dp"
-                android:layout_marginEnd="15dp"
-                style="@style/NastaveniLineColor" />
+                android:layout_marginEnd="15dp" />
 
         </RelativeLayout>
 
@@ -106,6 +105,7 @@
 
             <TextView
                 android:id="@+id/ucet_nastaveni"
+                style="@style/NastaveniNadpisColor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawablePadding="16dp"
@@ -113,7 +113,6 @@
                 android:text="@string/dark_mode"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                style="@style/NastaveniNadpisColor"
                 app:drawableStartCompat="@drawable/ic_dark_theme" />
 
             <androidx.appcompat.widget.SwitchCompat
@@ -127,13 +126,68 @@
                 tools:ignore="RtlSymmetry,UseSwitchCompatOrMaterialXml" />
 
             <View
+                style="@style/NastaveniLineColor"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_below="@id/nastaveni_switch_mode"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
-                android:layout_marginEnd="15dp"
-                style="@style/NastaveniLineColor" />
+                android:layout_marginEnd="15dp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/ucet_onemocneni"
+                style="@style/NastaveniNadpisColor"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:drawablePadding="16dp"
+                android:padding="10dp"
+                android:text="Onemocnění"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:drawableStartCompat="@drawable/ic_user_heart" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/ucet_onemocneni"
+                app:boxStrokeColor="@color/modro_ruzova"
+                app:endIconTint="@color/modro_ruzova"
+                app:helperTextTextColor="@color/modro_ruzova"
+                app:hintTextColor="@color/modro_ruzova"
+                app:suffixTextColor="@color/modro_ruzova"
+                app:prefixTextColor="@color/modro_ruzova"
+                >
+
+                <AutoCompleteTextView
+                    android:id="@+id/nastaveni_vyber_nemoci"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_marginEnd="15dp"
+                    android:fontFamily="@font/open_sans"
+                    android:hint="Vyberte"
+                    android:inputType="none"
+                    android:textSize="12sp"
+                    />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <View
+                style="@style/NastaveniLineColor"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/ucet_onemocneni"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="50dp"
+                android:layout_marginEnd="15dp" />
 
         </RelativeLayout>
 
@@ -145,6 +199,7 @@
 
             <TextView
                 android:id="@+id/nastaveni_cile"
+                style="@style/NastaveniNadpisColor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawablePadding="16dp"
@@ -152,17 +207,16 @@
                 android:text="@string/cile"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                style="@style/NastaveniNadpisColor"
                 app:drawableStartCompat="@drawable/ic_goal" />
 
             <View
+                style="@style/NastaveniLineColor"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_below="@id/nastaveni_cile"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
-                android:layout_marginEnd="15dp"
-                style="@style/NastaveniLineColor" />
+                android:layout_marginEnd="15dp" />
 
         </RelativeLayout>
 
@@ -174,6 +228,7 @@
 
             <TextView
                 android:id="@+id/nastaveni_kroky"
+                style="@style/NastaveniTextColor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawablePadding="10dp"
@@ -182,12 +237,12 @@
                 android:text="@string/Kroky"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                style="@style/NastaveniTextColor"
                 app:drawableStartCompat="@drawable/nastaveni_ic_steps"
                 tools:ignore="RtlSymmetry" />
 
             <EditText
                 android:id="@+id/nastaveni_kroky_editext"
+                style="@style/NastaveniDescriptionColor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@+id/nastaveni_kroky"
@@ -195,20 +250,19 @@
                 android:autofillHints="Kroky"
                 android:background="@null"
                 android:hint="@string/priklad_kroky_placeholder"
-                android:maxLength="5"
                 android:inputType="number"
+                android:maxLength="5"
                 android:padding="8dp"
-                android:textSize="16sp"
-                style="@style/NastaveniDescriptionColor"/>
+                android:textSize="16sp" />
 
             <View
+                style="@style/NastaveniLineColor"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_below="@id/nastaveni_kroky"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
-                android:layout_marginEnd="15dp"
-                style="@style/NastaveniLineColor" />
+                android:layout_marginEnd="15dp" />
 
         </RelativeLayout>
 
@@ -220,6 +274,7 @@
 
             <TextView
                 android:id="@+id/nastaveni_vaha"
+                style="@style/NastaveniVaha"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -229,7 +284,6 @@
                 android:text="@string/vaha"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                style="@style/NastaveniVaha"
                 app:drawableStartCompat="@drawable/ic_weight"
                 tools:ignore="RtlSymmetry" />
 
@@ -241,38 +295,38 @@
                 android:padding="8dp"
                 tools:ignore="RelativeOverlap">
 
-            <EditText
-                android:id="@+id/nastaveni_vaha_editext"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:autofillHints="Kroky"
-                android:background="@null"
-                android:hint="@string/priklad_vaha_placeholder"
-                android:inputType="number"
-                android:maxLength="3"
-                android:textSize="16sp"
-                android:padding="2dp"
-                android:layout_marginEnd="4dp"
-                style="@style/NastaveniDescriptionColor"/>
+                <EditText
+                    android:id="@+id/nastaveni_vaha_editext"
+                    style="@style/NastaveniDescriptionColor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:autofillHints="Kroky"
+                    android:background="@null"
+                    android:hint="@string/priklad_vaha_placeholder"
+                    android:inputType="number"
+                    android:maxLength="3"
+                    android:padding="2dp"
+                    android:textSize="16sp" />
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:text="@string/kg"
-                style="@style/NastaveniJednotky" />
+                <TextView
+                    style="@style/NastaveniJednotky"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/kg"
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
             <View
+                style="@style/NastaveniLineColor"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_below="@id/nastaveni_vaha"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
-                android:layout_marginEnd="15dp"
-                style="@style/NastaveniLineColor" />
+                android:layout_marginEnd="15dp" />
 
         </RelativeLayout>
 
@@ -285,6 +339,7 @@
 
             <TextView
                 android:id="@+id/nastaveni_zmenit_udaje"
+                style="@style/NastaveniNadpisColor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawablePadding="16dp"
@@ -292,17 +347,16 @@
                 android:text="@string/zmenit_udaje"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                style="@style/NastaveniNadpisColor"
                 app:drawableStartCompat="@drawable/ic_edit" />
 
             <View
+                style="@style/NastaveniLineColor"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_below="@id/nastaveni_zmenit_udaje"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
-                android:layout_marginEnd="15dp"
-                style="@style/NastaveniLineColor" />
+                android:layout_marginEnd="15dp" />
 
         </RelativeLayout>
 
@@ -314,6 +368,7 @@
 
             <TextView
                 android:id="@+id/nastaveni_udaje_datum_narozeni"
+                style="@style/NastaveniTextColor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -323,31 +378,29 @@
                 android:text="@string/datum_narozeni"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                style="@style/NastaveniTextColor"
                 app:drawableStartCompat="@drawable/ic_birthday_cake"
                 tools:ignore="RtlSymmetry" />
 
             <TextView
                 android:id="@+id/nastaveni_datum_narozeni_udaje_textview"
+                style="@style/NastaveniJednotky"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@+id/nastaveni_udaje_datum_narozeni"
                 android:layout_marginEnd="15dp"
                 android:background="@android:color/transparent"
-                android:text="@string/placeholder_datum_narozeni"
                 android:padding="8dp"
-                android:textSize="15sp"
-                style="@style/NastaveniJednotky"
-                />
+                android:text="@string/placeholder_datum_narozeni"
+                android:textSize="15sp" />
 
             <View
+                style="@style/NastaveniLineColor"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_below="@id/nastaveni_udaje_datum_narozeni"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
-                android:layout_marginEnd="15dp"
-                style="@style/NastaveniLineColor" />
+                android:layout_marginEnd="15dp" />
 
         </RelativeLayout>
 
@@ -359,6 +412,7 @@
 
             <TextView
                 android:id="@+id/nastaveni_udaje_vyska"
+                style="@style/NastaveniTextColor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -368,7 +422,6 @@
                 android:text="@string/vyska"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                style="@style/NastaveniTextColor"
                 app:drawableStartCompat="@drawable/ic_measure_scale"
                 tools:ignore="RtlSymmetry" />
 
@@ -382,36 +435,36 @@
 
                 <EditText
                     android:id="@+id/nastaveni_vyska_udaje_editext"
+                    style="@style/NastaveniDescriptionColor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
                     android:autofillHints="Kroky"
                     android:background="@null"
                     android:hint="@string/priklad_vyska_placeholder"
                     android:inputType="number"
                     android:maxLength="3"
-                    android:textSize="15sp"
                     android:padding="2dp"
-                    android:layout_marginEnd="4dp"
-                    style="@style/NastaveniDescriptionColor"/>
+                    android:textSize="15sp" />
 
 
                 <TextView
+                    style="@style/NastaveniJednotky"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp"
                     android:text="@string/cm"
-                    style="@style/NastaveniJednotky" />
+                    android:textSize="15sp" />
 
             </LinearLayout>
 
             <View
+                style="@style/NastaveniLineColor"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_below="@id/nastaveni_udaje_vyska"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
-                android:layout_marginEnd="15dp"
-                style="@style/NastaveniLineColor" />
+                android:layout_marginEnd="15dp" />
 
         </RelativeLayout>
 
@@ -424,6 +477,7 @@
 
             <TextView
                 android:id="@+id/nastaveni_udaje_vaha"
+                style="@style/NastaveniVaha"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -433,7 +487,6 @@
                 android:text="@string/vaha"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                style="@style/NastaveniVaha"
                 app:drawableStartCompat="@drawable/ic_weight"
                 tools:ignore="RtlSymmetry" />
 
@@ -447,36 +500,36 @@
 
                 <EditText
                     android:id="@+id/nastaveni_vaha_udaje_editext"
+                    style="@style/NastaveniDescriptionColor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
                     android:autofillHints="Kroky"
                     android:background="@null"
                     android:hint="@string/priklad_vaha_placeholder"
                     android:inputType="number"
                     android:maxLength="3"
-                    android:textSize="15sp"
                     android:padding="2dp"
-                    android:layout_marginEnd="4dp"
-                    style="@style/NastaveniDescriptionColor"/>
+                    android:textSize="15sp" />
 
 
                 <TextView
+                    style="@style/NastaveniJednotky"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp"
                     android:text="@string/kg"
-                    style="@style/NastaveniJednotky" />
+                    android:textSize="15sp" />
 
             </LinearLayout>
 
             <View
+                style="@style/NastaveniLineColor"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_below="@id/nastaveni_udaje_vaha"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
-                android:layout_marginEnd="15dp"
-                style="@style/NastaveniLineColor" />
+                android:layout_marginEnd="15dp" />
 
         </RelativeLayout>
 
@@ -488,11 +541,11 @@
                 android:id="@+id/nastaveni_ulozit_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
                 android:text="@string/ulozit_zmeny"
                 android:textColor="@color/white"
                 app:backgroundTint="#25c275"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

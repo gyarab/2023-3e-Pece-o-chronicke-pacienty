@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -13,6 +15,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.internetPripojeni.Internet
 import com.example.aplikaceprochronickpacienty.internetPripojeni.InternetPripojeni
@@ -56,6 +59,9 @@ class Nastaveni : AppCompatActivity() {
     // Uložit údaje
     private lateinit var button_ulozit: Button
 
+    // Výběr nemocí
+    private lateinit var nastaveni_vyber_nemoci: AutoCompleteTextView
+
     // Údaje uživatele
     private val udaje = listOf("krokyCil", "vahaCil", "datumNarozeni", "vyska", "vaha")
 
@@ -68,6 +74,13 @@ class Nastaveni : AppCompatActivity() {
 
         // Kontrola připojení
         val pripojeni = InternetPripojeni()
+
+        nastaveni_vyber_nemoci = findViewById(R.id.nastaveni_vyber_nemoci)
+
+        val nemoci = resources.getStringArray(R.array.nastaveni_vyber_nemoci)
+        val arrayAdapter = ArrayAdapter(this, R.layout.dropdown_item,nemoci)
+
+        nastaveni_vyber_nemoci.setAdapter(arrayAdapter)
 
         if (pripojeni.checkInternetConnection(this)) {
 
