@@ -1,9 +1,9 @@
-<TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/drop_item"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:padding="14dp"
-    android:text="TextView"
-    android:textColor="@color/black"
-    android:textSize="16sp"
-    android:textStyle="bold" />
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ellipsize="end"
+    android:maxLines="1"
+    android:padding="8dp"
+    android:textAlignment="center"
+    android:textAppearance="?attr/textAppearanceSubtitle1"
+    android:background="@drawable/nastaveni_vyber_border"/>

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
@@ -15,7 +16,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.internetPripojeni.Internet
 import com.example.aplikaceprochronickpacienty.internetPripojeni.InternetPripojeni
@@ -63,7 +63,10 @@ class Nastaveni : AppCompatActivity() {
     private lateinit var nastaveni_vyber_nemoci: AutoCompleteTextView
 
     // Údaje uživatele
-    private val udaje = listOf("krokyCil", "vahaCil", "datumNarozeni", "vyska", "vaha")
+    private val udaje = listOf("krokyCil", "vahaCil", "datumNarozeni", "vyska", "vaha", "nemoc")
+
+    // Aktuální nemoc
+    private var nemoc: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -75,14 +78,22 @@ class Nastaveni : AppCompatActivity() {
         // Kontrola připojení
         val pripojeni = InternetPripojeni()
 
-        nastaveni_vyber_nemoci = findViewById(R.id.nastaveni_vyber_nemoci)
-
-        val nemoci = resources.getStringArray(R.array.nastaveni_vyber_nemoci)
-        val arrayAdapter = ArrayAdapter(this, R.layout.dropdown_item,nemoci)
-
-        nastaveni_vyber_nemoci.setAdapter(arrayAdapter)
-
         if (pripojeni.checkInternetConnection(this)) {
+
+            // Chronické onemocnění
+            nastaveni_vyber_nemoci = findViewById(R.id.autoCompleteTextView)
+
+            // Výběr nemocí
+            val nemoci = resources.getStringArray(R.array.nastaveni_vyber_nemoci)
+            val arrayAdapter = ArrayAdapter(this, R.layout.dropdown_item, nemoci)
+
+            nastaveni_vyber_nemoci.setAdapter(arrayAdapter)
+
+            // Získání aktuální nemoci uživatele
+            nastaveni_vyber_nemoci.setOnItemClickListener { parent, view, position, id ->
+
+                nemoc = parent.getItemAtPosition(position).toString()
+            }
 
             // Firebase Reference
             databazeFirebase = FirebaseDatabase.getInstance()
@@ -279,6 +290,12 @@ class Nastaveni : AppCompatActivity() {
 
                                 nastaveni_vaha_udaje_editext.hint = uzivatelUdaje
                             }
+
+                            "nemoc" -> {
+
+                                nastaveni_vyber_nemoci.setText(uzivatelUdaje, false)
+
+                            }
                         }
                     }
                 }
@@ -360,6 +377,7 @@ class Nastaveni : AppCompatActivity() {
             val datumNarozeni = nastaveni_datum_narozeni_udaje_textview.text.toString()
             val vyska = nastaveni_vyska_udaje_editext.text.toString()
             val vaha = nastaveni_vaha_udaje_editext.text.toString()
+            val nemoc = nastaveni_vyber_nemoci.text.toString()
 
             // Přidání informací do komponenty HashMap
             val mapa = hashMapOf<String, String>()
@@ -368,6 +386,7 @@ class Nastaveni : AppCompatActivity() {
             mapa["datumNarozeni"] = datumNarozeni
             mapa["vyska"] = vyska
             mapa["vaha"] = vaha
+            mapa["nemoc"] = nemoc
 
             // Přidání nových dat uživatele
             uzivatel.displayName?.let {

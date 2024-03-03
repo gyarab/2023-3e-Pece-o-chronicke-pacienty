@@ -142,49 +142,63 @@
             android:layout_marginTop="4dp"
             android:orientation="horizontal">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/ucet_onemocneni"
                 style="@style/NastaveniNadpisColor"
-                android:layout_width="200dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawablePadding="16dp"
                 android:padding="10dp"
                 android:text="Onemocnění"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                app:drawableStartCompat="@drawable/ic_user_heart" />
+                app:drawableStartCompat="@drawable/ic_user_heart"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/ucet_onemocneni"
                 app:boxStrokeColor="@color/modro_ruzova"
                 app:endIconTint="@color/modro_ruzova"
                 app:helperTextTextColor="@color/modro_ruzova"
                 app:hintTextColor="@color/modro_ruzova"
-                app:suffixTextColor="@color/modro_ruzova"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:prefixTextColor="@color/modro_ruzova"
-                >
+                app:suffixTextColor="@color/modro_ruzova">
 
                 <AutoCompleteTextView
-                    android:id="@+id/nastaveni_vyber_nemoci"
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp"
+                    android:id="@+id/autoCompleteTextView"
+                    android:layout_width="130dp"
+                    android:layout_height="55dp"
                     android:layout_marginEnd="15dp"
                     android:fontFamily="@font/open_sans"
                     android:hint="Vyberte"
                     android:inputType="none"
-                    android:textSize="12sp"
-                    />
+                    android:textSize="14sp" />
 
             </com.google.android.material.textfield.TextInputLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
             <View
                 style="@style/NastaveniLineColor"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_below="@id/ucet_onemocneni"
+                android:layout_below="@id/constraintLayout"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="50dp"
                 android:layout_marginEnd="15dp" />

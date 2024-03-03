@@ -3,8 +3,6 @@ package com.example.aplikaceprochronickpacienty.nastaveni_aplikaceInfo
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.aplikaceprochronickpacienty.R
 import com.github.barteksc.pdfviewer.PDFView
 
@@ -23,6 +21,6 @@ class ZobrazeniPDF : AppCompatActivity() {
         zobrazenipdf_viewer = findViewById(R.id.zobrazenipdf_viewer)
 
         // Zobrazení dokumentace RP
-        zobrazenipdf_viewer.fromAsset("dokumentaceFotopuzzle.pdf").load()
+        zobrazenipdf_viewer.fromAsset("DOKUMENTACE.pdf").load()
     }
 }

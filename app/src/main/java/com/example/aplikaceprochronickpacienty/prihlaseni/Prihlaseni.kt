@@ -348,6 +348,7 @@ class Prihlaseni : AppCompatActivity() {
                     0.0,
                     0,
                     0.0,
+                    "",
                     ""
                 )
 
