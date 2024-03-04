@@ -35,6 +35,28 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import dev.langchain4j.chain.ConversationalRetrievalChain
+import dev.langchain4j.data.document.Document
+import dev.langchain4j.data.document.DocumentSplitter
+import dev.langchain4j.data.document.loader.FileSystemDocumentLoader.loadDocument
+import dev.langchain4j.data.document.parser.TextDocumentParser
+import dev.langchain4j.data.document.splitter.DocumentSplitters
+import dev.langchain4j.data.embedding.Embedding
+import dev.langchain4j.data.message.AiMessage
+import dev.langchain4j.data.segment.TextSegment
+import dev.langchain4j.model.chat.ChatLanguageModel
+import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel
+import dev.langchain4j.model.embedding.EmbeddingModel
+import dev.langchain4j.model.input.Prompt
+import dev.langchain4j.model.input.PromptTemplate
+import dev.langchain4j.model.openai.OpenAiChatModel
+import dev.langchain4j.model.openai.OpenAiModelName
+import dev.langchain4j.model.openai.OpenAiTokenizer
+import dev.langchain4j.retriever.EmbeddingStoreRetriever
+import dev.langchain4j.store.embedding.EmbeddingMatch
+import dev.langchain4j.store.embedding.EmbeddingStore
+import dev.langchain4j.store.embedding.EmbeddingStoreIngestor
+import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.GlobalScope
@@ -52,6 +74,11 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
+import java.net.URL
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.HashMap
+import java.util.stream.Collectors.joining
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.UUID
@@ -319,6 +346,25 @@ class Chat : AppCompatActivity() {
                             val content = messageObject.optString("content")
                             callback(content)
 
+//                            val embeddingModel: EmbeddingModel = AllMiniLmL6V2EmbeddingModel()
+//                            val embeddingStore: EmbeddingStore<TextSegment> = InMemoryEmbeddingStore()
+//                            val ingestor: EmbeddingStoreIngestor = EmbeddingStoreIngestor.builder()
+//                                .documentSplitter(DocumentSplitters.recursive(300, 0))
+//                                .embeddingModel(embeddingModel)
+//                                .embeddingStore(embeddingStore)
+//                                .build()
+//
+//                            val document: Document = loadDocument(toPath("story-about-happy-carrot.txt"), TextDocumentParser())
+//                            ingestor.ingest(document)
+//
+//                            val chain: ConversationalRetrievalChain = ConversationalRetrievalChain.builder()
+//                                .chatLanguageModel(OpenAiChatModel.withApiKey(apiKey))
+//                                .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
+//                                .build()
+//                            val answer: String = chain.execute("Who is Charlie?")
+//                            println(answer)
+
+
                         } else {
 
                             Log.e("error", "No choices found in the response.")
@@ -336,6 +382,19 @@ class Chat : AppCompatActivity() {
 
             }
         })
+    }
+
+    fun toPath(fileName: String): Path {
+
+        return try {
+
+            val fileUrl: URL? = Chat::class.java.getResource(fileName)
+            Paths.get(fileUrl?.toURI())
+
+        } catch (e: Exception) {
+
+            throw Exception(e)
+        }
     }
 
     /** Odpověď Dialogflow nebo ChatGPT **/
