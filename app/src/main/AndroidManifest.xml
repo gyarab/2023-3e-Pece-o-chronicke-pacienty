@@ -67,7 +67,6 @@
             android:exported="false"
             />
 
-
         <activity
             android:name=".nastaveni_aplikaceInfo.Nastaveni"
             android:exported="false"

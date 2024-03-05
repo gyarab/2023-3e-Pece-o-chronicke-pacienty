@@ -346,6 +346,8 @@ class Chat : AppCompatActivity() {
                             val content = messageObject.optString("content")
                             callback(content)
 
+                            println(content)
+
 //                            val embeddingModel: EmbeddingModel = AllMiniLmL6V2EmbeddingModel()
 //                            val embeddingStore: EmbeddingStore<TextSegment> = InMemoryEmbeddingStore()
 //                            val ingestor: EmbeddingStoreIngestor = EmbeddingStoreIngestor.builder()
@@ -487,8 +489,9 @@ class Chat : AppCompatActivity() {
                                             " BMI: $BMI" +
                                             " Data za poslední měsíc jsou: $data" +
 
-                                        " Pokud uživatel má podle daného BMI nadváhu či obezitu, nesmí jíst jídla s velkou kalorickou hodnotou" +
-                                        " Na otázku odpovídej s použitím těchto dat. Odpověď musí být stručná."
+                                        " Udělej měsíční analýzu kroků na základě těchto dat"
+
+                                println(dataUzivatele)
 
                                 getResponseAI(dataUzivatele)
                             }

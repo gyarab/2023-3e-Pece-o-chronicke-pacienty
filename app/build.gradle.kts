@@ -59,13 +59,6 @@ android {
         viewBinding = true
     }
 
-//    sourceSets {
-//
-//        val main = getByName("main")
-//
-//        main.resources.srcDirs("src/main/jniLibs")
-//    }
-
     dependencies {
 
         implementation(libs.androidx.core.ktx)
@@ -138,6 +131,14 @@ android {
         implementation("dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2:0.27.1")
         implementation("org.tinylog:tinylog-impl:2.6.2")
         implementation("org.tinylog:slf4j-tinylog:2.6.2")
+
+        implementation("com.microsoft.onnxruntime:onnxruntime:1.17.1")
+
+        configurations.all {
+            resolutionStrategy {
+                force("com.example:conflicting-module:desired.version")
+            }
+        }
 
     }
 }
