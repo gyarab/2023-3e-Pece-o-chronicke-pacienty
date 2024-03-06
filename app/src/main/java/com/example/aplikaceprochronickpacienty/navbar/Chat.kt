@@ -1,7 +1,15 @@
 package com.example.aplikaceprochronickpacienty.navbar
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Shader
@@ -10,6 +18,8 @@ import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.aplikaceprochronickpacienty.BuildConfig
 import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.adapters.ChatAdapter
@@ -17,6 +27,11 @@ import com.example.aplikaceprochronickpacienty.databinding.ActivityChatBinding
 import com.example.aplikaceprochronickpacienty.internetPripojeni.Internet
 import com.example.aplikaceprochronickpacienty.internetPripojeni.InternetPripojeni
 import com.example.aplikaceprochronickpacienty.models.Message
+import com.example.aplikaceprochronickpacienty.notifikace.Notifikace
+import com.example.aplikaceprochronickpacienty.notifikace.kanalID
+import com.example.aplikaceprochronickpacienty.notifikace.nadpisExtra
+import com.example.aplikaceprochronickpacienty.notifikace.notifikaceID
+import com.example.aplikaceprochronickpacienty.notifikace.zpravaExtra
 import com.example.aplikaceprochronickpacienty.roomDB.UzivatelDatabase
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.api.gax.core.FixedCredentialsProvider
@@ -156,6 +171,19 @@ class Chat : AppCompatActivity() {
                 }
             }
 
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.SCHEDULE_EXACT_ALARM) !=
+                PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.USE_EXACT_ALARM) !=
+                PackageManager.PERMISSION_GRANTED) {
+
+                // Request the permission
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.SCHEDULE_EXACT_ALARM, Manifest.permission.USE_EXACT_ALARM),
+                    1000)
+            }
+
+            createNotification()
+
             // Databáze ROOM
             roomDatabase = UzivatelDatabase.getDatabase(this)
 
@@ -211,6 +239,14 @@ class Chat : AppCompatActivity() {
 
             startActivity(Intent(applicationContext, Internet::class.java))
         }
+    }
+
+    private fun checkNotificationPermission(): Boolean {
+
+        return (ContextCompat.checkSelfPermission(this, Manifest.permission.SCHEDULE_EXACT_ALARM) ==
+                PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.USE_EXACT_ALARM) ==
+                PackageManager.PERMISSION_GRANTED)
     }
 
     /** Přidání zprávy **/
@@ -348,6 +384,8 @@ class Chat : AppCompatActivity() {
 
                             println(content)
 
+                            sendNotification()
+
 //                            val embeddingModel: EmbeddingModel = AllMiniLmL6V2EmbeddingModel()
 //                            val embeddingStore: EmbeddingStore<TextSegment> = InMemoryEmbeddingStore()
 //                            val ingestor: EmbeddingStoreIngestor = EmbeddingStoreIngestor.builder()
@@ -363,7 +401,7 @@ class Chat : AppCompatActivity() {
 //                                .chatLanguageModel(OpenAiChatModel.withApiKey(apiKey))
 //                                .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel))
 //                                .build()
-//                            val answer: String = chain.execute("Who is Charlie?")
+//                            val answer: String = chain.execute("Otázka")
 //                            println(answer)
 
 
@@ -503,6 +541,49 @@ class Chat : AppCompatActivity() {
                 })
             }
         }
+    }
+
+    /** Vytvoření notifikace pro uživatele **/
+    private fun createNotification() {
+
+        val nazev = "Titul"
+        val popis = "Popis"
+        val dulezitost = NotificationManager.IMPORTANCE_DEFAULT
+        val kanal = NotificationChannel(kanalID, nazev, dulezitost)
+
+        // Posílání zpráv na uzamčenou obrazovku
+        kanal.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        kanal.description = popis
+
+        val notifikaceManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notifikaceManager.createNotificationChannel(kanal)
+    }
+
+    /** Poslání notifikace pro uživatele **/
+    @SuppressLint("ScheduleExactAlarm")
+    private fun sendNotification() {
+
+        val intent = Intent(applicationContext, Notifikace::class.java)
+        val nadpis = "Motivační hláška"
+        val zprava = "nová hláška"
+        intent.putExtra(nadpisExtra, nadpis)
+        intent.putExtra(zpravaExtra, zprava)
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            notifikaceID,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        // Okamžitá notifikace
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            System.currentTimeMillis(),
+            pendingIntent
+        )
     }
 
     /** Dnešní datum **/
