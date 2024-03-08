@@ -18,6 +18,12 @@ interface UzivatelDao {
     @Query("SELECT * FROM uzivatel_table ORDER BY SubjectId = :subjectId DESC LIMIT 30")
     suspend fun getLastMonthData(subjectId : Int): List<Uzivatel>
 
+    @Query("SELECT * FROM uzivatel_table ORDER BY SubjectId = :subjectId DESC LIMIT 7")
+    suspend fun getLastWeekData(subjectId : Int): List<Uzivatel>
+
+    @Query("SELECT * FROM uzivatel_table ORDER BY SubjectId = :subjectId DESC LIMIT 1")
+    suspend fun getLastDayData(subjectId : Int): List<Uzivatel>
+
     @Query("SELECT uzivatel_id FROM uzivatel_table ORDER BY uzivatel_id DESC LIMIT 1")
     suspend fun getLastUserColumnValue(): Int?
 

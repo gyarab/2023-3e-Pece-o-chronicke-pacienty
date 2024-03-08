@@ -72,6 +72,7 @@ import dev.langchain4j.store.embedding.EmbeddingMatch
 import dev.langchain4j.store.embedding.EmbeddingStore
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore
+import io.ktor.util.Hash
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.GlobalScope
@@ -96,6 +97,8 @@ import java.util.HashMap
 import java.util.stream.Collectors.joining
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.GregorianCalendar
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -232,6 +235,8 @@ class Chat : AppCompatActivity() {
             // Načtení dat uživatele
             uvitaciText()
 
+            motivacniHlaska("tyden")
+
             //initialize bot config
             setUpBot()
 
@@ -239,6 +244,107 @@ class Chat : AppCompatActivity() {
 
             startActivity(Intent(applicationContext, Internet::class.java))
         }
+    }
+
+    private fun motivacniHlaska(obdobi: String) {
+
+        val databazeFirebase: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val referenceFirebaseUzivatel: DatabaseReference =
+            databazeFirebase.getReference("users")
+
+        val uzivatel = FirebaseAuth.getInstance().currentUser!!
+
+        referenceFirebaseUzivatel.addListenerForSingleValueEvent(object :
+            ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val vaha = uzivatel.displayName?.let {
+                    snapshot.child(it).child("vaha").getValue(Any::class.java).toString().toDouble()
+                }
+
+                val vyska = uzivatel.displayName?.let {
+                    snapshot.child(it).child("vyska").getValue(Any::class.java).toString().toInt()
+                }
+
+                val krokyCil = uzivatel.displayName?.let {
+                    snapshot.child(it).child("krokyCil").getValue(Any::class.java).toString()
+                        .toString()
+                }
+
+                val vahaCil = uzivatel.displayName?.let {
+                    snapshot.child(it).child("vahaCil").getValue(Any::class.java).toString()
+                }
+
+                runBlocking {
+
+                    val data = HashMap<String, String>()
+
+                    // Data za poslední měsíc
+                    val mesic = roomDatabase.uzivatelDao().getLastMonthData(aktivniUzivatel).toString()
+
+                    // Data za poslední týden
+                    val tyden = roomDatabase.uzivatelDao().getLastWeekData(aktivniUzivatel).toString()
+
+                    // Data za poslední týden
+                    val den = roomDatabase.uzivatelDao().getLastDayData(aktivniUzivatel).toString()
+
+                    if (obdobi == "mesic") {
+
+                        data.put(mesic, "mesic")
+
+                    } else if (obdobi == "tyden") {
+
+                        data.put(tyden, "tyden")
+
+                    } else {
+
+                        data.put(den, "den")
+                    }
+
+                    // Dnešní kroky
+                    val kroky =
+                        roomDatabase.uzivatelDao().getSteps(aktivniUzivatel, dnesniDatum())
+
+                    // Dnešní spálené kalorie
+                    val kalorie = roomDatabase.uzivatelDao()
+                        .getCalories(aktivniUzivatel, dnesniDatum())
+
+                    if (vyska != null && vaha != null) {
+
+                        val BMI = vypocetBMI(vyska, vaha)
+
+                        val dataUzivatele =
+
+                            "Jseš terapeut, jehož úkol je motivovat pacienta tak aby zhubnul. " +
+                            "Zde máš aktuální data (váhu, přijaté kalorie, kroky za den) od pacienta:  " +
+
+                                    " Dnešní kroky: $kroky" +
+                                    " Přijaté kalorie: $kalorie kJ" +
+                                    " Váha: $vaha kg" +
+                                    " Výška: $vyska cm" +
+                                    " Cíl kroků za den: $krokyCil " +
+                                    " Cílová váha: $vahaCil kg" +
+                                    " BMI: $BMI" +
+                                    " Data za poslední měsíc jsou: ${data.keys}" +
+
+                                    " Tvým úkolem je na základě poskytnutých dat (váha, kalorie, hmotnost) za poslední ${data.values}, " +
+                                    "motivovat pacienta tak aby měl lepší výsledky další měsíc. V případě, když uživatel má málo kroků nebo se váha nesnižuje, buď přísný a vulgární! " +
+                                    "Naopak pokud uživatel má spoustu kroků a vidíš, že se váha snižuje, pochval ho a motivuj dále! " +
+                                    "Maximální počet znaků pro tvoji odpověď je 150. Na konci odpovědi použij emoji a tagy. "
+
+                        println(dataUzivatele)
+
+                        // Vygenerování motivační hlášky za poslední měsíc uživatele
+                        getResponse(dataUzivatele) { result ->
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
     }
 
     private fun checkNotificationPermission(): Boolean {
@@ -342,7 +448,7 @@ class Chat : AppCompatActivity() {
         {
             "model": "gpt-3.5-turbo",
             "messages": [{"role": "user", "content": "$question"}],
-            "max_tokens": 150,
+            "max_tokens": 200,
             "temperature": 0.75,
             "frequency_penalty": 1.25,
             "presence_penalty": 0.5
@@ -384,7 +490,10 @@ class Chat : AppCompatActivity() {
 
                             println(content)
 
-                            sendNotification()
+                            if (content.toString().length > 50) {
+
+                                sendNotification(content.toString())
+                            }
 
 //                            val embeddingModel: EmbeddingModel = AllMiniLmL6V2EmbeddingModel()
 //                            val embeddingStore: EmbeddingStore<TextSegment> = InMemoryEmbeddingStore()
@@ -424,18 +533,18 @@ class Chat : AppCompatActivity() {
         })
     }
 
-    fun toPath(fileName: String): Path {
-
-        return try {
-
-            val fileUrl: URL? = Chat::class.java.getResource(fileName)
-            Paths.get(fileUrl?.toURI())
-
-        } catch (e: Exception) {
-
-            throw Exception(e)
-        }
-    }
+//    fun toPath(fileName: String): Path {
+//
+//        return try {
+//
+//            val fileUrl: URL? = Chat::class.java.getResource(fileName)
+//            Paths.get(fileUrl?.toURI())
+//
+//        } catch (e: Exception) {
+//
+//            throw Exception(e)
+//        }
+//    }
 
     /** Odpověď Dialogflow nebo ChatGPT **/
     private fun updateUI(response: DetectIntentResponse) {
@@ -527,7 +636,8 @@ class Chat : AppCompatActivity() {
                                             " BMI: $BMI" +
                                             " Data za poslední měsíc jsou: $data" +
 
-                                        " Udělej měsíční analýzu kroků na základě těchto dat"
+                                            " Pokud uživatel má podle daného BMI nadváhu či obezitu, nesmí jíst jídla s velkou kalorickou hodnotou" +
+                                            " Na otázku odpovídej s použitím těchto dat. Odpověď musí být stručná."
 
                                 println(dataUzivatele)
 
@@ -561,11 +671,11 @@ class Chat : AppCompatActivity() {
 
     /** Poslání notifikace pro uživatele **/
     @SuppressLint("ScheduleExactAlarm")
-    private fun sendNotification() {
+    private fun sendNotification(zprava: String) {
 
         val intent = Intent(applicationContext, Notifikace::class.java)
         val nadpis = "Motivační hláška"
-        val zprava = "nová hláška"
+
         intent.putExtra(nadpisExtra, nadpis)
         intent.putExtra(zpravaExtra, zprava)
 
@@ -579,10 +689,39 @@ class Chat : AppCompatActivity() {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         // Okamžitá notifikace
-        alarmManager.setExactAndAllowWhileIdle(
+//        alarmManager.setExactAndAllowWhileIdle(
+//            AlarmManager.RTC_WAKEUP,
+//            System.currentTimeMillis(),
+//            pendingIntent
+//        )
+
+        setTimeToPushNotifications(alarmManager, pendingIntent, 7)
+    }
+
+    /** Notifikace se zobrazí ve stejný čas v průběhu dne **/
+    private fun setTimeToPushNotifications(
+        alarmManager: AlarmManager,
+        intent: PendingIntent,
+        denniNotifikace: Int
+    ) {
+
+        val kalendar = GregorianCalendar.getInstance().apply {
+
+            if (get(Calendar.HOUR_OF_DAY) >= denniNotifikace) {
+                add(Calendar.DAY_OF_MONTH, 1)
+            }
+
+            set(Calendar.HOUR_OF_DAY, denniNotifikace)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        alarmManager.setRepeating(
             AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis(),
-            pendingIntent
+            kalendar.timeInMillis,
+            AlarmManager.INTERVAL_DAY,
+            intent
         )
     }
 
