@@ -50,29 +50,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import dev.langchain4j.chain.ConversationalRetrievalChain
-import dev.langchain4j.data.document.Document
-import dev.langchain4j.data.document.DocumentSplitter
-import dev.langchain4j.data.document.loader.FileSystemDocumentLoader.loadDocument
-import dev.langchain4j.data.document.parser.TextDocumentParser
-import dev.langchain4j.data.document.splitter.DocumentSplitters
-import dev.langchain4j.data.embedding.Embedding
-import dev.langchain4j.data.message.AiMessage
-import dev.langchain4j.data.segment.TextSegment
-import dev.langchain4j.model.chat.ChatLanguageModel
-import dev.langchain4j.model.embedding.AllMiniLmL6V2EmbeddingModel
-import dev.langchain4j.model.embedding.EmbeddingModel
-import dev.langchain4j.model.input.Prompt
-import dev.langchain4j.model.input.PromptTemplate
-import dev.langchain4j.model.openai.OpenAiChatModel
-import dev.langchain4j.model.openai.OpenAiModelName
-import dev.langchain4j.model.openai.OpenAiTokenizer
-import dev.langchain4j.retriever.EmbeddingStoreRetriever
-import dev.langchain4j.store.embedding.EmbeddingMatch
-import dev.langchain4j.store.embedding.EmbeddingStore
-import dev.langchain4j.store.embedding.EmbeddingStoreIngestor
-import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore
-import io.ktor.util.Hash
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.GlobalScope
@@ -90,11 +67,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
-import java.net.URL
-import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.HashMap
-import java.util.stream.Collectors.joining
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -132,6 +105,8 @@ class Chat : AppCompatActivity() {
 
     // Aktivní uživatel
     private val aktivniUzivatel = 2285
+
+    private var motivacniHlaska = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -246,6 +221,7 @@ class Chat : AppCompatActivity() {
         }
     }
 
+    /** Vygenerování motivační hlášky pro uživatele **/
     private fun motivacniHlaska(obdobi: String) {
 
         val databazeFirebase: FirebaseDatabase = FirebaseDatabase.getInstance()
@@ -275,6 +251,10 @@ class Chat : AppCompatActivity() {
                 val vahaCil = uzivatel.displayName?.let {
                     snapshot.child(it).child("vahaCil").getValue(Any::class.java).toString()
                 }
+
+//                val nemoc = uzivatel.displayName?.let {
+//                    snapshot.child(it).child("nemoc").getValue(Any::class.java).toString()
+//                }
 
                 runBlocking {
 
@@ -328,14 +308,17 @@ class Chat : AppCompatActivity() {
                                     " BMI: $BMI" +
                                     " Data za poslední měsíc jsou: ${data.keys}" +
 
-                                    " Tvým úkolem je na základě poskytnutých dat (váha, kalorie, hmotnost) za poslední ${data.values}, " +
-                                    "motivovat pacienta tak aby měl lepší výsledky další měsíc. V případě, když uživatel má málo kroků nebo se váha nesnižuje, buď přísný a vulgární! " +
-                                    "Naopak pokud uživatel má spoustu kroků a vidíš, že se váha snižuje, pochval ho a motivuj dále! " +
-                                    "Maximální počet znaků pro tvoji odpověď je 150. Na konci odpovědi použij emoji a tagy. "
+                                " Tvým úkolem je na základě poskytnutých dat (váha, kalorie, hmotnost) za poslední ${data.values}, " +
+                                "motivovat pacienta tak, aby měl lepší výsledky další ${data.values}. " +
+                                "V případě, když uživatel má málo kroků nebo se váha nesnižuje, buď přísný a mírně vulgární! " +
+                                "Naopak pokud uživatel má spoustu kroků a vidíš, že se váha snižuje, pochval ho a motivuj dále! " +
+                                "Maximální počet znaků pro tvoji odpověď je 150! Na konci odpovědi použij emoji a tagy. "
 
                         println(dataUzivatele)
 
-                        // Vygenerování motivační hlášky za poslední měsíc uživatele
+                        motivacniHlaska = true
+
+                        // Vygenerování motivační hlášky za určité období
                         getResponse(dataUzivatele) { result ->
                         }
                     }
@@ -490,10 +473,12 @@ class Chat : AppCompatActivity() {
 
                             println(content)
 
-                            if (content.toString().length > 50) {
+
+                            if (motivacniHlaska) {
 
                                 sendNotification(content.toString())
                             }
+
 
 //                            val embeddingModel: EmbeddingModel = AllMiniLmL6V2EmbeddingModel()
 //                            val embeddingStore: EmbeddingStore<TextSegment> = InMemoryEmbeddingStore()
@@ -555,6 +540,8 @@ class Chat : AppCompatActivity() {
 
         val arr = ArrayList<String>()
 
+        motivacniHlaska = false
+
         // Všechny tvary slova BMI
         getAllFormsWord("bmi", arr)
 
@@ -588,6 +575,10 @@ class Chat : AppCompatActivity() {
                     ValueEventListener {
 
                     override fun onDataChange(snapshot: DataSnapshot) {
+
+                        val nemoc = uzivatel.displayName?.let {
+                            snapshot.child(it).child("nemoc").getValue(Any::class.java).toString()
+                        }
 
                         val vaha = uzivatel.displayName?.let {
                             snapshot.child(it).child("vaha").getValue(Any::class.java).toString().toDouble()
@@ -627,6 +618,7 @@ class Chat : AppCompatActivity() {
 
                                     "Zde jsou dnešní aktuální data uživatele: " +
 
+                                            " Chronické onemocnění: $nemoc"
                                             " Dnešní kroky: $kroky" +
                                             " Spálené kalorie: $kalorie kJ" +
                                             " Váha: $vaha kg" +
@@ -636,8 +628,8 @@ class Chat : AppCompatActivity() {
                                             " BMI: $BMI" +
                                             " Data za poslední měsíc jsou: $data" +
 
-                                            " Pokud uživatel má podle daného BMI nadváhu či obezitu, nesmí jíst jídla s velkou kalorickou hodnotou" +
-                                            " Na otázku odpovídej s použitím těchto dat. Odpověď musí být stručná."
+                                    " Pokud uživatel má podle daného BMI nadváhu či obezitu, nesmí jíst jídla s velkou kalorickou hodnotou." +
+                                    " Na otázku odpovídej s použitím těchto dat. Odpověď musí být stručná a musí odpovídat na otázku uživatele."
 
                                 println(dataUzivatele)
 
@@ -689,13 +681,13 @@ class Chat : AppCompatActivity() {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         // Okamžitá notifikace
-//        alarmManager.setExactAndAllowWhileIdle(
-//            AlarmManager.RTC_WAKEUP,
-//            System.currentTimeMillis(),
-//            pendingIntent
-//        )
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            System.currentTimeMillis(),
+            pendingIntent
+        )
 
-        setTimeToPushNotifications(alarmManager, pendingIntent, 7)
+        //setTimeToPushNotifications(alarmManager, pendingIntent, 7)
     }
 
     /** Notifikace se zobrazí ve stejný čas v průběhu dne **/

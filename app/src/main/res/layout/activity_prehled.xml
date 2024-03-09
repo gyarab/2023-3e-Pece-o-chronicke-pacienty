@@ -9,6 +9,11 @@
     android:background="@color/tmave_fialova"
     tools:context=".navbar.Prehled">
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
@@ -35,6 +40,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+
+            <ImageButton
+                android:id="@+id/prehled_edit_kroky"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_edit"
+                android:padding="5dp"
+                android:background="@drawable/chat_pozadi_kruh_white"
+                android:layout_margin="5dp"
+                android:contentDescription="Upravit kroky"
+                app:layout_constraintEnd_toEndOf="@+id/prehled_donut_bar"
+                app:layout_constraintTop_toTopOf="@+id/prehled_donut_bar" />
 
             <LinearLayout
                 android:id="@+id/linearLayout3"
@@ -158,6 +175,18 @@
                 app:layout_constraintStart_toStartOf="@+id/prehled_donut_bar"
                 app:layout_constraintTop_toBottomOf="@id/vyber_togglebutton_2" />
 
+            <ImageButton
+                android:id="@+id/prehled_edit_kalorie"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_edit"
+                android:padding="5dp"
+                android:background="@drawable/chat_pozadi_kruh_white"
+                android:layout_margin="5dp"
+                android:contentDescription="Upravit kroky"
+                app:layout_constraintEnd_toEndOf="@+id/prehled_barChart"
+                app:layout_constraintTop_toTopOf="@+id/prehled_barChart" />
+
 
             <TextView
                 android:id="@+id/lineChartData"
@@ -242,6 +271,18 @@
 
             </com.db.williamchart.view.LineChartView>
 
+            <ImageButton
+                android:id="@+id/prehled_edit_vaha"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_edit"
+                android:padding="5dp"
+                android:background="@drawable/chat_pozadi_kruh_white"
+                android:layout_margin="5dp"
+                android:contentDescription="Upravit kroky"
+                app:layout_constraintEnd_toEndOf="@+id/prehled_lineChart"
+                app:layout_constraintTop_toTopOf="@+id/prehled_lineChart" />
+
             <TextView
                 android:id="@+id/prehled_souradnice_linearChart"
                 android:layout_width="wrap_content"
@@ -270,6 +311,8 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav"

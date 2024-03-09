@@ -125,6 +125,12 @@ android {
         // Rounded ImageView
         implementation("com.makeramen:roundedimageview:2.3.0")
 
+        // Blur effect
+        implementation("fr.tvbarthel.blurdialogfragment:lib:2.2.0")
+
+        // Swipe to refresh
+        implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
         // LangChain
         implementation("dev.langchain4j:langchain4j:0.27.1")
         implementation("dev.langchain4j:langchain4j-open-ai:0.27.1")

@@ -1,5 +1,6 @@
 package com.example.aplikaceprochronickpacienty.roomDB
 
+import android.text.Editable
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
@@ -35,6 +36,9 @@ interface UzivatelDao {
 
     @Query("SELECT StepsCountDay FROM uzivatel_table WHERE SubjectId = :subjectId AND Date = :date")
     suspend fun getSteps(subjectId : Int, date : String): Int
+
+    @Query("UPDATE uzivatel_table SET StepsCountDay = :kroky WHERE SubjectId = :subjectId AND Date = :date")
+    suspend fun updateSteps(subjectId: Int, date: String, kroky: Int): Int
 
     @Query("SELECT EnergyIntakeDayKJ FROM uzivatel_table WHERE SubjectId = :subjectId AND Date = :date")
     suspend fun getCalories(subjectId : Int, date : String): Double

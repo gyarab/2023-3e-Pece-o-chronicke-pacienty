@@ -22,11 +22,13 @@ import android.os.Bundle
 import android.text.Html
 import android.util.Log
 import android.view.animation.AlphaAnimation
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import app.futured.donut.DonutProgressView
 import app.futured.donut.DonutSection
 import com.db.williamchart.ExperimentalFeature
@@ -39,8 +41,10 @@ import com.example.aplikaceprochronickpacienty.notifikace.notifikaceID
 import com.example.aplikaceprochronickpacienty.notifikace.zpravaExtra
 import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.databinding.ActivityPrehledBinding
+import com.example.aplikaceprochronickpacienty.prihlaseni.Prihlaseni
 import com.example.aplikaceprochronickpacienty.roomDB.Uzivatel
 import com.example.aplikaceprochronickpacienty.roomDB.UzivatelDatabase
+import com.example.aplikaceprochronickpacienty.upravaUdaju.UpravaUdaju
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.tabs.TabLayout
@@ -136,6 +140,12 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
     private var click: String = "BAR LINE"
 
+    // Změna údajů
+    private lateinit var prehled_edit_kroky: ImageButton
+    private lateinit var prehled_edit_kalorie: ImageButton
+    private lateinit var prehled_edit_vaha: ImageButton
+
+
     @OptIn(DelicateCoroutinesApi::class)
     @RequiresApi(Build.VERSION_CODES.Q)
     @SuppressLint("SetTextI18n")
@@ -213,6 +223,30 @@ class Prehled : AppCompatActivity(), SensorEventListener {
             prehled_tabLayoutLine = findViewById(R.id.prehled_tabLayout2)
 
             prehled_souradnice_linearChart = findViewById(R.id.prehled_souradnice_linearChart)
+
+            // Úprava údajů
+            prehled_edit_kroky = findViewById(R.id.prehled_edit_kroky)
+
+            prehled_edit_kalorie = findViewById(R.id.prehled_edit_kalorie)
+
+            prehled_edit_vaha = findViewById(R.id.prehled_edit_vaha)
+
+            val refreshLayout = findViewById<SwipeRefreshLayout>(R.id.refreshLayout)
+
+            refreshLayout.setOnRefreshListener {
+
+                startActivity(Intent(this, Prehled::class.java))
+
+                finish()
+            }
+
+            prehled_edit_kroky.setOnClickListener {
+
+                val fragmentKroky = UpravaUdaju()
+
+                fragmentKroky.dataType("kroky","dnešní kroky", "počet dnešních kroků")
+                fragmentKroky.show(supportFragmentManager, fragmentKroky.javaClass.simpleName)
+            }
 
             // Získání konkrétní položky z tabulky
             getItemFromTableBarChart()
@@ -968,7 +1002,7 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        setTimeToPushNotifications(alarmManager, pendingIntent, 7)
+        setTimeToPushNotifications(alarmManager, pendingIntent, 14)
 
         // Okamžitá notifikace
         /*alarmManager.setExactAndAllowWhileIdle(
