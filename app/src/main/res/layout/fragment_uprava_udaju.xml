@@ -58,7 +58,6 @@
                 android:fontFamily="@font/open_sans"
                 android:textColor="@color/black"
                 android:inputType="numberDecimal"
-                android:maxLength="5"
                 android:textSize="16sp" />
 
         </com.google.android.material.textfield.TextInputLayout>

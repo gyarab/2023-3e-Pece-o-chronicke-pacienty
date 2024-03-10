@@ -104,7 +104,7 @@ class Chat : AppCompatActivity() {
     private lateinit var roomDatabase: UzivatelDatabase
 
     // Aktivní uživatel
-    private val aktivniUzivatel = 2285
+    private val aktivniUzivatel = 1648
 
     private var motivacniHlaska = false
 
@@ -152,12 +152,18 @@ class Chat : AppCompatActivity() {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.SCHEDULE_EXACT_ALARM) !=
                 PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.USE_EXACT_ALARM) !=
-                PackageManager.PERMISSION_GRANTED) {
+                PackageManager.PERMISSION_GRANTED
+            ) {
 
                 // Request the permission
-                ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.SCHEDULE_EXACT_ALARM, Manifest.permission.USE_EXACT_ALARM),
-                    1000)
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(
+                        Manifest.permission.SCHEDULE_EXACT_ALARM,
+                        Manifest.permission.USE_EXACT_ALARM
+                    ),
+                    1000
+                )
             }
 
             createNotification()
@@ -235,17 +241,12 @@ class Chat : AppCompatActivity() {
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                val vaha = uzivatel.displayName?.let {
-                    snapshot.child(it).child("vaha").getValue(Any::class.java).toString().toDouble()
-                }
-
                 val vyska = uzivatel.displayName?.let {
-                    snapshot.child(it).child("vyska").getValue(Any::class.java).toString().toInt()
+                    snapshot.child(it).child("vyska").getValue(Any::class.java).toString()
                 }
 
                 val krokyCil = uzivatel.displayName?.let {
                     snapshot.child(it).child("krokyCil").getValue(Any::class.java).toString()
-                        .toString()
                 }
 
                 val vahaCil = uzivatel.displayName?.let {
@@ -258,13 +259,17 @@ class Chat : AppCompatActivity() {
 
                 runBlocking {
 
+                    val vaha = roomDatabase.uzivatelDao().getWeight(aktivniUzivatel)
+
                     val data = HashMap<String, String>()
 
                     // Data za poslední měsíc
-                    val mesic = roomDatabase.uzivatelDao().getLastMonthData(aktivniUzivatel).toString()
+                    val mesic =
+                        roomDatabase.uzivatelDao().getLastMonthData(aktivniUzivatel).toString()
 
                     // Data za poslední týden
-                    val tyden = roomDatabase.uzivatelDao().getLastWeekData(aktivniUzivatel).toString()
+                    val tyden =
+                        roomDatabase.uzivatelDao().getLastWeekData(aktivniUzivatel).toString()
 
                     // Data za poslední týden
                     val den = roomDatabase.uzivatelDao().getLastDayData(aktivniUzivatel).toString()
@@ -284,20 +289,26 @@ class Chat : AppCompatActivity() {
 
                     // Dnešní kroky
                     val kroky =
-                        roomDatabase.uzivatelDao().getSteps(aktivniUzivatel, dnesniDatum())
+                        roomDatabase.uzivatelDao().getSteps(aktivniUzivatel)
 
                     // Dnešní spálené kalorie
                     val kalorie = roomDatabase.uzivatelDao()
-                        .getCalories(aktivniUzivatel, dnesniDatum())
+                        .getCalories(aktivniUzivatel)
 
-                    if (vyska != null && vaha != null) {
+                    if (vyska != null) {
 
-                        val BMI = vypocetBMI(vyska, vaha)
+                        var BMI = 0.0
+
+                        if (!vyska.equals("") && vaha.toInt() != 0) {
+
+                            BMI = vypocetBMI(vyska.toInt(), vaha)
+                        }
+
 
                         val dataUzivatele =
 
                             "Jseš terapeut, jehož úkol je motivovat pacienta tak aby zhubnul. " +
-                            "Zde máš aktuální data (váhu, přijaté kalorie, kroky za den) od pacienta:  " +
+                                    "Zde máš aktuální data (váhu, přijaté kalorie, kroky za den) od pacienta:  " +
 
                                     " Dnešní kroky: $kroky" +
                                     " Přijaté kalorie: $kalorie kJ" +
@@ -308,11 +319,11 @@ class Chat : AppCompatActivity() {
                                     " BMI: $BMI" +
                                     " Data za poslední měsíc jsou: ${data.keys}" +
 
-                                " Tvým úkolem je na základě poskytnutých dat (váha, kalorie, hmotnost) za poslední ${data.values}, " +
-                                "motivovat pacienta tak, aby měl lepší výsledky další ${data.values}. " +
-                                "V případě, když uživatel má málo kroků nebo se váha nesnižuje, buď přísný a mírně vulgární! " +
-                                "Naopak pokud uživatel má spoustu kroků a vidíš, že se váha snižuje, pochval ho a motivuj dále! " +
-                                "Maximální počet znaků pro tvoji odpověď je 150! Na konci odpovědi použij emoji a tagy. "
+                                    " Tvým úkolem je na základě poskytnutých dat (váha, kalorie, hmotnost) za poslední ${data.values}, " +
+                                    "motivovat pacienta tak, aby měl lepší výsledky další ${data.values}. " +
+                                    "V případě, když uživatel má málo kroků nebo se váha nesnižuje, buď přísný a snaž se ho motivovat co nejvíce! " +
+                                    "Naopak pokud uživatel má spoustu kroků a vidíš, že se váha snižuje, pochval ho a motivuj dále! " +
+                                    "Maximální počet znaků pro tvoji odpověď je 150! Na konci odpovědi použij emoji a tagy. "
 
                         println(dataUzivatele)
 
@@ -332,9 +343,15 @@ class Chat : AppCompatActivity() {
 
     private fun checkNotificationPermission(): Boolean {
 
-        return (ContextCompat.checkSelfPermission(this, Manifest.permission.SCHEDULE_EXACT_ALARM) ==
+        return (ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.SCHEDULE_EXACT_ALARM
+        ) ==
                 PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.USE_EXACT_ALARM) ==
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.USE_EXACT_ALARM
+                ) ==
                 PackageManager.PERMISSION_GRANTED)
     }
 
@@ -375,7 +392,8 @@ class Chat : AppCompatActivity() {
     private fun sendMessageToBot(message: String) {
 
         val input = QueryInput.newBuilder()
-            .setText(TextInput.newBuilder().setText(message).setLanguageCode("en-US")).build()
+            .setText(TextInput.newBuilder().setText(message).setLanguageCode("en-US"))
+            .build()
 
         GlobalScope.launch {
             sendMessageInBg(input)
@@ -577,38 +595,42 @@ class Chat : AppCompatActivity() {
                     override fun onDataChange(snapshot: DataSnapshot) {
 
                         val nemoc = uzivatel.displayName?.let {
-                            snapshot.child(it).child("nemoc").getValue(Any::class.java).toString()
-                        }
-
-                        val vaha = uzivatel.displayName?.let {
-                            snapshot.child(it).child("vaha").getValue(Any::class.java).toString().toDouble()
+                            snapshot.child(it).child("nemoc").getValue(Any::class.java)
+                                .toString()
                         }
 
                         val vyska = uzivatel.displayName?.let {
-                            snapshot.child(it).child("vyska").getValue(Any::class.java).toString().toInt()
+                            snapshot.child(it).child("vyska").getValue(Any::class.java)
+                                .toString().toInt()
                         }
 
                         val krokyCil = uzivatel.displayName?.let {
-                            snapshot.child(it).child("krokyCil").getValue(Any::class.java).toString()
+                            snapshot.child(it).child("krokyCil").getValue(Any::class.java)
+                                .toString()
                                 .toString()
                         }
 
                         val vahaCil = uzivatel.displayName?.let {
-                            snapshot.child(it).child("vahaCil").getValue(Any::class.java).toString()
+                            snapshot.child(it).child("vahaCil").getValue(Any::class.java)
+                                .toString()
                         }
 
                         runBlocking {
 
                             // Data za poslední měsíc
-                            val data = roomDatabase.uzivatelDao().getLastMonthData(aktivniUzivatel)
+                            val data =
+                                roomDatabase.uzivatelDao().getLastMonthData(aktivniUzivatel)
 
                             // Dnešní kroky
                             val kroky =
-                                roomDatabase.uzivatelDao().getSteps(aktivniUzivatel, dnesniDatum())
+                                roomDatabase.uzivatelDao().getSteps(aktivniUzivatel)
 
                             // Dnešní spálené kalorie
                             val kalorie = roomDatabase.uzivatelDao()
-                                .getCalories(aktivniUzivatel, dnesniDatum())
+                                .getCalories(aktivniUzivatel)
+
+                            // Dnešní váha uživatele
+                            val vaha = roomDatabase.uzivatelDao().getWeight(aktivniUzivatel)
 
                             if (vyska != null && vaha != null) {
 
@@ -618,18 +640,18 @@ class Chat : AppCompatActivity() {
 
                                     "Zde jsou dnešní aktuální data uživatele: " +
 
-                                            " Chronické onemocnění: $nemoc"
-                                            " Dnešní kroky: $kroky" +
-                                            " Spálené kalorie: $kalorie kJ" +
-                                            " Váha: $vaha kg" +
-                                            " Výška: $vyska cm" +
-                                            " Cíl kroků za den: $krokyCil " +
-                                            " Cílová váha: $vahaCil kg" +
-                                            " BMI: $BMI" +
-                                            " Data za poslední měsíc jsou: $data" +
+                                        " Chronické onemocnění: $nemoc" +
+                                        " Dnešní kroky: $kroky" +
+                                        " Spálené kalorie: $kalorie kJ" +
+                                        " Váha: $vaha kg" +
+                                        " Výška: $vyska cm" +
+                                        " Cíl kroků za den: $krokyCil " +
+                                        " Cílová váha: $vahaCil kg" +
+                                        " BMI: $BMI" +
+                                        " Data za poslední měsíc jsou: $data" +
 
-                                    " Pokud uživatel má podle daného BMI nadváhu či obezitu, nesmí jíst jídla s velkou kalorickou hodnotou." +
-                                    " Na otázku odpovídej s použitím těchto dat. Odpověď musí být stručná a musí odpovídat na otázku uživatele."
+                                        " Pokud uživatel má podle daného BMI nadváhu či obezitu, nesmí jíst jídla s velkou kalorickou hodnotou." +
+                                        " Na otázky odpovídej s použitím těchto dat. Odpověď musí být stručná (Maximálně 150 znaků) a musí odpovídat na otázku uživatele."
 
                                 println(dataUzivatele)
 
@@ -657,7 +679,8 @@ class Chat : AppCompatActivity() {
         kanal.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         kanal.description = popis
 
-        val notifikaceManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val notifikaceManager =
+            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notifikaceManager.createNotificationChannel(kanal)
     }
 
@@ -791,25 +814,29 @@ class Chat : AppCompatActivity() {
     private fun getBMIUzivatel() {
 
         val databazeFirebase: FirebaseDatabase = FirebaseDatabase.getInstance()
-        val referenceFirebaseUzivatel: DatabaseReference = databazeFirebase.getReference("users")
+        val referenceFirebaseUzivatel: DatabaseReference =
+            databazeFirebase.getReference("users")
 
         val uzivatel = FirebaseAuth.getInstance().currentUser!!
 
-        referenceFirebaseUzivatel.addListenerForSingleValueEvent(object : ValueEventListener {
+        referenceFirebaseUzivatel.addListenerForSingleValueEvent(object :
+            ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
 
                 val vaha = uzivatel.displayName?.let {
-                    snapshot.child(it).child("vaha").getValue(Any::class.java).toString().toDouble()
+                    snapshot.child(it).child("vaha").getValue(Any::class.java).toString()
+                        .toDouble()
                 }
 
                 val vyska = uzivatel.displayName?.let {
-                    snapshot.child(it).child("vyska").getValue(Any::class.java).toString().toInt()
+                    snapshot.child(it).child("vyska").getValue(Any::class.java).toString()
+                        .toInt()
                 }
 
                 if (vaha != null && vyska != null) {
 
-                    val vysledek = vypocetBMI(vyska,vaha)
+                    val vysledek = vypocetBMI(vyska, vaha)
 
                     if (vysledek < 18.5) {
 
@@ -866,7 +893,10 @@ class Chat : AppCompatActivity() {
     }
 
     /** Všechny verze slova **/
-    private fun getAllFormsWord(slovo: String, arr: ArrayList<String>): ArrayList<String> {
+    private fun getAllFormsWord(
+        slovo: String,
+        arr: ArrayList<String>
+    ): ArrayList<String> {
 
         arr.add(slovo)
 

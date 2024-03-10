@@ -19,7 +19,9 @@ import androidx.appcompat.widget.SwitchCompat
 import com.example.aplikaceprochronickpacienty.R
 import com.example.aplikaceprochronickpacienty.internetPripojeni.Internet
 import com.example.aplikaceprochronickpacienty.internetPripojeni.InternetPripojeni
+import com.example.aplikaceprochronickpacienty.navbar.Prehled
 import com.example.aplikaceprochronickpacienty.navbar.Ucet
+import com.example.aplikaceprochronickpacienty.roomDB.UzivatelDatabase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
@@ -27,6 +29,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 
 class Nastaveni : AppCompatActivity() {
@@ -52,6 +55,12 @@ class Nastaveni : AppCompatActivity() {
     // Firebase Realtime database
     private lateinit var databazeFirebase: FirebaseDatabase
     private lateinit var referenceFirebaseUzivatel: DatabaseReference
+
+    // ROOM
+    val roomDatabase = UzivatelDatabase.getDatabase(this)
+
+    // Aktivní uživatel
+    private val aktivniUzivatel = 1648
 
     // Uživatel Firebase Auth
     private lateinit var uzivatel: FirebaseUser
@@ -248,6 +257,16 @@ class Nastaveni : AppCompatActivity() {
 
     private fun getUserDataDB(nazevInfo: String) {
 
+        runBlocking {
+
+            nastaveni_vaha_udaje_editext = findViewById(R.id.nastaveni_vaha_udaje_editext)
+
+            val vaha = roomDatabase.uzivatelDao().getWeight(aktivniUzivatel)
+
+            println("VAHA je $vaha")
+            nastaveni_vaha_udaje_editext.hint = vaha.toString()
+        }
+
         referenceFirebaseUzivatel.addListenerForSingleValueEvent(object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -284,11 +303,6 @@ class Nastaveni : AppCompatActivity() {
 
                                 nastaveni_vyska_udaje_editext.hint = uzivatelUdaje
 
-                            }
-
-                            "vaha" -> {
-
-                                nastaveni_vaha_udaje_editext.hint = uzivatelUdaje
                             }
 
                             "nemoc" -> {
@@ -376,8 +390,20 @@ class Nastaveni : AppCompatActivity() {
             val vahaCil = nastaveni_vaha_editext.text.toString()
             val datumNarozeni = nastaveni_datum_narozeni_udaje_textview.text.toString()
             val vyska = nastaveni_vyska_udaje_editext.text.toString()
-            val vaha = nastaveni_vaha_udaje_editext.text.toString()
             val nemoc = nastaveni_vyber_nemoci.text.toString()
+
+            val datum = Prehled().dnesniDatum()
+
+            // Obnovení váhy v DB ROOM
+            runBlocking {
+
+                roomDatabase.uzivatelDao()
+                    .updateWeight(
+                        aktivniUzivatel,
+                        datum,
+                        nastaveni_vaha_udaje_editext.text.toString().toDouble()
+                    )
+            }
 
             // Přidání informací do komponenty HashMap
             val mapa = hashMapOf<String, String>()
@@ -385,7 +411,6 @@ class Nastaveni : AppCompatActivity() {
             mapa["vahaCil"] = vahaCil
             mapa["datumNarozeni"] = datumNarozeni
             mapa["vyska"] = vyska
-            mapa["vaha"] = vaha
             mapa["nemoc"] = nemoc
 
             // Přidání nových dat uživatele

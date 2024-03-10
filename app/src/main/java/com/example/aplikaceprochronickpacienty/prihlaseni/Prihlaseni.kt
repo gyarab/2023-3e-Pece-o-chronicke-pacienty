@@ -345,7 +345,6 @@ class Prihlaseni : AppCompatActivity() {
                     true,
                     "",
                     "",
-                    0.0,
                     0,
                     0.0,
                     "",

@@ -20,6 +20,7 @@ import com.example.aplikaceprochronickpacienty.internetPripojeni.InternetPripoje
 import com.example.aplikaceprochronickpacienty.nastaveni_aplikaceInfo.AplikaceInfo
 import com.example.aplikaceprochronickpacienty.nastaveni_aplikaceInfo.Nastaveni
 import com.example.aplikaceprochronickpacienty.prihlaseni.Prihlaseni
+import com.example.aplikaceprochronickpacienty.roomDB.UzivatelDatabase
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -32,6 +33,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.makeramen.roundedimageview.RoundedImageView
+import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayOutputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -58,6 +60,9 @@ class Ucet : AppCompatActivity() {
     // Odhlášení uživatele
     private lateinit var odhlaseni_google_client: GoogleSignInClient
     private lateinit var googleSignOutOptions: GoogleSignInOptions
+
+    // Akutální uživatel
+    private val aktivniUzivatel = 1648
 
     // Aktuální uživatel
     private var uzivatel: FirebaseUser? = null
@@ -161,7 +166,6 @@ class Ucet : AppCompatActivity() {
             // Ostatní údaje uživatele
             getUserDataDB("datumNarozeni")
             getUserDataDB("vyska")
-            getUserDataDB("vaha")
             getUserDataDB("vek")
             getUserDataDB("profilovyObrazek")
 
@@ -244,7 +248,17 @@ class Ucet : AppCompatActivity() {
 
     }
 
+    @SuppressLint("SetTextI18n")
     private fun getUserDataDB(nazevInfo: String) {
+
+        val roomDatabase = UzivatelDatabase.getDatabase(this)
+
+        runBlocking {
+
+            val vaha = roomDatabase.uzivatelDao().getWeight(aktivniUzivatel)
+
+            ucet_vaha.text = "$vaha kg"
+        }
 
         referenceFirebaseUzivatel.addListenerForSingleValueEvent(object : ValueEventListener {
 
@@ -270,12 +284,6 @@ class Ucet : AppCompatActivity() {
                             "vyska" -> {
 
                                 ucet_vyska.text = "$uzivatelUdaje cm"
-
-                            }
-
-                            "vaha" -> {
-
-                                ucet_vaha.text = "$uzivatelUdaje kg"
 
                             }
 

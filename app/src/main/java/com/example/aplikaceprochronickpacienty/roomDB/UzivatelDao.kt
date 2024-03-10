@@ -34,14 +34,23 @@ interface UzivatelDao {
     @Query("SELECT Date FROM uzivatel_table WHERE SubjectId = :subjectId")
     suspend fun getDatesForSubject(subjectId : Int): List<String>
 
-    @Query("SELECT StepsCountDay FROM uzivatel_table WHERE SubjectId = :subjectId AND Date = :date")
-    suspend fun getSteps(subjectId : Int, date : String): Int
+    @Query("SELECT StepsCountDay FROM uzivatel_table WHERE SubjectId = :subjectId ORDER BY uzivatel_id DESC LIMIT 1")
+    suspend fun getSteps(subjectId : Int): Int
 
     @Query("UPDATE uzivatel_table SET StepsCountDay = :kroky WHERE SubjectId = :subjectId AND Date = :date")
     suspend fun updateSteps(subjectId: Int, date: String, kroky: Int): Int
 
-    @Query("SELECT EnergyIntakeDayKJ FROM uzivatel_table WHERE SubjectId = :subjectId AND Date = :date")
-    suspend fun getCalories(subjectId : Int, date : String): Double
+    @Query("SELECT EnergyIntakeDayKJ FROM uzivatel_table WHERE SubjectId = :subjectId ORDER BY uzivatel_id DESC LIMIT 1")
+    suspend fun getCalories(subjectId : Int): Double
+
+    @Query("UPDATE uzivatel_table SET EnergyIntakeDayKJ = :kalorie WHERE SubjectId = :subjectId AND Date = :date")
+    suspend fun updateCalories(subjectId: Int, date: String, kalorie: Double): Int
+
+    @Query("SELECT WeightDayKG FROM uzivatel_table WHERE SubjectId = :subjectId ORDER BY uzivatel_id DESC LIMIT 1")
+    suspend fun getWeight(subjectId : Int): Double
+
+    @Query("UPDATE uzivatel_table SET WeightDayKG = :vaha WHERE SubjectId = :subjectId AND Date = :date")
+    suspend fun updateWeight(subjectId: Int, date: String, vaha: Double): Int
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun addUser(uzivatel: Uzivatel)

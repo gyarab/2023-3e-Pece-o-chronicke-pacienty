@@ -33,7 +33,7 @@ class UpravaUdaju : SupportBlurDialogFragment() {
 
     private var dataTypHint = ""
 
-    private val aktivniUzivatel = 2285
+    private val aktivniUzivatel = 1648
 
     fun dataType(typ: String, dataNadpis: String, dataHint: String) {
 
@@ -73,11 +73,7 @@ class UpravaUdaju : SupportBlurDialogFragment() {
 
         fragment_ulozit_button = root.findViewById(R.id.fragment_ulozit_button)
 
-        val databazeFirebase: FirebaseDatabase = FirebaseDatabase.getInstance()
-        val referenceFirebaseUzivatel: DatabaseReference = databazeFirebase.getReference("users")
-
-        val uzivatel = FirebaseAuth.getInstance().currentUser!!
-
+        // ROOM
         val roomDatabase = context?.let { UzivatelDatabase.getDatabase(it) }
 
         fragment_ulozit_button.setOnClickListener {
@@ -86,8 +82,40 @@ class UpravaUdaju : SupportBlurDialogFragment() {
 
             runBlocking {
 
-                roomDatabase?.uzivatelDao()
-                    ?.updateSteps(aktivniUzivatel,datum,fragment_edittext_data.text.toString().toInt())
+                when (typData) {
+
+                    "kroky" -> {
+
+                        roomDatabase?.uzivatelDao()
+                            ?.updateSteps(
+                                aktivniUzivatel,
+                                datum,
+                                fragment_edittext_data.text.toString().toInt()
+                            )
+
+                    }
+                    "kalorie" -> {
+
+                        roomDatabase?.uzivatelDao()
+                            ?.updateCalories(
+                                aktivniUzivatel,
+                                datum,
+                                fragment_edittext_data.text.toString().toDouble()
+                            )
+                    }
+
+                    "vaha" -> {
+
+                        roomDatabase?.uzivatelDao()
+                            ?.updateWeight(
+                                aktivniUzivatel,
+                                datum,
+                                fragment_edittext_data.text.toString().toDouble()
+                            )
+                    }
+
+                    else -> true
+                }
             }
 
             dismiss()
