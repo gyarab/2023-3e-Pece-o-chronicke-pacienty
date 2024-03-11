@@ -67,11 +67,13 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
-import java.util.HashMap
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.GregorianCalendar
+import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -216,7 +218,9 @@ class Chat : AppCompatActivity() {
             // Načtení dat uživatele
             uvitaciText()
 
-            motivacniHlaska("tyden")
+            //motivacniHlaska("tyden")
+
+            tydnyMesic()
 
             //initialize bot config
             setUpBot()
@@ -339,20 +343,6 @@ class Chat : AppCompatActivity() {
             override fun onCancelled(error: DatabaseError) {
             }
         })
-    }
-
-    private fun checkNotificationPermission(): Boolean {
-
-        return (ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.SCHEDULE_EXACT_ALARM
-        ) ==
-                PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.USE_EXACT_ALARM
-                ) ==
-                PackageManager.PERMISSION_GRANTED)
     }
 
     /** Přidání zprávy **/
@@ -607,7 +597,6 @@ class Chat : AppCompatActivity() {
                         val krokyCil = uzivatel.displayName?.let {
                             snapshot.child(it).child("krokyCil").getValue(Any::class.java)
                                 .toString()
-                                .toString()
                         }
 
                         val vahaCil = uzivatel.displayName?.let {
@@ -632,7 +621,7 @@ class Chat : AppCompatActivity() {
                             // Dnešní váha uživatele
                             val vaha = roomDatabase.uzivatelDao().getWeight(aktivniUzivatel)
 
-                            if (vyska != null && vaha != null) {
+                            if (vyska != null) {
 
                                 val BMI = vypocetBMI(vyska, vaha)
 
@@ -710,7 +699,7 @@ class Chat : AppCompatActivity() {
             pendingIntent
         )
 
-        //setTimeToPushNotifications(alarmManager, pendingIntent, 7)
+        setTimeToPushNotifications(alarmManager, pendingIntent, 7)
     }
 
     /** Notifikace se zobrazí ve stejný čas v průběhu dne **/
@@ -794,6 +783,31 @@ class Chat : AppCompatActivity() {
         } catch (e: Exception) {
 
             Log.e("ERROR VSTUP", e.toString())
+        }
+    }
+
+    /** Týdny v měsíci **/
+    private fun tydnyMesic() {
+
+        val dnesniDatum = LocalDate.now()
+
+        val mesic = dnesniDatum.month
+
+        val rok = dnesniDatum.year
+
+        val yearMonthObject = YearMonth.of(rok, mesic)
+        val daysInMonth = yearMonthObject.lengthOfMonth()
+
+        // Formát datumu
+        val datumFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+
+        for (i in 1..daysInMonth step 7) {
+
+            val dny: LocalDate = dnesniDatum.withDayOfMonth(i)
+
+            val formattedDate = dny.format(datumFormat)
+
+            println("DNY $formattedDate")
         }
     }
 
