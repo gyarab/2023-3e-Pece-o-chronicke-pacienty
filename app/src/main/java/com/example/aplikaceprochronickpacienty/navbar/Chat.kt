@@ -67,13 +67,11 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.GregorianCalendar
-import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
@@ -218,9 +216,17 @@ class Chat : AppCompatActivity() {
             // Načtení dat uživatele
             uvitaciText()
 
-            //motivacniHlaska("tyden")
+            val datum = tydnyMesic()
 
-            tydnyMesic()
+            for (i in datum) {
+
+                println(i)
+
+                if (dnesniDatum() == i) {
+
+                    motivacniHlaska("tyden")
+                }
+            }
 
             //initialize bot config
             setUpBot()
@@ -484,7 +490,7 @@ class Chat : AppCompatActivity() {
 
                             if (motivacniHlaska) {
 
-                                sendNotification(content.toString())
+                                sendNotificationWeek(content.toString())
                             }
 
 
@@ -629,18 +635,18 @@ class Chat : AppCompatActivity() {
 
                                     "Zde jsou dnešní aktuální data uživatele: " +
 
-                                        " Chronické onemocnění: $nemoc" +
-                                        " Dnešní kroky: $kroky" +
-                                        " Spálené kalorie: $kalorie kJ" +
-                                        " Váha: $vaha kg" +
-                                        " Výška: $vyska cm" +
-                                        " Cíl kroků za den: $krokyCil " +
-                                        " Cílová váha: $vahaCil kg" +
-                                        " BMI: $BMI" +
-                                        " Data za poslední měsíc jsou: $data" +
+                                            " Chronické onemocnění: $nemoc" +
+                                            " Dnešní kroky: $kroky" +
+                                            " Spálené kalorie: $kalorie kJ" +
+                                            " Váha: $vaha kg" +
+                                            " Výška: $vyska cm" +
+                                            " Cíl kroků za den: $krokyCil " +
+                                            " Cílová váha: $vahaCil kg" +
+                                            " BMI: $BMI" +
+                                            " Data za poslední měsíc jsou: $data" +
 
-                                        " Pokud uživatel má podle daného BMI nadváhu či obezitu, nesmí jíst jídla s velkou kalorickou hodnotou." +
-                                        " Na otázky odpovídej s použitím těchto dat. Odpověď musí být stručná (Maximálně 150 znaků) a musí odpovídat na otázku uživatele."
+                                            " Pokud uživatel má podle daného BMI nadváhu či obezitu, nesmí jíst jídla s velkou kalorickou hodnotou." +
+                                            " Na otázky odpovídej s použitím těchto dat. Odpověď musí být stručná (Maximálně 150 znaků) a musí odpovídat na otázku uživatele."
 
                                 println(dataUzivatele)
 
@@ -673,9 +679,9 @@ class Chat : AppCompatActivity() {
         notifikaceManager.createNotificationChannel(kanal)
     }
 
-    /** Poslání notifikace pro uživatele **/
+    /** Poslání týdenní notifikace pro uživatele **/
     @SuppressLint("ScheduleExactAlarm")
-    private fun sendNotification(zprava: String) {
+    private fun sendNotificationWeek(zprava: String) {
 
         val intent = Intent(applicationContext, Notifikace::class.java)
         val nadpis = "Motivační hláška"
@@ -709,24 +715,47 @@ class Chat : AppCompatActivity() {
         denniNotifikace: Int
     ) {
 
-        val kalendar = GregorianCalendar.getInstance().apply {
+        val datum = tydnyMesic()
 
-            if (get(Calendar.HOUR_OF_DAY) >= denniNotifikace) {
-                add(Calendar.DAY_OF_MONTH, 1)
+        for (i in datum) {
+
+            if (dnesniDatum() == i) {
+
+                // Rozdělení Stringu
+                val parts = i.split("/")
+
+                val rok = parts[2].toInt()
+                val mesic = parts[0].toInt()
+                val den = parts[1].toInt()
+
+                println("$den.$mesic.$rok")
+
+                val kalendar = GregorianCalendar.getInstance().apply {
+
+                    set(Calendar.YEAR, rok)
+                    set(Calendar.MONTH, mesic)
+                    set(Calendar.DAY_OF_MONTH, den)
+
+
+                    set(Calendar.HOUR_OF_DAY, denniNotifikace)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+
+
+                    if (get(Calendar.HOUR_OF_DAY) >= denniNotifikace) {
+
+                        add(Calendar.DAY_OF_MONTH, 1)
+                    }
+                }
+
+                alarmManager.setExact(
+                    AlarmManager.RTC_WAKEUP,
+                    kalendar.timeInMillis,
+                    intent
+                )
             }
-
-            set(Calendar.HOUR_OF_DAY, denniNotifikace)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
         }
-
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            kalendar.timeInMillis,
-            AlarmManager.INTERVAL_DAY,
-            intent
-        )
     }
 
     /** Dnešní datum **/
@@ -786,8 +815,8 @@ class Chat : AppCompatActivity() {
         }
     }
 
-    /** Týdny v měsíci **/
-    private fun tydnyMesic() {
+    /** Vypsání počátečních dnů jednotlivých týdnů v měsíci **/
+    private fun tydnyMesic(): ArrayList<String> {
 
         val dnesniDatum = LocalDate.now()
 
@@ -801,6 +830,8 @@ class Chat : AppCompatActivity() {
         // Formát datumu
         val datumFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy")
 
+        val arr = ArrayList<String>()
+
         for (i in 1..daysInMonth step 7) {
 
             val dny: LocalDate = dnesniDatum.withDayOfMonth(i)
@@ -808,7 +839,11 @@ class Chat : AppCompatActivity() {
             val formattedDate = dny.format(datumFormat)
 
             println("DNY $formattedDate")
+
+            arr.add(formattedDate)
         }
+
+        return arr
     }
 
     /** Metoda pro výpočet BMI **/
