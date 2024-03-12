@@ -108,6 +108,10 @@ class Chat : AppCompatActivity() {
 
     private var motivacniHlaska = false
 
+    private var oznameniTyden = false
+
+    private var oznameniMesic = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -166,7 +170,9 @@ class Chat : AppCompatActivity() {
                 )
             }
 
+            // Vytvoření a poslání notifikace
             createNotification()
+            getNotifcation()
 
             // Databáze ROOM
             roomDatabase = UzivatelDatabase.getDatabase(this)
@@ -216,24 +222,78 @@ class Chat : AppCompatActivity() {
             // Načtení dat uživatele
             uvitaciText()
 
-            val datum = tydnyMesic()
-
-            for (i in datum) {
-
-                println(i)
-
-                if (dnesniDatum() == i) {
-
-                    motivacniHlaska("tyden")
-                }
-            }
-
             //initialize bot config
             setUpBot()
 
         } else {
 
             startActivity(Intent(applicationContext, Internet::class.java))
+        }
+    }
+
+    /** Kontrola zda jsou zapnuta oznámení, pokud ano, je vzápětí posláno oznámení **/
+    private fun getNotifcation() {
+
+        val databazeFirebase: FirebaseDatabase = FirebaseDatabase.getInstance()
+        val referenceFirebaseUzivatel: DatabaseReference =
+            databazeFirebase.getReference("users")
+
+        val uzivatel = FirebaseAuth.getInstance().currentUser!!
+
+        referenceFirebaseUzivatel.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+
+                val oznameniDB = uzivatel.displayName?.let {
+                    snapshot.child(it).child("oznameni").getValue(Boolean::class.java)
+                }
+
+                // Oznámení zapnuta
+                if (oznameniDB == true) {
+
+                    // Poslání notifikace
+                    poslaniMotivacniHlasky()
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+    }
+
+    /** Posílání notifikací za určité časové období **/
+    private fun poslaniMotivacniHlasky() {
+
+        val now = Calendar.getInstance()
+
+        val hodina = now[Calendar.HOUR_OF_DAY]
+
+        if (hodina == 18) {
+
+            // Denní oznámení
+            motivacniHlaska("den")
+        }
+
+        // Týdenní notifikace
+        val datum = tydnyMesic()
+
+        for (i in datum) {
+
+            if (dnesniDatum() == i) {
+
+                oznameniTyden = true
+                motivacniHlaska("tyden")
+            }
+        }
+
+        // Měsíční notifikace
+        val den = posledniDenMesic()
+
+        if (dnesniDatum() == den) {
+
+            oznameniMesic = true
+            motivacniHlaska("mesic")
         }
     }
 
@@ -286,15 +346,15 @@ class Chat : AppCompatActivity() {
 
                     if (obdobi == "mesic") {
 
-                        data.put(mesic, "mesic")
+                        data[mesic] = "mesic"
 
                     } else if (obdobi == "tyden") {
 
-                        data.put(tyden, "tyden")
+                        data[tyden] = "tyden"
 
                     } else {
 
-                        data.put(den, "den")
+                        data[den] = "den"
                     }
 
                     // Dnešní kroky
@@ -334,8 +394,6 @@ class Chat : AppCompatActivity() {
                                     "V případě, když uživatel má málo kroků nebo se váha nesnižuje, buď přísný a snaž se ho motivovat co nejvíce! " +
                                     "Naopak pokud uživatel má spoustu kroků a vidíš, že se váha snižuje, pochval ho a motivuj dále! " +
                                     "Maximální počet znaků pro tvoji odpověď je 150! Na konci odpovědi použij emoji a tagy. "
-
-                        println(dataUzivatele)
 
                         motivacniHlaska = true
 
@@ -490,7 +548,7 @@ class Chat : AppCompatActivity() {
 
                             if (motivacniHlaska) {
 
-                                sendNotificationWeek(content.toString())
+                                sendNotification(content.toString())
                             }
 
 
@@ -679,9 +737,9 @@ class Chat : AppCompatActivity() {
         notifikaceManager.createNotificationChannel(kanal)
     }
 
-    /** Poslání týdenní notifikace pro uživatele **/
+    /** Poslání notifikace pro uživatele **/
     @SuppressLint("ScheduleExactAlarm")
-    private fun sendNotificationWeek(zprava: String) {
+    private fun sendNotification(zprava: String) {
 
         val intent = Intent(applicationContext, Notifikace::class.java)
         val nadpis = "Motivační hláška"
@@ -699,22 +757,60 @@ class Chat : AppCompatActivity() {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         // Okamžitá notifikace
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis(),
-            pendingIntent
-        )
+//        alarmManager.setExactAndAllowWhileIdle(
+//            AlarmManager.RTC_WAKEUP,
+//            System.currentTimeMillis(),
+//            pendingIntent
+//        )
 
-        setTimeToPushNotifications(alarmManager, pendingIntent, 7)
+        setTimeToPushNotificationsDay(alarmManager, pendingIntent, 18)
+
+        if (oznameniTyden) {
+
+            setTimeToPushNotificationsWeek(alarmManager, pendingIntent, 18)
+        }
+
+        if (oznameniMesic) {
+
+            setTimeToPushNotificationsMonth(alarmManager, pendingIntent, 18)
+        }
     }
 
     /** Notifikace se zobrazí ve stejný čas v průběhu dne **/
-    private fun setTimeToPushNotifications(
+    private fun setTimeToPushNotificationsDay(
         alarmManager: AlarmManager,
         intent: PendingIntent,
         denniNotifikace: Int
     ) {
 
+        val kalendar = GregorianCalendar.getInstance().apply {
+
+            if (get(Calendar.HOUR_OF_DAY) >= denniNotifikace) {
+                add(Calendar.DAY_OF_MONTH, 1)
+            }
+
+            set(Calendar.HOUR_OF_DAY, denniNotifikace)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        alarmManager.setRepeating(
+            AlarmManager.RTC_WAKEUP,
+            kalendar.timeInMillis,
+            AlarmManager.INTERVAL_DAY,
+            intent
+        )
+    }
+
+    /** Notifikace se zobrazí ve stejný čas na konci týdne **/
+    private fun setTimeToPushNotificationsWeek(
+        alarmManager: AlarmManager,
+        intent: PendingIntent,
+        denniNotifikace: Int
+    ) {
+
+        // Týdenní notifikace
         val datum = tydnyMesic()
 
         for (i in datum) {
@@ -728,26 +824,7 @@ class Chat : AppCompatActivity() {
                 val mesic = parts[0].toInt()
                 val den = parts[1].toInt()
 
-                println("$den.$mesic.$rok")
-
-                val kalendar = GregorianCalendar.getInstance().apply {
-
-                    set(Calendar.YEAR, rok)
-                    set(Calendar.MONTH, mesic)
-                    set(Calendar.DAY_OF_MONTH, den)
-
-
-                    set(Calendar.HOUR_OF_DAY, denniNotifikace)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-
-
-                    if (get(Calendar.HOUR_OF_DAY) >= denniNotifikace) {
-
-                        add(Calendar.DAY_OF_MONTH, 1)
-                    }
-                }
+                val kalendar = calendarNotification(rok, mesic, den, denniNotifikace)
 
                 alarmManager.setExact(
                     AlarmManager.RTC_WAKEUP,
@@ -756,6 +833,63 @@ class Chat : AppCompatActivity() {
                 )
             }
         }
+    }
+
+    /** Notifikace se zobrazí ve stejný čas na konci měsíce **/
+    private fun setTimeToPushNotificationsMonth(
+        alarmManager: AlarmManager,
+        intent: PendingIntent,
+        denniNotifikace: Int
+    ) {
+
+        // Týdenní notifikace
+        val datum = posledniDenMesic()
+
+        if (dnesniDatum() == datum) {
+
+            // Rozdělení Stringu
+            val parts = datum.split("/")
+
+            val rok = parts[2].toInt()
+            val mesic = parts[0].toInt()
+            val den = parts[1].toInt()
+
+            val kalendar = calendarNotification(rok, mesic, den, denniNotifikace)
+
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                kalendar.timeInMillis,
+                intent
+            )
+        }
+    }
+
+    /** Kalendářní dny notifikace **/
+    private fun calendarNotification(
+        rok: Int,
+        mesic: Int,
+        den: Int,
+        denniNotifikace: Int
+    ): Calendar {
+        val kalendar = GregorianCalendar.getInstance().apply {
+
+            set(Calendar.YEAR, rok)
+            set(Calendar.MONTH, mesic)
+            set(Calendar.DAY_OF_MONTH, den)
+
+
+            set(Calendar.HOUR_OF_DAY, denniNotifikace)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+
+
+            if (get(Calendar.HOUR_OF_DAY) >= denniNotifikace) {
+
+                add(Calendar.DAY_OF_MONTH, 1)
+            }
+        }
+        return kalendar
     }
 
     /** Dnešní datum **/
@@ -791,21 +925,9 @@ class Chat : AppCompatActivity() {
 
             /** Uvítání uživatele **/
 
-            getResponse("") { vysledek ->
+            runOnUiThread {
 
-                runOnUiThread {
-
-                    addMessageToList("Dobrý den, \n jak vám mohu pomoci? ", true)
-
-                    addMessageToList(
-                        "Jsem vytrénovaný \uD83D\uDE0A \n " +
-                                "\n Mohu vám poskytnout odbornou pomoc s následujícími nemocemi: \n" +
-                                "\n — Obezita" +
-                                "\n — Kašel" +
-                                "\n — Horečka" +
-                                "\n — Bolest hlavy", true
-                    )
-                }
+                addMessageToList("Dobrý den \uD83D\uDE0A, \n jak vám mohu pomoci?", true)
             }
 
 
@@ -813,6 +935,21 @@ class Chat : AppCompatActivity() {
 
             Log.e("ERROR VSTUP", e.toString())
         }
+    }
+
+    /** Vypsání posledního dne v měsíci **/
+    private fun posledniDenMesic(): String? {
+
+        val dnesniDatum = LocalDate.now()
+
+        // Formát datumu
+        val datumFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+
+        val lastDayOfMonth = dnesniDatum.withDayOfMonth(dnesniDatum.lengthOfMonth())
+
+        val posledniDen = lastDayOfMonth.format(datumFormat)
+
+        return posledniDen
     }
 
     /** Vypsání počátečních dnů jednotlivých týdnů v měsíci **/
@@ -837,8 +974,6 @@ class Chat : AppCompatActivity() {
             val dny: LocalDate = dnesniDatum.withDayOfMonth(i)
 
             val formattedDate = dny.format(datumFormat)
-
-            println("DNY $formattedDate")
 
             arr.add(formattedDate)
         }
@@ -957,8 +1092,6 @@ class Chat : AppCompatActivity() {
 
             val vysledek = slovo.replace(pismeno.toString(), velkePismeno)
 
-            println(vysledek)
-
             arr.add(vysledek)
 
             if (slovo.length >= 2 && i < slovo.length - 1) {
@@ -997,7 +1130,6 @@ class Chat : AppCompatActivity() {
             }
         }
 
-        println(arr)
         return arr
     }
 }

@@ -198,10 +198,6 @@ class Prehled : AppCompatActivity(), SensorEventListener {
             // Zaznamenání pohybu uživatele
             senzorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
-            // Vytvoření a poslání notifikace
-            createNotification()
-            getNotifcation()
-
             // Začátek nového dne
             newDayStart()
 
@@ -988,109 +984,6 @@ class Prehled : AppCompatActivity(), SensorEventListener {
 
             lineChart.animate(set)
         }
-    }
-
-    /** Vytvoření notifikace pro uživatele **/
-    private fun createNotification() {
-
-        val nazev = "Titul"
-        val popis = "Popis"
-        val dulezitost = NotificationManager.IMPORTANCE_DEFAULT
-        val kanal = NotificationChannel(kanalID, nazev, dulezitost)
-
-        // Posílání zpráv na uzamčenou obrazovku
-        kanal.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        kanal.description = popis
-
-        val notifikaceManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notifikaceManager.createNotificationChannel(kanal)
-    }
-
-    /** Poslání notifikace pro uživatele **/
-    @SuppressLint("ScheduleExactAlarm")
-    private fun sendNotification() {
-
-        val intent = Intent(applicationContext, Notifikace::class.java)
-        val nadpis = "Motivační hláška"
-        val zprava = "Koukněte co je nového!"
-        intent.putExtra(nadpisExtra, nadpis)
-        intent.putExtra(zpravaExtra, zprava)
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            applicationContext,
-            notifikaceID,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-        setTimeToPushNotifications(alarmManager, pendingIntent, 14)
-
-        // Okamžitá notifikace
-        /*alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis(),
-            pendingIntent
-        )*/
-    }
-
-    /** Notifikace se zobrazí ve stejný čas v průběhu dne **/
-    private fun setTimeToPushNotifications(
-        alarmManager: AlarmManager,
-        intent: PendingIntent,
-        denniNotifikace: Int
-    ) {
-
-        val kalendar = GregorianCalendar.getInstance().apply {
-
-            if (get(Calendar.HOUR_OF_DAY) >= denniNotifikace) {
-                add(Calendar.DAY_OF_MONTH, 1)
-            }
-
-            set(Calendar.HOUR_OF_DAY, denniNotifikace)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            kalendar.timeInMillis,
-            AlarmManager.INTERVAL_DAY,
-            intent
-        )
-    }
-
-    /** Kontrola zda jsou zapnuta oznámení, pokud ano, je vzápětí posláno oznámení **/
-    private fun getNotifcation() {
-
-        val databazeFirebase: FirebaseDatabase = FirebaseDatabase.getInstance()
-        val referenceFirebaseUzivatel: DatabaseReference =
-            databazeFirebase.getReference("users")
-
-        val uzivatel = FirebaseAuth.getInstance().currentUser!!
-
-        referenceFirebaseUzivatel.addListenerForSingleValueEvent(object : ValueEventListener {
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-
-                val oznameniDB = uzivatel.displayName?.let {
-                    snapshot.child(it).child("oznameni").getValue(Boolean::class.java)
-                }
-
-                // Oznámení zapnuta
-                if (oznameniDB == true) {
-
-                    // Poslání notifikace
-                    sendNotification()
-
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-            }
-        })
     }
 
     override fun onPause() {
