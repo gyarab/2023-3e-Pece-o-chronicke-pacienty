@@ -406,16 +406,6 @@ class Prehled : AppCompatActivity(), SensorEventListener {
                         GlobalScope.launch(Dispatchers.IO) {
 
                             roomDatabase.uzivatelDao().addUser(uzivatel)
-
-                            // List se všemi datumy uživatele
-                            val list =
-                                roomDatabase.uzivatelDao().getDatesForSubject(aktivniUzivatel)
-
-                            // Pokud list již neobsahuje dnešní datum, tak následně přidá uživatele
-                            if (!list.contains(dnesniDatum())) {
-
-                                newDayStart()
-                            }
                         }
                     }
                 }
