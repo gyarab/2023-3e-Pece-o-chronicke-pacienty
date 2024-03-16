@@ -269,11 +269,7 @@ class Chat : AppCompatActivity() {
 
         val hodina = now[Calendar.HOUR_OF_DAY]
 
-        if (hodina == 18) {
-
-            // Denní oznámení
-            motivacniHlaska("den")
-        }
+        println("HODINA $hodina")
 
         // Týdenní notifikace
         val datum = tydnyMesic()
@@ -294,6 +290,12 @@ class Chat : AppCompatActivity() {
 
             oznameniMesic = true
             motivacniHlaska("mesic")
+        }
+
+        if (hodina == 18 && !oznameniTyden && !oznameniMesic) {
+
+            // Denní oznámení
+            motivacniHlaska("den")
         }
     }
 
@@ -377,7 +379,7 @@ class Chat : AppCompatActivity() {
 
                         val dataUzivatele =
 
-                            "Jseš terapeut, jehož úkol je motivovat pacienta tak aby zhubnul. " +
+                            "Jseš terapeut, jehož úkol je motivovat pacienta tak, aby zhubnul. " +
                                     "Zde máš aktuální data (váhu, přijaté kalorie, kroky za den) od pacienta:  " +
 
                                     " Dnešní kroky: $kroky" +
@@ -391,7 +393,7 @@ class Chat : AppCompatActivity() {
 
                                     " Tvým úkolem je na základě poskytnutých dat (váha, kalorie, hmotnost) za poslední ${data.values}, " +
                                     "motivovat pacienta tak, aby měl lepší výsledky další ${data.values}. " +
-                                    "V případě, když uživatel má málo kroků nebo se váha nesnižuje, buď přísný a snaž se ho motivovat co nejvíce! " +
+                                    "V případě, když uživatel má málo kroků nebo se váha nesnižuje, buď přísný, naštvaný a snaž se ho motivovat co nejvíce! " +
                                     "Naopak pokud uživatel má spoustu kroků a vidíš, že se váha snižuje, pochval ho a motivuj dále! " +
                                     "Maximální počet znaků pro tvoji odpověď je 150! Na konci odpovědi použij emoji a tagy. "
 
@@ -691,7 +693,8 @@ class Chat : AppCompatActivity() {
 
                                 val dataUzivatele =
 
-                                    "Zde jsou dnešní aktuální data uživatele: " +
+                                    "Jseš terapeut, jehož úkol je motivovat pacienta tak, aby zhubnul. " +
+                                    "Zde máš aktuální data (váhu, přijaté kalorie, kroky za den) od pacienta:  " +
 
                                             " Chronické onemocnění: $nemoc" +
                                             " Dnešní kroky: $kroky" +
@@ -757,13 +760,13 @@ class Chat : AppCompatActivity() {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         // Okamžitá notifikace
-//        alarmManager.setExactAndAllowWhileIdle(
-//            AlarmManager.RTC_WAKEUP,
-//            System.currentTimeMillis(),
-//            pendingIntent
-//        )
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            System.currentTimeMillis(),
+            pendingIntent
+        )
 
-        setTimeToPushNotificationsDay(alarmManager, pendingIntent, 18)
+        /*setTimeToPushNotificationsDay(alarmManager, pendingIntent, 18)
 
         if (oznameniTyden) {
 
@@ -773,7 +776,7 @@ class Chat : AppCompatActivity() {
         if (oznameniMesic) {
 
             setTimeToPushNotificationsMonth(alarmManager, pendingIntent, 18)
-        }
+        }*/
     }
 
     /** Notifikace se zobrazí ve stejný čas v průběhu dne **/
