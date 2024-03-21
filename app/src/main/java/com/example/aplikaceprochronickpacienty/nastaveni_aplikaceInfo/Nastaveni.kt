@@ -394,15 +394,24 @@ class Nastaveni : AppCompatActivity() {
 
             val datum = Prehled().dnesniDatum()
 
+            println(nastaveni_vaha_udaje_editext.text)
+
             // Obnovení váhy v DB ROOM
             runBlocking {
 
-                roomDatabase.uzivatelDao()
-                    .updateWeight(
-                        aktivniUzivatel,
-                        datum,
-                        nastaveni_vaha_udaje_editext.text.toString().toDouble()
-                    )
+                try {
+
+                    roomDatabase.uzivatelDao()
+                        .updateWeight(
+                            aktivniUzivatel,
+                            datum,
+                            nastaveni_vaha_udaje_editext.text.toString().toDouble()
+                        )
+
+                } catch (e: NumberFormatException) {
+
+                    println("Váha nebyla změněna")
+                }
             }
 
             // Přidání informací do komponenty HashMap

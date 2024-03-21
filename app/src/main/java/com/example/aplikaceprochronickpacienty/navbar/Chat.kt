@@ -292,7 +292,7 @@ class Chat : AppCompatActivity() {
             motivacniHlaska("mesic")
         }
 
-        if (hodina == 18 && !oznameniTyden && !oznameniMesic) {
+        if (!oznameniTyden && !oznameniMesic) {
 
             // Denní oznámení
             motivacniHlaska("den")
